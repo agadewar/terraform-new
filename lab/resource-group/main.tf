@@ -27,7 +27,6 @@ resource "azurerm_resource_group" "sapience" {
 
   tags = "${merge(
     local.common_tags,
-    map(
-    )
+    map()
   )}"
 }

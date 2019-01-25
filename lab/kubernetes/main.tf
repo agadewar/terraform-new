@@ -13,8 +13,7 @@ provider "azurerm" {
 
 provider "kubernetes" {
   version = "1.5.0"
-  #config_path = "${var.kubeconfig_path}"
-  #config_path = "../aks/kubeconfig_sapience-lab"
+
   config_path = "../kubernetes/kubeconfig"
 }
 
@@ -28,6 +27,7 @@ provider "template" {
 
 data "terraform_remote_state" "resource_group" {
   backend = "azurerm"
+
   config {
     access_key           = "gx3N29hLwW2OC+kO5FaAedBpjlh83kY35dpOrJZvdYAB+1CG5iHm85/763rJCiEZ6CY+cwSq+ZAVOvK8f2o4Hg=="
     storage_account_name = "terraformstatesapience"
@@ -35,26 +35,6 @@ data "terraform_remote_state" "resource_group" {
     key                  = "sapience.lab.resource-group.terraform.tfstate"
   }
 }
-
-# data "terraform_remote_state" "vnet" {
-#   backend = "azurerm"
-#   config {
-#     access_key           = "gx3N29hLwW2OC+kO5FaAedBpjlh83kY35dpOrJZvdYAB+1CG5iHm85/763rJCiEZ6CY+cwSq+ZAVOvK8f2o4Hg=="
-#     storage_account_name = "terraformstatesapience"
-# 	  container_name       = "tfstate"
-#     key                  = "sapience.dev.vnet.terraform.tfstate"
-#   }
-# }
-
-# data "terraform_remote_state" "service_principal" {
-#   backend = "azurerm"
-#   config {
-#     access_key           = "y1FXsI40SHdh0qwMGymrROUXdx3VMvSVSqTOQ1CRRF9vnxjRb9T3t7JXt4kfEAbP3vsuNeIpCyTwNOBo4H5/lw=="
-#     storage_account_name = "terraformstatesapience"
-# 	container_name       = "tfstate"
-#     key                  = "sapience.lab.service-principal.terraform.tfstate"
-#   }
-# }
 
 locals {
   kubernetes_version        = "1.11.5"
@@ -77,8 +57,8 @@ locals {
   }
 }
 
-# See: https://docs.microsoft.com/en-us/azure/terraform/terraform-create-k8s-cluster-with-tf-and-aks
-# See: https://www.terraform.io/docs/providers/azurerm/r/kubernetes_cluster.html
+#See: https://docs.microsoft.com/en-us/azure/terraform/terraform-create-k8s-cluster-with-tf-and-aks
+#See: https://www.terraform.io/docs/providers/azurerm/r/kubernetes_cluster.html
 resource "azurerm_kubernetes_cluster" "kubernetes" {
   name                = "${local.cluster_name}"
   location            = "${data.terraform_remote_state.resource_group.resource_group_location}"
@@ -101,44 +81,21 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     vm_size         = "Standard_D2_v2"
     os_type         = "Linux"
     os_disk_size_gb = 30
-#    vnet_subnet_id  = "${data.terraform_remote_state.vnet.private_subnet_id}"
   }
-
-#   agent_pool_profile {
-#     name            = "${local.agent_pool_profile_name}_2"
-#     count           = "${local.min_count}"
-#     vm_size         = "Standard_D2_v2"
-#     os_type         = "Linux"
-#     os_disk_size_gb = 30
-# #    vnet_subnet_id  = "${data.terraform_remote_state.vnet.private_subnet_id}"
-#   }
   
-  # Enable Advanced Networking
-  # See: https://docs.microsoft.com/en-us/azure/aks/configure-advanced-networking
-#  network_profile {
-#    network_plugin     = "azure"
-#    service_cidr       = "10.2.128.0/17"
-#    dns_service_ip     = "10.2.128.10"
-#    docker_bridge_cidr = "172.17.0.1/16"
-#  }
-
   service_principal {
-    # client_id     = "${data.terraform_remote_state.service_principal.service_principal_client_id}"
-    # client_secret = "${data.terraform_remote_state.service_principal.service_principal_client_secret}"
     client_id     = "${local.app_id}"
     client_secret = "${local.password}"
   }
 
   tags = "${merge(
     local.common_tags,
-    map(
-    )
+    map()
   )}"
 }
 
 #See: https://docs.microsoft.com/en-us/azure/aks/autoscaler
 #See: https://github.com/underguiz/terraform-aks-autoscaler
-
 data "template_file" "node_resource_group" {
   template = "${file("autoscaler/node_resource_group.tpl")}"
 
@@ -153,8 +110,6 @@ data "template_file" "autoscaler_config" {
   template = "${file("autoscaler/cluster-autoscaler-containerservice.yaml.tpl")}"
 
   vars {
-    #autoscaler_client_id           = "${base64encode(data.terraform_remote_state.service_principal.service_principal_client_id)}"
-    #autoscaler_client_secret       = "${base64encode(data.terraform_remote_state.service_principal.service_principal_client_secret)}"
     autoscaler_client_id           = "${base64encode(local.app_id)}"
     autoscaler_client_secret       = "${base64encode(local.password)}"
     autoscaler_resource_group      = "${base64encode(azurerm_kubernetes_cluster.kubernetes.resource_group_name)}"
@@ -177,12 +132,10 @@ resource "null_resource" "kubeconfig" {
   }
   
   provisioner "local-exec" {
-    # command = "rm -f kubeconfig_${local.cluster_name}"
     command = "rm -f kubeconfig"
   }
   
   provisioner "local-exec" {
-    # command = "az aks get-credentials --resource-group ${azurerm_kubernetes_cluster.kubernetes.resource_group_name} --name ${azurerm_kubernetes_cluster.kubernetes.name} -f kubeconfig_${local.cluster_name}"
     command = "az aks get-credentials --resource-group ${azurerm_kubernetes_cluster.kubernetes.resource_group_name} --name ${azurerm_kubernetes_cluster.kubernetes.name} -f kubeconfig"
   }
 }
@@ -196,7 +149,6 @@ resource "null_resource" "kubernetes_config_autoscaler" {
   }
 
   provisioner "local-exec" {
-    # command = "kubectl apply --kubeconfig=kubeconfig_${local.cluster_name} -f - <<EOF\n${data.template_file.autoscaler_config.rendered}\nEOF"
     command = "kubectl apply --kubeconfig=kubeconfig -f - <<EOF\n${data.template_file.autoscaler_config.rendered}\nEOF"
   }
 }
