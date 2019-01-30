@@ -46,10 +46,18 @@ resource "azurerm_data_lake_store" "sapience" {
   )}"
 }
 
-resource "azurerm_data_lake_store_firewall_rule" "sapience" {
+resource "azurerm_data_lake_store_firewall_rule" "ardis_home" {
   name                = "ardis-home"
   account_name        = "${azurerm_data_lake_store.sapience.name}"
   resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
   start_ip_address    = "24.99.117.169"
   end_ip_address      = "24.99.117.169"
+}
+
+resource "azurerm_data_lake_store_firewall_rule" "banyan" {
+  name                = "banyan"
+  account_name        = "${azurerm_data_lake_store.sapience.name}"
+  resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
+  start_ip_address    = "50.20.0.62"
+  end_ip_address      = "50.20.0.62"
 }

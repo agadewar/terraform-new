@@ -53,6 +53,14 @@ resource "azurerm_servicebus_queue" "canopy_eventpipeline" {
   enable_partitioning = true
 }
 
+resource "azurerm_servicebus_queue" "canopy_datalake" {
+  name                = "sapience-${local.environment}-canopy-datalake"
+  resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
+  namespace_name      = "${azurerm_servicebus_namespace.namespace.name}"
+
+  enable_partitioning = true
+}
+
 resource "azurerm_servicebus_queue" "canopy_dummy" {
   name                = "sapience-${local.environment}-canopy-dummy"
   resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"

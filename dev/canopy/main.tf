@@ -65,6 +65,19 @@ module "eventpipeline_leaf_broker" {
           ]
         }
       ]
+    },
+    {
+      name = "CANOPY_AMQP_PASSWORD"
+      value_from = [
+        {
+          secret_key_ref = [
+            {
+              name = "eventpipeline-leaf-broker"
+              key = "canopy.amqp.password"
+            }
+          ]
+        }
+      ]
     }
   ]
 
@@ -134,6 +147,19 @@ module "canopy_user_service" {
             {
               name = "canopy-user-service"
               key = "canopy.database.password"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name = "CANOPY_AMQP_PASSWORD"
+      value_from = [
+        {
+          secret_key_ref = [
+            {
+              name = "eventpipeline-leaf-broker"
+              key = "canopy.amqp.password"
             }
           ]
         }
@@ -261,6 +287,19 @@ module "canopy_device_service" {
       ]
     },
     {
+      name = "CANOPY_AMQP_PASSWORD"
+      value_from = [
+        {
+          secret_key_ref = [
+            {
+              name = "eventpipeline-leaf-broker"
+              key = "canopy.amqp.password"
+            }
+          ]
+        }
+      ]
+    },
+    {
       name = "GOOGLE_API_KEY"
       value_from = [
         {
@@ -346,6 +385,19 @@ module "eventpipeline_service" {
           ]
         }
       ]
+    },
+    {
+      name = "CANOPY_AMQP_PASSWORD"
+      value_from = [
+        {
+          secret_key_ref = [
+            {
+              name = "eventpipeline-leaf-broker"
+              key = "canopy.amqp.password"
+            }
+          ]
+        }
+      ]
     }
   ]
 
@@ -378,48 +430,62 @@ module "eventpipeline_service" {
   )}"
 }
 
-# module "sapience_event_hub_journal" {
-#   source = "../../../terraform-canopy-service-module/"
+module "sapience_event_hub_journal" {
+  source = "../../../terraform-canopy-service-module/"
 
-#   kubeconfig_path = "${local.kubeconfig_path}"
+  kubeconfig_path = "${local.kubeconfig_path}"
 
-#   name      = "sapience-event-hub-journal"
-#   namespace = "${local.namespace}"
+  name      = "sapience-event-hub-journal"
+  namespace = "${local.namespace}"
 
-#   deployment_image             = "${local.container_registry_hostname}/sapience-event-hub-journal:1.0.0-SNAPSHOT"
-#   deployment_replicas          = 1
-#   deployment_image_pull_policy = "Always"
-#   deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
+  deployment_image             = "${local.container_registry_hostname}/sapience-event-hub-journal:1.0.0-SNAPSHOT"
+  deployment_replicas          = 1
+  deployment_image_pull_policy = "Always"
+  deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
 
-#   default_token = "${local.default_token}"
+  default_token = "${local.default_token}"
 
-#   deployment_env = []
+  deployment_env = [
+    {
+      name = "CANOPY_AMQP_PASSWORD"
+      value_from = [
+        {
+          secret_key_ref = [
+            {
+              name = "eventpipeline-leaf-broker"
+              key = "canopy.amqp.password"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 
-#   service_spec = [
-#     {
-#       type = "LoadBalancer"
-#       selector {
-#         app = "sapience-event-hub-journal"
-#       }
+  service_spec = [
+    {
+      type = "LoadBalancer"
+      selector {
+        app = "sapience-event-hub-journal"
+      }
 
-#       port = [
-#         {
-#           name        = "application"
-#           port        = 80
-#           target_port = 8080
-#         }
-#       ]
+      port = [
+        {
+          name        = "application"
+          port        = 80
+          target_port = 8080
+        }
+      ]
 
-#       load_balancer_source_ranges = [ 
-#         "50.20.0.62/32",     # Banyan office
-#         "24.99.117.169/32",  # Ardis home
-#         "47.187.167.223/32"  # Sapience office
-#       ]
-#     }
-#   ]
+      load_balancer_source_ranges = [ 
+        "50.20.0.62/32",     # Banyan office
+        "24.99.117.169/32",  # Ardis home
+        "47.187.167.223/32"  # Sapience office
+      ]
+    }
+  ]
 
-  # annotations = "${merge(
-  #   local.common_tags,
-  #   map()
-  # )}"
-# }
+  annotations = "${merge(
+    local.common_tags,
+    map()
+  )}"
+}
