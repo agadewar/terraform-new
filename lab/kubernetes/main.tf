@@ -160,3 +160,11 @@ resource "kubernetes_namespace" "dev" {
     name = "dev"
   }
 }
+
+resource "kubernetes_namespace" "dev2" {
+  depends_on = ["null_resource.kubeconfig"]
+  
+  metadata {
+    name = "dev2"
+  }
+}
