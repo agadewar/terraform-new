@@ -46,7 +46,7 @@ resource "azurerm_servicebus_namespace" "namespace" {
 }
 
 resource "azurerm_servicebus_queue" "canopy_eventpipeline" {
-  name                = "sapience-${local.environment}-canopy-eventpipeline"
+  name                = "sapience-canopy-eventpipeline"
   resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
   namespace_name      = "${azurerm_servicebus_namespace.namespace.name}"
 
@@ -54,15 +54,7 @@ resource "azurerm_servicebus_queue" "canopy_eventpipeline" {
 }
 
 resource "azurerm_servicebus_queue" "canopy_datalake" {
-  name                = "sapience-${local.environment}-canopy-datalake"
-  resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
-  namespace_name      = "${azurerm_servicebus_namespace.namespace.name}"
-
-  enable_partitioning = true
-}
-
-resource "azurerm_servicebus_queue" "canopy_dummy" {
-  name                = "sapience-${local.environment}-canopy-dummy"
+  name                = "sapience-canopy-datalake"
   resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
   namespace_name      = "${azurerm_servicebus_namespace.namespace.name}"
 
