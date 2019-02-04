@@ -25,3 +25,7 @@ output "kube_config" {
 output "host" {
   value = "${azurerm_kubernetes_cluster.kubernetes.kube_config.0.host}"
 }
+
+output "aks_egress_dev_ip_address" {
+  value = "${azurerm_public_ip.aks_egress_dev.ip_address}"
+}

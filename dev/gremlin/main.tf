@@ -14,12 +14,12 @@ provider "kubernetes" {
 locals {
   namespace = "dev"
 
-  common_tags = {
-    Customer    = "Sapience"
-	  Product     = "Sapience"
-	  Environment = "Dev"
-	  Component   = "Gremlin"
-	  ManagedBy   = "Terraform"
+  common_labels = {
+    "app.kubernetes.io/customer"    = "Sapience"
+	  "app.kubernetes.io/product"     = "Sapience"
+	  "app.kubernetes.io/environment" = "Dev"
+	  "app.kubernetes.io/component"   = "Gremlin"
+	  "app.kubernetes.io/managed-by"  = "Terraform"
   }
 }
 resource "kubernetes_deployment" "gremlin" {
@@ -27,14 +27,12 @@ resource "kubernetes_deployment" "gremlin" {
     name = "gremlin"
     namespace = "${local.namespace}"
 
-    annotations = "${merge(
-      local.common_tags,
-      map()
+    labels = "${merge(
+      local.common_labels,
+      map(
+        "app.kubernetes.io/name", "gremlin"
+      )
     )}"
-    
-    labels {
-	    app = "gremlin"
-    }
   }
 
   spec {
@@ -42,15 +40,18 @@ resource "kubernetes_deployment" "gremlin" {
 
     selector {
       match_labels {
-        app = "gremlin"
+        "app.kubernetes.io/name" = "gremlin"
       }
     }
 
     template {
       metadata {
-        labels {
-          app = "gremlin"
-        }
+        labels = "${merge(
+          local.common_labels,
+          map(
+            "app.kubernetes.io/name", "gremlin"
+          )
+        )}"
       }
 
       spec {
@@ -66,9 +67,11 @@ resource "kubernetes_deployment" "gremlin" {
 
 resource "kubernetes_service" "gremlin" {
   metadata {
-    annotations = "${merge(
-      local.common_tags,
-      map()
+    labels = "${merge(
+      local.common_labels,
+      map(
+        "app.kubernetes.io/name", "gremlin"
+      )
     )}"
     
     name = "gremlin"
@@ -78,7 +81,7 @@ resource "kubernetes_service" "gremlin" {
   spec {
     type = "LoadBalancer"
     selector {
-      app = "gremlin"
+      "app.kubernetes.io/name" = "gremlin"
     }
 
     port {

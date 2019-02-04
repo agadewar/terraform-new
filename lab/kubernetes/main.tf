@@ -153,6 +153,8 @@ resource "null_resource" "kubernetes_config_autoscaler" {
   }
 }
 
+
+##### "dev" evironment (BEGIN)
 resource "kubernetes_namespace" "dev" {
   depends_on = ["null_resource.kubeconfig"]
   
@@ -161,10 +163,35 @@ resource "kubernetes_namespace" "dev" {
   }
 }
 
-resource "kubernetes_namespace" "dev2" {
-  depends_on = ["null_resource.kubeconfig"]
-  
+resource "azurerm_public_ip" "aks_egress_dev" {
+  name                = "aks-egress-dev"
+  location            = "${azurerm_kubernetes_cluster.kubernetes.location}"
+  # resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
+  resource_group_name = "${data.template_file.node_resource_group.rendered}"
+  public_ip_address_allocation   = "Static"
+
+  tags = "${merge(
+    local.common_tags,
+    map()
+  )}"
+}
+
+resource "kubernetes_service" "aks_egress_dev" {
   metadata {
-    name = "dev2"
+    labels {
+      "app.kubernetes.io/name" = "azure-egress"
+    }
+    
+    name = "azure-egress"
+    namespace = "dev"
+  }
+
+  spec {
+    load_balancer_ip = "${azurerm_public_ip.aks_egress_dev.ip_address}"
+    type = "LoadBalancer"
+    port {
+      port = "80"
+    }
   }
 }
+##### "dev" evironment (END)

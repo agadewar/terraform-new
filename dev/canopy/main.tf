@@ -15,12 +15,12 @@ locals {
 
   default_token = "default-token-6s4dn"
 
-  common_tags = {
-    Customer    = "Sapience"
-	  Product     = "Sapience"
-	  Environment = "Dev"
-	  Component   = "Canopy"
-	  ManagedBy   = "Terraform"
+  common_labels = {
+    "app.kubernetes.io/customer"    = "Sapience"
+	  "app.kubernetes.io/product"     = "Sapience"
+	  "app.kubernetes.io/environment" = "Dev"
+	  "app.kubernetes.io/component"   = "Canopy"
+	  "app.kubernetes.io/managed-by"  = "Terraform"
   }
 }
 
@@ -85,7 +85,7 @@ module "eventpipeline_leaf_broker" {
     {
       type = "LoadBalancer"
       selector {
-        app = "eventpipeline-leaf-broker"
+        "app.kubernetes.io/name" = "eventpipeline-leaf-broker"
       }
 
       port = [
@@ -104,8 +104,8 @@ module "eventpipeline_leaf_broker" {
     }
   ]
 
-  annotations = "${merge(
-    local.common_tags,
+  labels = "${merge(
+    local.common_labels,
     map()
   )}"
 }
@@ -171,7 +171,7 @@ module "canopy_user_service" {
     {
       type = "LoadBalancer"
       selector {
-        app = "canopy-user-service"
+        "app.kubernetes.io/name" = "canopy-user-service"
       }
 
       port = [
@@ -194,8 +194,8 @@ module "canopy_user_service" {
     }
   ]
 
-  annotations = "${merge(
-    local.common_tags,
+  labels = "${merge(
+    local.common_labels,
     map()
   )}"
 }
@@ -219,7 +219,7 @@ module "canopy_hierarchy_service" {
     {
       type = "LoadBalancer"
       selector {
-        app = "canopy-hierarchy-service"
+        "app.kubernetes.io/name" = "canopy-hierarchy-service"
       }
 
       port = [
@@ -238,8 +238,8 @@ module "canopy_hierarchy_service" {
     }
   ]
 
-  annotations = "${merge(
-    local.common_tags,
+  labels = "${merge(
+    local.common_labels,
     map()
   )}"
 }
@@ -318,7 +318,7 @@ module "canopy_device_service" {
     {
       type = "LoadBalancer"
       selector {
-        app = "canopy-device-service"
+        "app.kubernetes.io/name" = "canopy-device-service"
       }
 
       port = [
@@ -338,8 +338,8 @@ module "canopy_device_service" {
     }
   ]
 
-  annotations = "${merge(
-    local.common_tags,
+  labels = "${merge(
+    local.common_labels,
     map()
   )}"
 }
@@ -405,7 +405,7 @@ module "eventpipeline_service" {
     {
       type = "LoadBalancer"
       selector {
-        app = "eventpipeline-service"
+        "app.kubernetes.io/name" = "eventpipeline-service"
       }
 
       port = [
@@ -424,8 +424,8 @@ module "eventpipeline_service" {
     }
   ]
 
-  annotations = "${merge(
-    local.common_tags,
+  labels = "${merge(
+    local.common_labels,
     map()
   )}"
 }
@@ -465,7 +465,7 @@ module "sapience_event_hub_journal" {
     {
       type = "LoadBalancer"
       selector {
-        app = "sapience-event-hub-journal"
+        "app.kubernetes.io/name" = "sapience-event-hub-journal"
       }
 
       port = [
@@ -484,8 +484,8 @@ module "sapience_event_hub_journal" {
     }
   ]
 
-  annotations = "${merge(
-    local.common_tags,
+  labels = "${merge(
+    local.common_labels,
     map()
   )}"
 }
