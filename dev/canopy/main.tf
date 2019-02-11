@@ -389,6 +389,9 @@ module "eventpipeline_service" {
 
   default_token = "${local.default_token}"
 
+  readiness_probe_timeout_seconds = 10
+  liveness_probe_timeout_seconds  = 10
+
   deployment_env = [
     {
       name = "CANOPY_DATABASE_USERNAME"
