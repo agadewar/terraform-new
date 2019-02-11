@@ -37,6 +37,12 @@ module "eventpipeline_leaf_broker" {
   deployment_image_pull_policy = "Always"
   deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
 
+  resources = [
+    {
+      requests.memory = "2048M"
+    }
+  ]
+
   default_token = "${local.default_token}"
 
   deployment_env = [
@@ -122,6 +128,12 @@ module "canopy_user_service" {
   deployment_replicas          = 1
   deployment_image_pull_policy = "Always"
   deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
+
+  resources = [
+    {
+      requests.memory = "512M"
+    }
+  ]
 
   default_token = "${local.default_token}"
 
@@ -213,6 +225,12 @@ module "canopy_hierarchy_service" {
   deployment_image_pull_policy = "Always"
   deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
 
+  resources = [
+    {
+      requests.memory = "512"
+    }
+  ]
+
   default_token = "${local.default_token}"
 
   service_spec = [
@@ -256,6 +274,12 @@ module "canopy_device_service" {
   deployment_replicas          = 1
   deployment_image_pull_policy = "Always"
   deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
+
+  resources = [
+    {
+      requests.memory = "1024M"
+    }
+  ]
 
   default_token = "${local.default_token}"
 
@@ -357,6 +381,12 @@ module "eventpipeline_service" {
   deployment_image_pull_policy = "Always"
   deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
 
+  resources = [
+    {
+      requests.memory = "1024M"
+    }
+  ]
+
   default_token = "${local.default_token}"
 
   deployment_env = [
@@ -442,6 +472,12 @@ module "sapience_event_hub_journal" {
   deployment_replicas          = 1
   deployment_image_pull_policy = "Always"
   deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
+
+  resources = [
+    {
+      requests.memory = "512M"
+    }
+  ]
 
   default_token = "${local.default_token}"
 
