@@ -9,6 +9,7 @@ terraform {
 
 provider "azurerm" {
   version = "1.20.0"
+  subscription_id = "${local.subscription_id}"
 }
 
 provider "kubernetes" {
@@ -136,7 +137,7 @@ resource "null_resource" "kubeconfig" {
   }
   
   provisioner "local-exec" {
-    command = "az aks get-credentials --resource-group ${azurerm_kubernetes_cluster.kubernetes.resource_group_name} --name ${azurerm_kubernetes_cluster.kubernetes.name} -f kubeconfig"
+    command = "az aks get-credentials --subscription ${local.subscription_id} --resource-group ${azurerm_kubernetes_cluster.kubernetes.resource_group_name} --name ${azurerm_kubernetes_cluster.kubernetes.name} -f kubeconfig"
   }
 }
 
@@ -160,6 +161,20 @@ resource "kubernetes_namespace" "dev" {
   
   metadata {
     name = "dev"
+  }
+}
+
+resource "kubernetes_resource_quota" "resource_quota_dev" {
+  metadata {
+    name = "resource-quota-dev"
+    namespace = "dev"
+  }
+  
+  spec {
+    hard {
+      requests.memory = "7Gi"
+      requests.cpu = "2"
+    }
   }
 }
 
