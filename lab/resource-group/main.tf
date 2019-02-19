@@ -9,6 +9,7 @@ terraform {
 
 provider "azurerm" {
   version = "1.20.0"
+  subscription_id = "102120b5-ffe5-46c3-bdb5-19248bcb798b"
 }
 
 locals {
