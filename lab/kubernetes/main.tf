@@ -40,7 +40,7 @@ data "terraform_remote_state" "resource_group" {
 locals {
   kubernetes_version        = "1.11.7"
   cluster_name              = "lab"
-  min_count                 = "1"
+  min_count                 = "2"
   max_count                 = "8"
   agent_pool_profile_1_name = "default"
   dns_prefix                = "${local.cluster_name}"
