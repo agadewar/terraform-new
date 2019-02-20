@@ -41,8 +41,8 @@ module "eventpipeline_leaf_broker" {
     {
       requests = [
         {
-          memory = "1024M"
-          cpu = "250m"
+          memory = "768M"
+          cpu = "150m"
         }
       ]
     }
@@ -139,7 +139,7 @@ module "canopy_user_service" {
       requests = [
         {
           memory = "512M"
-          cpu = "250m"
+          cpu = "150m"
         }
       ]
     }
@@ -240,6 +240,7 @@ module "canopy_hierarchy_service" {
       requests = [
         {
           memory = "256M"
+          cpu = "150m"
         }
       ]
     }
@@ -293,8 +294,8 @@ module "canopy_device_service" {
     {
       requests = [
         {
-          memory = "1024M"
-          cpu = "250m"
+          memory = "768M"
+          cpu = "150m"
         }
       ]
     }
@@ -404,8 +405,8 @@ module "eventpipeline_service" {
     {
       requests = [
         {
-          memory = "1024M"
-          cpu = "250m"
+          memory = "768M"
+          cpu = "150m"
         }
       ]
     }
@@ -505,6 +506,7 @@ module "sapience_event_hub_journal" {
       requests = [
         {
           memory = "512M"
+          cpu = "150m"
         }
       ]
     }

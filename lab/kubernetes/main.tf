@@ -38,7 +38,7 @@ data "terraform_remote_state" "resource_group" {
 }
 
 locals {
-  kubernetes_version        = "1.11.5"
+  kubernetes_version        = "1.11.7"
   cluster_name              = "lab"
   min_count                 = "1"
   max_count                 = "8"
