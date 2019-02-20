@@ -1,7 +1,7 @@
 terraform {
   backend "azurerm" {
-    access_key           = "gx3N29hLwW2OC+kO5FaAedBpjlh83kY35dpOrJZvdYAB+1CG5iHm85/763rJCiEZ6CY+cwSq+ZAVOvK8f2o4Hg=="
-    storage_account_name = "terraformstatesapience"
+    access_key           = "tsHXP9evG4Azm/RNmmk5yxy18SaZ3RAoi2lKPxQvIPjtMgMsas3fe5tQiMOMMDzZsOeLJ1EtyhLXjHzI+wF2JQ=="
+    storage_account_name = "terraformstatelab"
 	  container_name       = "tfstate"
     key                  = "sapience.dev.canopy.terraform.tfstate"
   }
