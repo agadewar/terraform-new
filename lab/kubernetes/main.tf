@@ -53,7 +53,7 @@ locals {
   common_tags = {
     Customer = "Sapience"
     Product = "Sapience"
-    Environment = "Lab"
+    Environment = "sandbox"
     Component = "Kubernetes"
     ManagedBy = "Terraform"
   }
@@ -156,19 +156,19 @@ resource "null_resource" "kubernetes_config_autoscaler" {
 }
 
 
-##### "dev" evironment (BEGIN)
-resource "kubernetes_namespace" "dev" {
+##### "sandbox" evironment (BEGIN)
+resource "kubernetes_namespace" "lab" {
   depends_on = ["null_resource.kubeconfig"]
 
   metadata {
-    name = "dev"
+    name = "sandbox"
   }
 }
 
 resource "kubernetes_resource_quota" "resource_quota_dev" {
   metadata {
     name = "resource-quota-dev"
-    namespace = "dev"
+    namespace = "lab"
   }
 
   spec {
@@ -199,7 +199,7 @@ resource "kubernetes_service" "aks_egress_dev" {
     }
 
     name = "azure-egress"
-    namespace = "dev"
+    namespace = "lab"
   }
 
   spec {
