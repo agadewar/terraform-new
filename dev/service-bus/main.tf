@@ -16,7 +16,7 @@ data "terraform_remote_state" "resource_group" {
   config {
     access_key           = "lo8HUaHNNDrFRHsTL+5uNuykv+WfQSHNxgXWqdcxE2vbk/eiSgaZx+gP2bHdU9TWKJk+PqhhyB0wY95wOCLDoQ=="
     storage_account_name = "tfstatelower"
-	  container_name       = "tfstate"
+    container_name       = "tfstate"
     key                  = "sapience.lab.resource-group.terraform.tfstate"
   }
 }
@@ -27,14 +27,14 @@ locals {
   common_tags = {
     Customer = "Sapience"
     Product = "Sapience"
-    Environment = "dev"
+    Environment = "Dev"
     Component = "Service Bus"
     ManagedBy = "Terraform"
   }
 }
 
 resource "azurerm_servicebus_namespace" "namespace" {
-  name                = "sapience-${local.environment}"
+  name                = "sapience-dev"
   location            = "${data.terraform_remote_state.resource_group.resource_group_location}"
   resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
   sku                 = "Standard"
