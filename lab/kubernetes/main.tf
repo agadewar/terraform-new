@@ -44,10 +44,11 @@ locals {
   max_count                 = "8"
   agent_pool_profile_1_name = "default"
   dns_prefix                = "${local.cluster_name}"
-  subscription_id           = "102120b5-ffe5-46c3-bdb5-19248bcb798b"
-  app_id                    = "5afcf5b7-088f-4b4c-9552-dc4bf43fe043"
-  tenant                    = "9c5c9da2-8ba9-4f91-8fa6-2c4382395477"
-  password                  = "7de66251-ce87-43f1-adf6-f3513d2f19b2"
+  subscription_id           = "a450fc5d-cebe-4c62-b61a-0069ab902ee7"
+  app_id                    = "956d01ae-ba03-457f-b454-bc9872b496c6"
+  tenant                    = "9c5c9da2-8ba9-4f91-8fa6-2c438239547"
+  password                  = "9ed8b931-9534-439c-81a8-62c39773279d"
+
 
   common_tags = {
     Customer = "Sapience"
@@ -65,12 +66,12 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   location            = "${data.terraform_remote_state.resource_group.resource_group_location}"
   resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
   dns_prefix          = "${local.dns_prefix}"
-  
+
   kubernetes_version  =  "${local.kubernetes_version}"
-  
+
   linux_profile {
       admin_username = "sapience"
-  
+
       ssh_key {
         key_data = "${file("/home/scardis/.ssh/id_rsa.pub")}"
       }
@@ -83,7 +84,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     os_type         = "Linux"
     os_disk_size_gb = 30
   }
-  
+
   service_principal {
     client_id     = "${local.app_id}"
     client_secret = "${local.password}"
@@ -131,11 +132,11 @@ resource "null_resource" "kubeconfig" {
   triggers = {
     timestamp = "${timestamp()}"
   }
-  
+
   provisioner "local-exec" {
     command = "rm -f kubeconfig"
   }
-  
+
   provisioner "local-exec" {
     command = "az aks get-credentials --subscription ${local.subscription_id} --resource-group ${azurerm_kubernetes_cluster.kubernetes.resource_group_name} --name ${azurerm_kubernetes_cluster.kubernetes.name} -f kubeconfig"
   }
@@ -158,7 +159,7 @@ resource "null_resource" "kubernetes_config_autoscaler" {
 ##### "dev" evironment (BEGIN)
 resource "kubernetes_namespace" "dev" {
   depends_on = ["null_resource.kubeconfig"]
-  
+
   metadata {
     name = "dev"
   }
@@ -169,7 +170,7 @@ resource "kubernetes_resource_quota" "resource_quota_dev" {
     name = "resource-quota-dev"
     namespace = "dev"
   }
-  
+
   spec {
     hard {
       requests.memory = "7Gi"
@@ -196,7 +197,7 @@ resource "kubernetes_service" "aks_egress_dev" {
     labels {
       "app.kubernetes.io/name" = "azure-egress"
     }
-    
+
     name = "azure-egress"
     namespace = "dev"
   }
