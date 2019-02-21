@@ -161,7 +161,7 @@ resource "kubernetes_namespace" "lab" {
   depends_on = ["null_resource.kubeconfig"]
 
   metadata {
-    name = "dev"
+    name = "lab"
   }
 }
 
