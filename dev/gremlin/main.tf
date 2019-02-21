@@ -17,7 +17,7 @@ locals {
   common_labels = {
     "app.kubernetes.io/customer"    = "Sapience"
 	  "app.kubernetes.io/product"     = "Sapience"
-	  "app.kubernetes.io/environment" = "sandbox"
+	  "app.kubernetes.io/environment" = "dev"
 	  "app.kubernetes.io/component"   = "Gremlin"
 	  "app.kubernetes.io/managed-by"  = "Terraform"
   }

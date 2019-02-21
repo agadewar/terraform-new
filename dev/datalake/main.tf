@@ -22,12 +22,12 @@ data "terraform_remote_state" "resource_group" {
 }
 
 locals {
-  Environment = "sandbox"
+  Environment = "dev"
   subscription_id = "a450fc5d-cebe-4c62-b61a-0069ab902ee7"
   common_tags = {
     Customer = "Sapience"
     Product = "Sapience"
-    Environment = "sandbox"
+    Environment = "dev"
     Component = "Data Lake"
     ManagedBy = "Terraform"
   }

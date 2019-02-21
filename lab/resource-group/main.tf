@@ -17,7 +17,7 @@ locals {
   common_tags = {
     Customer = "Sapience"
     Product = "Sapience"
-    Environment = "sandbox"
+    Environment = "dev"
     Component = "Resource Group"
     ManagedBy = "Terraform"
   }

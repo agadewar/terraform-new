@@ -53,7 +53,7 @@ locals {
   common_tags = {
     Customer = "Sapience"
     Product = "Sapience"
-    Environment = "sandbox"
+    Environment = "dev"
     Component = "Kubernetes"
     ManagedBy = "Terraform"
   }
@@ -156,12 +156,12 @@ resource "null_resource" "kubernetes_config_autoscaler" {
 }
 
 
-##### "sandbox" evironment (BEGIN)
+##### "dev" evironment (BEGIN)
 resource "kubernetes_namespace" "lab" {
   depends_on = ["null_resource.kubeconfig"]
 
   metadata {
-    name = "sandbox"
+    name = "dev"
   }
 }
 
