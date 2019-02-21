@@ -1,15 +1,6 @@
 
-#### Jump to
-[Setup Sapience Azure Account via Terraform](#setup-sapience-azure-account-via-terraform)
-<br>
-[Create a New Environment in Lab](#create-a-new-environment-in-lab)
 
-<br>
-<br>
-
-
-
-#<font color="orange"> Setup Sapience Azure Account via Terraform </font>
+#<font color="orange"> **Setup Sapience Azure Account via Terraform** </font>
 
 ---
 ##### 1. Create a "terraformstatesapience" Storage Account via the Azure Portal
@@ -154,7 +145,7 @@ SECRET :b:
 	5. Go to Azure Portal and configure the "datalake" Event Hub to "Capture" -> On and into the Data Lake configured above at path "/raw_data" (see: https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-capture-enable-through-portal)
 
 
-
+<br>
 
 # <font color="orange"> **Create a New Environment in Lab** </font>
 
