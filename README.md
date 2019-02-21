@@ -9,7 +9,7 @@
 
 
 
-# <font color="orange"> **Setup Sapience Azure Account via Terraform** </font>
+#<font color="orange"> Setup Sapience Azure Account via Terraform </font>
 
 ---
 ##### 1. Create a "terraformstatesapience" Storage Account via the Azure Portal
