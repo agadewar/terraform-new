@@ -9,11 +9,11 @@ terraform {
 
 provider "azurerm" {
   version = "1.20.0"
-  subscription_id = "a450fc5d-cebe-4c62-b61a-0069ab902ee7"
-
 }
 
 locals {
+  subscription_id = "a450fc5d-cebe-4c62-b61a-0069ab902ee7"
+
   common_tags = {
     Customer = "Sapience"
     Product = "Sapience"

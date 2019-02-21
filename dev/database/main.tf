@@ -33,7 +33,7 @@ data "terraform_remote_state" "kubernetes" {
 
 locals {
   Environment = "sandbox"
-
+  subscription_id = "a450fc5d-cebe-4c62-b61a-0069ab902ee7"
   cosmos_failover_location = "eastus2"
 
   common_tags = {
