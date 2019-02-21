@@ -1,10 +1,13 @@
-- [Setup Sapience Azure Account via Terraform](#setup-sapience-azure-account-via-terraform)
-- [Create a New Environment in Lab](#create-a-new-environment-in-lab)
+#### Jump to
+-	[Setup Sapience Azure Account via Terraform](#setup-sapience-azure-account-via-terraform)
+-	[Create a New Environment in Lab](#create-a-new-environment-in-lab)
+
+<br>
+<br>
 
 
 
-
-# Setup Sapience Azure Account via Terraform 
+# <font color="orange"> **Setup Sapience Azure Account via Terraform** </font>
 
 ---
 ##### 1. Create a "terraformstatesapience" Storage Account via the Azure Portal
@@ -48,9 +51,9 @@ SECRET :b:
 	9. port: 8182
 	10. serializer: { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV1d0, config: { serializeResultToString: true }}
 	11. bin/gremlin.sh
-	12. :remote connect tinkerpop.server conf/remote.yaml
-	13. :> g.addV(label, 'Branch', 'id', 'Sapience', 'name', 'Sapience')
-	14. :> g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').next().addEdge('BELONGS_TO', g.V(0).next())
+		- :remote connect tinkerpop.server conf/remote.yaml
+		- :> g.addV(label, 'Branch', 'id', 'Sapience', 'name', 'Sapience')
+		- :> g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').next().addEdge('BELONGS_TO', g.V(0).next())
 
 3. Setup Canopy
 	1. Setup Canopy container registry credentials
@@ -151,7 +154,87 @@ SECRET :b:
 
 
 
-# Create a New Environment in Lab
+# <font color="orange"> **Create a New Environment in Lab** </font>
 
 ---
+1. Add a new "dev2" namespace
+	1. add a new "dev2" namespace to "/terraform/lab/kubernetes/main.tf"
+	2. cd /terraform/lab/kubernetes
+	3. terraform apply
 
+	http://localhost:8001/api/v1/namespaces/kube-system/services/kubernetes-dashboard/proxy/#!/overview?namespace=_all
+
+2. Prepare "dev2" folder structure
+	1. Copy "/terraform/dev" to "/terraform/dev2"
+	2. Remove all .terraform folders (recursively) under "dev2"
+
+3. Prepare "dev2" configurations
+	1. Edit "/terraform/dev2/canopy/main.tf"
+		1. Change all "dev" to "dev2"
+		2. Change all "Dev" to "Dev2"
+		3. Change "default_token" to the newly created namespace's secret name
+	2. Edit "/terraform/dev2/cronjob/main.tf"
+		1. Change all "dev" to "dev2"
+		2. Change all "Dev" to "Dev2"
+		3. Change "config/canopy-container-registry-credential-helper" namespace property to "dev2"   (this can be templated)
+	3. Edit "/terraform/dev2/datalake/main.tf"
+		1. Change all "dev" to "dev2"
+		2. Change all "Dev" to "Dev2"
+	4. Edit "/terraform/dev2/eventhubs/main.tf"
+		1. Change all "dev" to "dev2"
+		2. Change all "Dev" to "Dev2"
+	5. Edit "/terraform/dev2/gremlin/main.tf"
+		1. Change all "dev" to "dev2"
+		2. Change all "Dev" to "Dev2"
+	6. Edit "/terraform/dev2/service-bus/main.tf"
+		1. Change all "dev" to "dev2"
+		2. Change all "Dev" to "Dev2"
+
+4. Run "terraform init && terraform apply" against each of the following folders
+	1. /terraform/dev2/service-bus
+	2. /terraform/dev2/eventhubs
+	3. /terraform/dev2/datalake
+
+5. Setup capture of Event Hub into Data Lake (cannot be done via Terraform at this time, as only Blob Storage is supported for capture)
+	1. Setup permissions on Data Lake for Event Hubs
+	2. Setup capture in Event Hubs to data lake
+
+6. Add ConfigMaps and Secrets
+	1. cp /canopy-kubernetes-config/dev /canopy/kubernetes-config/dev2
+	2. <font color="red">eventpipeline-service needs to be fixed to dynamically build eventpipeline.conf at container startup</font>
+	3. Edit properties (remove the need for this via ${environment} property)
+		1. Edit "sapience-event-hub-journal.properties"
+			1. Grab the Event Hub key and update "event-hub.key" 
+				- <font color="red">this needs to be put into a secret</font>
+		2. Edit "global.properties"
+			1. Change the "environment" property from "dev" to "dev2" 
+				- <font color="red">this needs to be put into a ConfigMap</font>
+			2. Change the "spring.datasource.*" properties 
+				- <font color="red">this needs to be put into a secret</font>
+		3. Edit all secrets files
+			- <font color="red">these can be templated</font>
+			- <font color="red">be sure to copy the amqp.password from the Azure Service Bus</font>
+		4. Deploy ConfigMaps and Secrets
+			1. cd canopy-kubernetes-config
+			2. ./aws.sh dev2
+			3. ./eventpipeline-leaf-broker.sh dev2
+			4. ./canopy-user-service.sh dev2
+			5. ./canopy-hierarchy-service.sh dev2
+			6. ./canopy-device-service.sh dev2
+			7. ./eventpipeline-service.sh dev2
+			8. ./sapience-event-hub-journal.sh dev2
+		5. Run "terraform init && terraform apply" against each of the following folders
+			1. /terraform/dev2/cronjob
+			2. /terraform/dev2/gremlin
+		6. Trigger the "canopy-container-registry-credential-helper" CronJob
+		7. Run "terraform init && terraform apply" against each of the following folders
+			1. /terraform/dev2/canopy
+		8. Setup the root of the hierarchy via Gremlin CLI
+			1. conf/remote.yaml
+				- hosts: [168.61.37.11]
+				- port: 8182
+				- serializer: { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV1d0, config: { serializeResultToString: true }}
+				- bin/gremlin.sh
+				- :remote connect tinkerpop.server conf/remote.yaml
+				- :> g.addV(label, 'Branch', 'id', 'Sapience', 'name', 'Sapience')
+				- :> g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').next().addEdge('BELONGS_TO', g.V(0).next())
