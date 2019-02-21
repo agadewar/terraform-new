@@ -1,6 +1,8 @@
+
 #### Jump to
--	[Setup Sapience Azure Account via Terraform](#setup-sapience-azure-account-via-terraform)
--	[Create a New Environment in Lab](#create-a-new-environment-in-lab)
+[Setup Sapience Azure Account via Terraform](#setup-sapience-azure-account-via-terraform)
+<br>
+[Create a New Environment in Lab](#create-a-new-environment-in-lab)
 
 <br>
 <br>
