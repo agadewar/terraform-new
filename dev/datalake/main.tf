@@ -1,7 +1,7 @@
 terraform {
   backend "azurerm" {
-    access_key           = "gx3N29hLwW2OC+kO5FaAedBpjlh83kY35dpOrJZvdYAB+1CG5iHm85/763rJCiEZ6CY+cwSq+ZAVOvK8f2o4Hg=="
-    storage_account_name = "terraformstatesapience"
+    access_key           = "OPAUji+E5XV9vXAouVK5wt7u2ZTfdvVdifj8dUmOcRq9WGjQe5cyciqPZ23ZaffW1P5/GE29OzvLfhmUjl3HQg=="
+    storage_account_name = "terraformstatelab"
 	  container_name       = "tfstate"
     key                  = "sapience.dev.datalake.terraform.tfstate"
   }
@@ -14,8 +14,8 @@ provider "azurerm" {
 data "terraform_remote_state" "resource_group" {
   backend = "azurerm"
   config {
-    access_key           = "gx3N29hLwW2OC+kO5FaAedBpjlh83kY35dpOrJZvdYAB+1CG5iHm85/763rJCiEZ6CY+cwSq+ZAVOvK8f2o4Hg=="
-    storage_account_name = "terraformstatesapience"
+    access_key           = "OPAUji+E5XV9vXAouVK5wt7u2ZTfdvVdifj8dUmOcRq9WGjQe5cyciqPZ23ZaffW1P5/GE29OzvLfhmUjl3HQg=="
+    storage_account_name = "terraformstatelab"
 	  container_name       = "tfstate"
     key                  = "sapience.lab.resource-group.terraform.tfstate"
   }

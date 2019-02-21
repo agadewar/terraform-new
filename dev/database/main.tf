@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    access_key           = "tsHXP9evG4Azm/RNmmk5yxy18SaZ3RAoi2lKPxQvIPjtMgMsas3fe5tQiMOMMDzZsOeLJ1EtyhLXjHzI+wF2JQ=="
+    access_key           = "OPAUji+E5XV9vXAouVK5wt7u2ZTfdvVdifj8dUmOcRq9WGjQe5cyciqPZ23ZaffW1P5/GE29OzvLfhmUjl3HQg=="
     storage_account_name = "terraformstatelab"
 	  container_name       = "tfstate"
     key                  = "sapience.dev.database.terraform.tfstate"
@@ -24,7 +24,7 @@ data "terraform_remote_state" "resource_group" {
 data "terraform_remote_state" "kubernetes" {
   backend = "azurerm"
   config {
-    access_key           = "tsHXP9evG4Azm/RNmmk5yxy18SaZ3RAoi2lKPxQvIPjtMgMsas3fe5tQiMOMMDzZsOeLJ1EtyhLXjHzI+wF2JQ=="
+    access_key           = "OPAUji+E5XV9vXAouVK5wt7u2ZTfdvVdifj8dUmOcRq9WGjQe5cyciqPZ23ZaffW1P5/GE29OzvLfhmUjl3HQg=="
     storage_account_name = "terraformstatelab"
 	  container_name       = "tfstate"
     key                  = "sapience.lab.kubernetes.terraform.tfstate"
@@ -90,8 +90,8 @@ resource "azurerm_cosmosdb_account" "mdm" {
   offer_type          = "Standard"
   kind                = "GlobalDocumentDB"
 
-  capabilities = [ 
-    { 
+  capabilities = [
+    {
       name = "EnableGremlin"
     }
   ]
