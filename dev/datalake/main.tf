@@ -1,7 +1,7 @@
 terraform {
   backend "azurerm" {
-    access_key           = "OPAUji+E5XV9vXAouVK5wt7u2ZTfdvVdifj8dUmOcRq9WGjQe5cyciqPZ23ZaffW1P5/GE29OzvLfhmUjl3HQg=="
-    storage_account_name = "terraformstatelab"
+    access_key           = "lo8HUaHNNDrFRHsTL+5uNuykv+WfQSHNxgXWqdcxE2vbk/eiSgaZx+gP2bHdU9TWKJk+PqhhyB0wY95wOCLDoQ=="
+    storage_account_name = "tfstatelower"
 	  container_name       = "tfstate"
     key                  = "sapience.dev.datalake.terraform.tfstate"
   }
@@ -14,20 +14,20 @@ provider "azurerm" {
 data "terraform_remote_state" "resource_group" {
   backend = "azurerm"
   config {
-    access_key           = "OPAUji+E5XV9vXAouVK5wt7u2ZTfdvVdifj8dUmOcRq9WGjQe5cyciqPZ23ZaffW1P5/GE29OzvLfhmUjl3HQg=="
-    storage_account_name = "terraformstatelab"
+    access_key           = "lo8HUaHNNDrFRHsTL+5uNuykv+WfQSHNxgXWqdcxE2vbk/eiSgaZx+gP2bHdU9TWKJk+PqhhyB0wY95wOCLDoQ=="
+    storage_account_name = "tfstatelower"
 	  container_name       = "tfstate"
     key                  = "sapience.lab.resource-group.terraform.tfstate"
   }
 }
 
 locals {
-  environment = "dev"
+  Environment = "sandbox"
 
   common_tags = {
     Customer = "Sapience"
     Product = "Sapience"
-    Environment = "Dev"
+    Environment = "sandbox"
     Component = "Data Lake"
     ManagedBy = "Terraform"
   }

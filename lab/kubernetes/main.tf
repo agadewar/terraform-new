@@ -1,7 +1,7 @@
 terraform {
   backend "azurerm" {
-    access_key           = "tsHXP9evG4Azm/RNmmk5yxy18SaZ3RAoi2lKPxQvIPjtMgMsas3fe5tQiMOMMDzZsOeLJ1EtyhLXjHzI+wF2JQ=="
-    storage_account_name = "terraformstatelab"
+    access_key           = "lo8HUaHNNDrFRHsTL+5uNuykv+WfQSHNxgXWqdcxE2vbk/eiSgaZx+gP2bHdU9TWKJk+PqhhyB0wY95wOCLDoQ=="
+    storage_account_name = "tfstatelower"
 	  container_name       = "tfstate"
     key                  = "sapience.lab.kubernetes.terraform.tfstate"
   }
@@ -30,8 +30,8 @@ data "terraform_remote_state" "resource_group" {
   backend = "azurerm"
 
   config {
-    access_key           = "tsHXP9evG4Azm/RNmmk5yxy18SaZ3RAoi2lKPxQvIPjtMgMsas3fe5tQiMOMMDzZsOeLJ1EtyhLXjHzI+wF2JQ=="
-    storage_account_name = "terraformstatelab"
+    access_key           = "lo8HUaHNNDrFRHsTL+5uNuykv+WfQSHNxgXWqdcxE2vbk/eiSgaZx+gP2bHdU9TWKJk+PqhhyB0wY95wOCLDoQ=="
+    storage_account_name = "tfstatelower"
 	  container_name       = "tfstate"
     key                  = "sapience.lab.resource-group.terraform.tfstate"
   }
@@ -45,9 +45,9 @@ locals {
   agent_pool_profile_1_name = "default"
   dns_prefix                = "${local.cluster_name}"
   subscription_id           = "a450fc5d-cebe-4c62-b61a-0069ab902ee7"
-  app_id                    = "956d01ae-ba03-457f-b454-bc9872b496c6"
-  tenant                    = "9c5c9da2-8ba9-4f91-8fa6-2c438239547"
-  password                  = "9ed8b931-9534-439c-81a8-62c39773279d"
+  app_id                    = "e68bc794-bad9-4605-9a84-69722969e2fc"
+  tenant                    = "9c5c9da2-8ba9-4f91-8fa6-2c4382395477"
+  password                  = "1b24afc1-3f4e-4351-8727-29917fde1991"
 
 
   common_tags = {
