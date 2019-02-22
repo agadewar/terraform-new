@@ -51,7 +51,13 @@ SECRET :b:
 	
 ##### 6. Create "Dev" infrastructure
 1. Setup service-bus
-	1. cd /c/projects-sapience/terraform/dev/service-bus
+    1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
+	2. Edit "terraform/dev/service-bus/main.tf"
+		1. Edit "terraform { backend {} }" as needed
+		2. Edit "locals { subscription_id }" as needed
+		3. Edit "locals { common_tags {} }" as needed
+		4. Edit "data.terraform_remote_state.resource_group { config {} }" as needed
+	1. cd terraform/dev/service-bus
 	2. terraform init
 	3. terraform apply
 
