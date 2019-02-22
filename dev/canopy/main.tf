@@ -8,7 +8,7 @@ terraform {
 }
 
 locals {
-  namespace                         = "dev"
+  namespace                         = "lab"
   kubeconfig_path                   = "../../lab/kubernetes/kubeconfig"
   container_registry_hostname       = "406661537381.dkr.ecr.us-east-1.amazonaws.com"
   deployment_image_pull_secret_name = "canopy-container-registry-credential"
@@ -18,7 +18,7 @@ locals {
   common_labels = {
     "app.kubernetes.io/customer"    = "Sapience"
 	  "app.kubernetes.io/product"     = "Sapience"
-	  "app.kubernetes.io/environment" = "sandbox"
+	  "app.kubernetes.io/environment" = "dev"
 	  "app.kubernetes.io/component"   = "Canopy"
 	  "app.kubernetes.io/managed-by"  = "Terraform"
   }
