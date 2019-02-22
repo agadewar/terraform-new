@@ -32,9 +32,9 @@ SECRET :b:
 	2. Edit "terraform/lab/resource-group/main.tf"
 		1. Edit "terraform { backend {} }" as needed
 		2. Edit "locals { * }" as needed
-		11. Edit "data.terraform_remote_state.resource_group { config {} }" as needed
-		12. Edit "resource.azurerm_kubernetes_cluster.kubernetes { * }" as needed
-		13. Add / edit any namespace sections that need to be created (see "##### "dev" namespace (BEGIN)" -> "##### "dev" namespace (END)" )
+		3. Edit "data.terraform_remote_state.resource_group { config {} }" as needed
+		4. Edit "resource.azurerm_kubernetes_cluster.kubernetes { * }" as needed
+		5. Add / edit any namespace sections that need to be created (see "##### "dev" namespace (BEGIN)" -> "##### "dev" namespace (END)" )
 	3. cd terraform/lab/kubernetes
 	4. terraform init
 	5. terraform apply
@@ -54,19 +54,27 @@ SECRET :b:
 	3. terraform apply
 
 4. Setup Data Lake
-	1. cd /c/projects-sapience/terraform/dev/datalake
-	2. Review the "azurerm_data_lake_store_firewall_rule"(s) that are configured in "main.tf"
-	3. terraform init
-	4. terraform apply
+    1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
+	2. Edit "terraform/dev/data-lake/main.tf"
+		1. Edit "terraform { backend {} }" as needed
+		2. Edit "locals { * }" as needed
+	3. cd terraform/dev/data-lake
+	4. Review the "azurerm_data_lake_store_firewall_rule"(s) that are configured in "main.tf"
+	5. terraform init
+	6. terraform apply
 
 5. Setup Event Hubs
-	1. cd /c/projects-sapience/terraform/dev/eventhubs
-	2. terraform init
-	3. terraform apply
-	4. Give permissions to the "datalake" Event Hub to capture into the Data Lake configured above (see: https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-archive-eventhub-capture#assign-permissions-to-event-hubs)
+    1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
+	2. Edit "terraform/dev/data-lake/main.tf"
+		1. Edit "terraform { backend {} }" as needed
+		2. Edit "locals { * }" as needed
+	3. cd terraform/dev/event-hubs
+	4. terraform init
+	5. terraform apply
+	6. Give permissions to the "datalake" Event Hub to capture into the Data Lake configured above (see: https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-archive-eventhub-capture#assign-permissions-to-event-hubs)
 		1. Create a New Folder in the Data Lake named "raw_data"
 		2. Follow the instructions in the link above
-	5. Go to Azure Portal and configure the "datalake" Event Hub to "Capture" -> On and into the Data Lake configured above at path "/raw_data" (see: https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-capture-enable-through-portal)
+	7. Go to Azure Portal and configure the "datalake" Event Hub to "Capture" -> On and into the Data Lake configured above at path "/raw_data" (see: https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-capture-enable-through-portal)
 
 2. Setup Databases
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
@@ -77,14 +85,17 @@ SECRET :b:
 	2. terraform init
 	3. terraform apply
 	4. Configure user(s) in Gremlin
-	5. Download Gremlin / Tinkerpop console http://tinkerpop.apache.org/docs/current/tutorials/the-gremlin-console/
-	6. conf/remote.yaml
-	8. hosts: [168.61.37.11]
-	9. port: 8182
-	10. serializer: { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV1d0, config: { serializeResultToString: true }}
-	11. bin/gremlin.sh
-		- :remote connect tinkerpop.server conf/remote.yaml
-		- :> g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))
+	    1. Create graph database in Cosmos
+			<benji>
+	    5. Download Gremlin / Tinkerpop console http://tinkerpop.apache.org/docs/current/tutorials/the-gremlin-console/
+		6. conf/remote.yaml
+		8. hosts: [168.61.37.11]
+		9. port: 8182
+		10. serializer: { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV1d0, config: { serializeResultToString: true }}
+		11. bin/gremlin.sh
+			- :remote connect tinkerpop.server conf/remote.yaml
+			- :> g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))
+	5. Setup schemas in SQL Server
 
 3. Setup Canopy
 	1. Setup Canopy container registry credentials
