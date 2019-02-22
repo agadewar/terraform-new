@@ -124,6 +124,7 @@ SECRET :b:
 			3. canopy.database.username
 			4. canopy.event-hub.password
 			5. google.api.key
+		2. Edit canopy-kubernetes-config/dev/canopy/gremlin-cosmos.yaml
 		2. cd canopy-kubernetes-config
 		3. ./update_all.sh dev
 	
