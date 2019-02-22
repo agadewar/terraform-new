@@ -95,7 +95,9 @@ SECRET :b:
 		11. bin/gremlin.sh
 			- :remote connect tinkerpop.server conf/remote.yaml
 			- :> g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))
-	5. Setup schemas in SQL Server
+	5. Setup SQL Server
+		1. Run DDL in canopy-sql/ddl
+		2. Run DML in canopy-sql/dml
 
 3. Setup Canopy
 	1. Setup Canopy container registry credentials
