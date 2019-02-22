@@ -115,7 +115,7 @@ SECRET :b:
 			3. terraform apply
 			4. To make sure the secret for the "Setup Canopy" step is created, manually trigger this through the Kubernetes dashboard
 	
-	2. Configure global.properties
+	2. Configure secrets
 		1. Edit canopy-kubernetes-config/dev/canopy/secrets
 			1. canopy.amqp.password
 			2. canopy.database.password
@@ -126,6 +126,10 @@ SECRET :b:
 		3. ./update_all.sh dev
 	
 	3. Deploy Canopy containers
-		1. cd /c/projects-sapience/terraform/dev/canopy
-		2. terraform init
-		3. terraform apply
+		1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
+	    2. Edit "terraform/dev/database/main.tf"
+		    1. Edit "terraform { backend {} }" as needed
+		    2. Edit "locals { * }" as needed
+		3. cd /c/projects-sapience/terraform/dev/canopy
+		4. terraform init
+		5. terraform apply
