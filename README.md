@@ -33,31 +33,37 @@ SECRET :b:
 		1. Edit "terraform { backend {} }" as needed
 		2. Edit "locals { * }" as needed
 		3. Edit "data.terraform_remote_state.resource_group { config {} }" as needed
-		4. Edit "resource.azurerm_kubernetes_cluster.kubernetes { * }" as needed
-		5. Add / edit any namespace sections that need to be created (see "##### "dev" namespace (BEGIN)" -> "##### "dev" namespace (END)" )
 	3. cd terraform/lab/kubernetes
 	4. terraform init
 	5. terraform apply
 	
 ##### 6. Create "Dev" infrastructure
 1. Setup Kubernetes namespace
-   1.
+    1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
+	2. Edit "terraform/lab/resource-group/main.tf"
+	    1. Edit "terraform { backend {} }" as needed
+		2. Edit "locals { * }" as needed
+		3. Edit "data.terraform_remote_state.resource_group { config {} }" as needed
+	3. cd terraform/dev/kubernetes-kubernetes_namespace
+	4. terraform init
+	5. terraform apply
 
 1. Setup service-bus
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/dev/service-bus/main.tf"
 		1. Edit "terraform { backend {} }" as needed
 		2. Edit "locals { * }" as needed
-		4. Edit "data.terraform_remote_state.resource_group { config {} }" as needed
-	1. cd terraform/dev/service-bus
-	2. terraform init
-	3. terraform apply
+		3. Edit "data.terraform_remote_state.resource_group { config {} }" as needed
+	3. cd terraform/dev/service-bus
+	4. terraform init
+	5. terraform apply
 
 4. Setup Data Lake
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/dev/data-lake/main.tf"
 		1. Edit "terraform { backend {} }" as needed
 		2. Edit "locals { * }" as needed
+		3. Edit "data.terraform_remote_state.resource_group { config {} }" as needed
 	3. cd terraform/dev/data-lake
 	4. Review the "azurerm_data_lake_store_firewall_rule"(s) that are configured in "main.tf"
 	5. terraform init
@@ -68,6 +74,7 @@ SECRET :b:
 	2. Edit "terraform/dev/data-lake/main.tf"
 		1. Edit "terraform { backend {} }" as needed
 		2. Edit "locals { * }" as needed
+		3. Edit "data.terraform_remote_state.resource_group { config {} }" as needed
 	3. cd terraform/dev/event-hubs
 	4. terraform init
 	5. terraform apply
@@ -81,21 +88,23 @@ SECRET :b:
 	2. Edit "terraform/dev/database/main.tf"
 		1. Edit "terraform { backend {} }" as needed
 		2. Edit "locals { * }" as needed
-	1. cd terraform/dev/database
-	2. terraform init
-	3. terraform apply
-	4. Configure user(s) in Gremlin
+		3. Edit "data.terraform_remote_state.resource_group { config {} }" as needed
+		4. Edit "data.terraform_remote_state.kubernetes_namespace { config {} }" as needed
+	3. cd terraform/dev/database
+	4. terraform init
+	5. terraform apply
+	6. Configure user(s) in Gremlin
 	    1. Create graph database in Cosmos
 		![Image](../AddGraph.png)
-	    5. Download Gremlin / Tinkerpop console http://tinkerpop.apache.org/docs/current/tutorials/the-gremlin-console/
-		6. conf/remote.yaml
-		8. hosts: [168.61.37.11]
-		9. port: 8182
-		10. serializer: { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV1d0, config: { serializeResultToString: true }}
-		11. bin/gremlin.sh
-			- :remote connect tinkerpop.server conf/remote.yaml
+	    2. Download Gremlin / Tinkerpop console http://tinkerpop.apache.org/docs/current/tutorials/the-gremlin-console/
+		3. conf/remote.yaml
+		4. hosts: [168.61.37.11]
+		5. port: 8182
+		6. serializer: { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV1d0, config: { serializeResultToString: true }}
+		7. bin/gremlin.sh
+		    - :remote connect tinkerpop.server conf/remote.yaml
 			- :> g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))
-	5. Setup SQL Server
+	7. Setup SQL Server
 		1. Run DDL in canopy-sql/ddl
 		2. Run DML in canopy-sql/dml
 
@@ -112,10 +121,10 @@ SECRET :b:
 	        2. Edit "terraform/dev/cronjob/main.tf"
 		        1. Edit "terraform { backend {} }" as needed
 		        2. Edit "locals { * }" as needed
-			1. cd terraform/dev/cronjob
-			2. terraform init
-			3. terraform apply
-			4. To make sure the secret for the "Setup Canopy" step is created, manually trigger this through the Kubernetes dashboard
+			3. cd terraform/dev/cronjob
+			4. terraform init
+			5. terraform apply
+			6. To make sure the secret for the "Setup Canopy" step is created, manually trigger this through the Kubernetes dashboard
 	
 	2. Configure secrets
 		1. Edit canopy-kubernetes-config/dev/canopy/secrets
@@ -125,8 +134,8 @@ SECRET :b:
 			4. canopy.event-hub.password
 			5. google.api.key
 		2. Edit canopy-kubernetes-config/dev/canopy/gremlin-cosmos.yaml
-		2. cd canopy-kubernetes-config
-		3. ./update_all.sh dev
+		3. cd canopy-kubernetes-config
+		4. ./update_all.sh dev
 	
 	3. Deploy Canopy containers
 		1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
