@@ -86,7 +86,7 @@ SECRET :b:
 	3. terraform apply
 	4. Configure user(s) in Gremlin
 	    1. Create graph database in Cosmos
-			<benji>
+		![Image](../AddGraph.png)
 	    5. Download Gremlin / Tinkerpop console http://tinkerpop.apache.org/docs/current/tutorials/the-gremlin-console/
 		6. conf/remote.yaml
 		8. hosts: [168.61.37.11]
