@@ -45,8 +45,7 @@ SECRET :b:
 	10. serializer: { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV1d0, config: { serializeResultToString: true }}
 	11. bin/gremlin.sh
 		- :remote connect tinkerpop.server conf/remote.yaml
-		- :> g.addV(label, 'Branch', 'id', 'Sapience', 'name', 'Sapience')
-		- :> g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').next().addEdge('BELONGS_TO', g.V(0).next())
+		- :> g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))
 
 3. Setup Canopy
 	1. Setup Canopy container registry credentials
@@ -177,5 +176,4 @@ SECRET :b:
 				- serializer: { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV1d0, config: { serializeResultToString: true }}
 				- bin/gremlin.sh
 				- :remote connect tinkerpop.server conf/remote.yaml
-				- :> g.addV(label, 'Branch', 'id', 'Sapience', 'name', 'Sapience')
-				- :> g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').next().addEdge('BELONGS_TO', g.V(0).next())
+				- :> g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))
