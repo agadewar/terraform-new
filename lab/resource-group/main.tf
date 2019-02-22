@@ -9,22 +9,25 @@ terraform {
 
 provider "azurerm" {
   version = "1.20.0"
+  subscription_id = "${local.subscription_id}"
 }
 
 locals {
   subscription_id = "a450fc5d-cebe-4c62-b61a-0069ab902ee7"
 
+  resource_group_name = "LabEnvironment"
+
   common_tags = {
     Customer = "Sapience"
     Product = "Sapience"
-    Environment = "dev"
+    Environment = "Lab"
     Component = "Resource Group"
     ManagedBy = "Terraform"
   }
 }
 
 resource "azurerm_resource_group" "sapience" {
-  name     = "LabEnvironment"
+  name     = "${local.resource_group_name}"
   location = "eastus"
 
   tags = "${merge(

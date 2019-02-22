@@ -8,17 +8,17 @@ terraform {
 }
 
 locals {
-  namespace                         = "lab"
+  namespace                         = "dev"
   kubeconfig_path                   = "../../lab/kubernetes/kubeconfig"
   container_registry_hostname       = "406661537381.dkr.ecr.us-east-1.amazonaws.com"
   deployment_image_pull_secret_name = "canopy-container-registry-credential"
 
-  default_token = "default-token-6s4dn"
+  default_token = "default-token-phrtl"
 
   common_labels = {
     "app.kubernetes.io/customer"    = "Sapience"
 	  "app.kubernetes.io/product"     = "Sapience"
-	  "app.kubernetes.io/environment" = "dev"
+	  "app.kubernetes.io/environment" = "Dev"
 	  "app.kubernetes.io/component"   = "Canopy"
 	  "app.kubernetes.io/managed-by"  = "Terraform"
   }
@@ -336,7 +336,7 @@ module "canopy_device_service" {
         {
           secret_key_ref = [
             {
-              name = "eventpipeline-leaf-broker"
+              name = "canopy-device-service"
               key = "canopy.amqp.password"
             }
           ]
@@ -424,7 +424,7 @@ module "eventpipeline_service" {
         {
           secret_key_ref = [
             {
-              name = "canopy-user-service"
+              name = "eventpipeline-service"
               key = "canopy.database.username"
             }
           ]
@@ -437,7 +437,7 @@ module "eventpipeline_service" {
         {
           secret_key_ref = [
             {
-              name = "canopy-user-service"
+              name = "eventpipeline-service"
               key = "canopy.database.password"
             }
           ]
@@ -450,7 +450,7 @@ module "eventpipeline_service" {
         {
           secret_key_ref = [
             {
-              name = "eventpipeline-leaf-broker"
+              name = "eventpipeline-service"
               key = "canopy.amqp.password"
             }
           ]
@@ -521,13 +521,26 @@ module "sapience_event_hub_journal" {
         {
           secret_key_ref = [
             {
-              name = "eventpipeline-leaf-broker"
+              name = "sapience-event-hub-journal"
               key = "canopy.amqp.password"
             }
           ]
         }
       ]
-    }
+    },
+   {
+      name = "CANOPY_EVENT_HUB_PASSWORD"
+      value_from = [
+        {
+          secret_key_ref = [
+            {
+              name = "sapience-event-hub-journal"
+              key = "canopy.event-hub.password"
+            }
+          ]
+        }
+      ]
+    } 
   ]
 
   service_spec = [

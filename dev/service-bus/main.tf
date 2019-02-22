@@ -9,6 +9,7 @@ terraform {
 
 provider "azurerm" {
   version = "1.20.0"
+  subscription_id = "${local.subscription_id}"
 }
 
 data "terraform_remote_state" "resource_group" {
@@ -22,7 +23,7 @@ data "terraform_remote_state" "resource_group" {
 }
 
 locals {
-  Environment = "dev"
+  environment = "dev"
   subscription_id = "a450fc5d-cebe-4c62-b61a-0069ab902ee7"
   common_tags = {
     Customer = "Sapience"
@@ -34,7 +35,7 @@ locals {
 }
 
 resource "azurerm_servicebus_namespace" "namespace" {
-  name                = "sapience-dev"
+  name                = "sapience-${local.environment}"
   location            = "${data.terraform_remote_state.resource_group.resource_group_location}"
   resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
   sku                 = "Standard"

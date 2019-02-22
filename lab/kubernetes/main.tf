@@ -12,11 +12,11 @@ provider "azurerm" {
   subscription_id = "${local.subscription_id}"
 }
 
-provider "kubernetes" {
+/* provider "kubernetes" {
   version = "1.5.0"
 
   config_path = "../kubernetes/kubeconfig"
-}
+} */
 
 provider "null" {
   version = "2.0.0"
@@ -38,22 +38,25 @@ data "terraform_remote_state" "resource_group" {
 }
 
 locals {
-  kubernetes_version        = "1.11.7"
+  kubernetes_version        = "1.12.5"
   cluster_name              = "lab"
   min_count                 = "2"
   max_count                 = "8"
   agent_pool_profile_1_name = "default"
+  agent_pool_profile_1_vm_size = "Standard_D2_v2"
   dns_prefix                = "${local.cluster_name}"
   subscription_id           = "a450fc5d-cebe-4c62-b61a-0069ab902ee7"
   app_id                    = "e68bc794-bad9-4605-9a84-69722969e2fc"
   tenant                    = "9c5c9da2-8ba9-4f91-8fa6-2c4382395477"
   password                  = "1b24afc1-3f4e-4351-8727-29917fde1991"
+  linux_profile_admin_username = "sapience"
+  linux_profile_ssh_key_loc = "/home/scardis/.ssh/id_rsa.pub"
 
 
   common_tags = {
     Customer = "Sapience"
     Product = "Sapience"
-    Environment = "dev"
+    Environment = "Lab"
     Component = "Kubernetes"
     ManagedBy = "Terraform"
   }
@@ -70,17 +73,17 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   kubernetes_version  =  "${local.kubernetes_version}"
 
   linux_profile {
-      admin_username = "sapience"
+      admin_username = "${local.linux_profile_admin_username}"
 
       ssh_key {
-        key_data = "${file("/home/scardis/.ssh/id_rsa.pub")}"
+        key_data = "${file("${local.linux_profile_ssh_key_loc}")}"
       }
   }
 
   agent_pool_profile {
     name            = "${local.agent_pool_profile_1_name}"
     count           = "${local.min_count}"
-    vm_size         = "Standard_D2_v2"
+    vm_size         = "${local.agent_pool_profile_1_vm_size}"
     os_type         = "Linux"
     os_disk_size_gb = 30
   }
@@ -156,58 +159,58 @@ resource "null_resource" "kubernetes_config_autoscaler" {
 }
 
 
-##### "dev" evironment (BEGIN)
-resource "kubernetes_namespace" "lab" {
-  depends_on = ["null_resource.kubeconfig"]
+# ##### "dev" evironment (BEGIN)
+# resource "kubernetes_namespace" "lab" {
+#   depends_on = ["null_resource.kubeconfig"]
 
-  metadata {
-    name = "lab"
-  }
-}
+#   metadata {
+#     name = "lab"
+#   }
+# }
 
-resource "kubernetes_resource_quota" "resource_quota_dev" {
-  metadata {
-    name = "resource-quota-dev"
-    namespace = "lab"
-  }
+# resource "kubernetes_resource_quota" "resource_quota_dev" {
+#   metadata {
+#     name = "resource-quota-dev"
+#     namespace = "lab"
+#   }
 
-  spec {
-    hard {
-      requests.memory = "7Gi"
-      requests.cpu = "2"
-    }
-  }
-}
+#   spec {
+#     hard {
+#       requests.memory = "7Gi"
+#       requests.cpu = "2"
+#     }
+#   }
+# }
 
-resource "azurerm_public_ip" "aks_egress_dev" {
-  name                = "aks-egress-dev"
-  location            = "${azurerm_kubernetes_cluster.kubernetes.location}"
-  # resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
-  resource_group_name = "${data.template_file.node_resource_group.rendered}"
-  public_ip_address_allocation   = "Static"
+# resource "azurerm_public_ip" "aks_egress_dev" {
+#   name                = "aks-egress-dev"
+#   location            = "${azurerm_kubernetes_cluster.kubernetes.location}"
+#   # resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
+#   resource_group_name = "${data.template_file.node_resource_group.rendered}"
+#   public_ip_address_allocation   = "Static"
 
-  tags = "${merge(
-    local.common_tags,
-    map()
-  )}"
-}
+#   tags = "${merge(
+#     local.common_tags,
+#     map()
+#   )}"
+# }
 
-resource "kubernetes_service" "aks_egress_dev" {
-  metadata {
-    labels {
-      "app.kubernetes.io/name" = "azure-egress"
-    }
+# resource "kubernetes_service" "aks_egress_dev" {
+#   metadata {
+#     labels {
+#       "app.kubernetes.io/name" = "azure-egress"
+#     }
 
-    name = "azure-egress"
-    namespace = "lab"
-  }
+#     name = "azure-egress"
+#     namespace = "lab"
+#   }
 
-  spec {
-    load_balancer_ip = "${azurerm_public_ip.aks_egress_dev.ip_address}"
-    type = "LoadBalancer"
-    port {
-      port = "80"
-    }
-  }
-}
-##### "dev" evironment (END)
+#   spec {
+#     load_balancer_ip = "${azurerm_public_ip.aks_egress_dev.ip_address}"
+#     type = "LoadBalancer"
+#     port {
+#       port = "80"
+#     }
+#   }
+# }
+# ##### "dev" evironment (END)
