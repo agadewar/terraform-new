@@ -76,54 +76,8 @@ SECRET :b:
 		4. Edit Dockerfile for eventpipeline-service in cat eventpipeline.sources.in.queue=sapience-dev-canopy-eventpipeline\n\
 	
 	3. Deploy ConfigMaps and Secrets
-		1. eventpipeline-leaf-broker
-			```
-			cd /c/projects-sapience/canopy-kubernetes-config/dev/canopy
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig  --ignore-not-found=true --namespace=dev delete configmap eventpipeline-leaf-broker
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig create configmap eventpipeline-leaf-broker --namespace=dev --from-file=application.properties=eventpipeline-leaf-broker.properties --from-file=global.properties=global.properties
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig  --ignore-not-found=true --namespace=dev delete secret eventpipeline-leaf-broker
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig create secret generic eventpipeline-leaf-broker --namespace=dev --from-file=secrets/canopy.database.username --from-file=secrets/canopy.database.password --from-file=secrets/canopy.amqp.password
-			```
-		2. canopy-user-service
-			```
-			cd /c/projects-sapience/canopy-kubernetes-config/dev/canopy
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig  --ignore-not-found=true --namespace=dev delete configmap canopy-user-service
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig create configmap canopy-user-service --namespace=dev --from-file=application.properties=canopy-user-service.properties --from-file=global.properties=global.properties
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig  --ignore-not-found=true --namespace=dev delete secret canopy-user-service
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig create secret generic canopy-user-service --namespace=dev --from-file=secrets/canopy.database.username --from-file=secrets/canopy.database.password --from-file=secrets/canopy.amqp.password
-			```
-		3. canopy-hierarchy-service
-			```
-			cd /c/projects-sapience/canopy-kubernetes-config/dev/canopy
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig  --ignore-not-found=true --namespace=dev delete configmap canopy-hierarchy-service
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig create configmap canopy-hierarchy-service --namespace=dev --from-file=application.properties=canopy-hierarchy-service.properties --from-file=global.properties=global.properties
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig  --ignore-not-found=true --namespace=dev delete secret canopy-hierarchy-service
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig create secret generic canopy-hierarchy-service --namespace=dev
-			```
-		4. canopy-device-service
-			```
-			cd /c/projects-sapience/canopy-kubernetes-config/dev/canopy
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig  --ignore-not-found=true --namespace=dev delete configmap canopy-device-service
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig create configmap canopy-device-service --namespace=dev --from-file=application.properties=canopy-device-service.properties --from-file=global.properties=global.properties
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig  --ignore-not-found=true --namespace=dev delete secret canopy-device-service
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig create secret generic canopy-device-service --namespace=dev --from-file=secrets/canopy.database.username --from-file=secrets/canopy.database.password --from-file=secrets/google.api.key --from-file=secrets/canopy.amqp.password
-			```
-		5. eventpipeline-service
-			```
-			cd /c/projects-sapience/canopy-kubernetes-config/dev/canopy
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig  --ignore-not-found=true --namespace=dev delete configmap eventpipeline-service
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig create configmap eventpipeline-service --namespace=dev --from-file=application.properties=eventpipeline-service.properties --from-file=global.properties=global.properties
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig  --ignore-not-found=true --namespace=dev delete secret eventpipeline-service
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig create secret generic eventpipeline-service --namespace=dev --from-file=secrets/canopy.database.username --from-file=secrets/canopy.database.password --from-file=secrets/canopy.amqp.password
-			```
-		6. sapience-event-hub-journal
-			```
-			cd /c/projects-sapience/canopy-kubernetes-config/dev/canopy
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig  --ignore-not-found=true --namespace=dev delete configmap sapience-event-hub-journal
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig create configmap sapience-event-hub-journal --namespace=dev --from-file=application.properties=sapience-event-hub-journal.properties --from-file=global.properties=global.properties
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig  --ignore-not-found=true --namespace=dev delete secret sapience-event-hub-journal
-			kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig create secret generic sapience-event-hub-journal --namespace=dev --from-file=secrets/canopy.amqp.password
-			```
+		1. cd /c/projects-sapience/canopy-kubernetes-config
+		2. ./update_all.sh <env> (i.e. ./update_all.sh dev)
 	4. Deploy Canopy containers
 		1. cd /c/projects-sapience/terraform/dev/canopy
 		2. terraform init
@@ -209,13 +163,7 @@ SECRET :b:
 			- <font color="red">be sure to copy the amqp.password from the Azure Service Bus</font>
 		4. Deploy ConfigMaps and Secrets
 			1. cd canopy-kubernetes-config
-			2. ./aws.sh dev2
-			3. ./eventpipeline-leaf-broker.sh dev2
-			4. ./canopy-user-service.sh dev2
-			5. ./canopy-hierarchy-service.sh dev2
-			6. ./canopy-device-service.sh dev2
-			7. ./eventpipeline-service.sh dev2
-			8. ./sapience-event-hub-journal.sh dev2
+			2. ./update_all.sh dev2
 		5. Run "terraform init && terraform apply" against each of the following folders
 			1. /terraform/dev2/cronjob
 			2. /terraform/dev2/gremlin
