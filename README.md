@@ -20,19 +20,35 @@ SECRET :b:
 ##### 5. Create "Lab" infrastructure
 1. Setup resource group(s)
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
-	1. Edit "terraform/lab/resource-group/main.tf"
+	2. Edit "terraform/lab/resource-group/main.tf"
 		1. Edit "terraform { backend {} }" as needed
 		2. Edit "locals { subscription_id }" as needed
 		3. Edit "locals { resource_group_name }" as needed
 		4. Edit "locals { common_tags {} }" as needed
-	2. cd terraform/lab/resource-group
-    3. terraform init
-	4. terraform apply
+	3. cd terraform/lab/resource-group
+    4. terraform init
+	5. terraform apply
 
 2. Setup Kubernetes/AKS
-	1. cd /c/projects-sapience/terraform/lab/kubernetes
-	2. terraform init
-	3. terraform apply
+    1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
+	2. Edit "terraform/lab/resource-group/main.tf"
+		1. Edit "terraform { backend {} }" as needed
+		2. Edit "locals { subscription_id }" as needed
+		3. Edit "locals { app_id }" as needed
+		4. Edit "locals { tenant }" as needed
+		5. Edit "locals { password }" as needed
+		6. Edit "locals { cluster_name }" as needed
+		7. Edit "locals { agent_pool_profile_1_vm_size }" as needed"
+		8. Edit "locals { linux_profile_admin_username }" as needed"
+		9. Edit "locals { linux_profile_ssh_key_loc }" as needed"
+		10. Edit "locals { common_tags {} }" as needed
+		11. Edit "data.terraform_remote_state.resource_group { config {} }" as needed
+		12. Edit "resource.azurerm_kubernetes_cluster.kubernetes { * }" as needed
+		13. Add / edit any namespace sections that need to be created (see "##### "dev" namespace (BEGIN)" -> "##### "dev" namespace (END)" )
+	3. cd terraform/lab/kubernetes
+	4. terraform init
+	5. terraform apply
+	
 ##### 6. Create "Dev" infrastructure
 1. Setup service-bus
 	1. cd /c/projects-sapience/terraform/dev/service-bus
