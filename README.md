@@ -3,25 +3,31 @@
 #<font color="orange"> **Setup Sapience Azure Account via Terraform** </font>
 
 ---
-##### 1. Create a "terraformstatesapience" Storage Account via the Azure Portal
+##### 1. Create a Storage Account (via the Azure Portal) for Terraform remote state storage (i.e. "tfstatelower")
 
 ##### 2. Create a "tfstate" Blob container (private)
 
-##### 3. Retrieve the "Access Key" for the "terraformstatesapience" Storage Account via the Azure Portal... this will be used in Terraform "backend" blocks in each Terraform main.tf
+##### 3. Retrieve the "Access Key" for the Terraform remote state Storage Account via the Azure Portal... this will be used in Terraform "backend" blocks in each Terraform main.tf
 SECRET :a:
 
 ##### 4. Create an Azure Service Principal via the Azure CLI: see Microsoft AKS documentation, Microsoft Azure CLI documentation, and Terraform documentation
-1. az account set --subscription="102120b5-ffe5-46c3-bdb5-19248bcb798b"
-2. az ad sp create-for-rbac --skip-assignment --name Terraform
+1. az account set --subscription="<subscription_id>"
+2. az ad sp create-for-rbac --skip-assignment --name Terraform (if the sp has already been created, use "az ad sp show --id http://Terraform")
 3. Copy and store the output of the command above
 
 SECRET :b:
 
 ##### 5. Create "Lab" infrastructure
 1. Setup resource group(s)
-	1. cd /c/projects-sapience/terraform/lab/resource-group
-	2. terraform init
-	3. terraform apply
+    1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
+	1. Edit "terraform/lab/resource-group/main.tf"
+		1. Edit "terraform { backend {} }" as needed
+		2. Edit "locals { subscription_id }" as needed
+		3. Edit "locals { resource_group_name }" as needed
+		4. Edit "locals { common_tags {} }" as needed
+	2. cd terraform/lab/resource-group
+    3. terraform init
+	4. terraform apply
 
 2. Setup Kubernetes/AKS
 	1. cd /c/projects-sapience/terraform/lab/kubernetes
@@ -171,7 +177,7 @@ SECRET :b:
 			1. /terraform/dev2/canopy
 		8. Setup the root of the hierarchy via Gremlin CLI
 			1. conf/remote.yaml
-				- hosts: [168.61.37.11]
+				- hosts: [ Cosmos host ]
 				- port: 8182
 				- serializer: { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV1d0, config: { serializeResultToString: true }}
 				- bin/gremlin.sh
