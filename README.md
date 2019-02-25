@@ -3,7 +3,7 @@
 #<font color="orange"> **Setup Sapience Azure Account via Terraform** </font>
 
 ---
-##### 1. Create a Storage Account (via the Azure Portal) for Terraform remote state storage (i.e. "tfstatelower")
+##### 1. Create a Storage Account (via the Azure Portal) for Terraform remote state storage for the resource group (i.e. "tfstatelab")
 
 ##### 2. Create a "tfstate" Blob container (private)
 
