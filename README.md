@@ -29,13 +29,14 @@ SECRET :b:
 
 2. Setup Kubernetes/AKS
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
-	2. Edit "terraform/lab/kubernetes/main.tf"
+	2. Remove any existing terraform/lab/kubernetes/kubeconfig
+	3. Edit "terraform/lab/kubernetes/main.tf"
 		1. Edit "terraform { backend {} }" as needed
 		2. Edit "locals { * }" as needed
 		3. Edit "data.terraform_remote_state.resource_group { config {} }" as needed
-	3. cd terraform/lab/kubernetes
-	4. terraform init
-	5. terraform apply
+	4. cd terraform/lab/kubernetes
+	5. terraform init
+	6. terraform apply
 	- If it returns an error similar to this, you'll need to run Step 5 (Create "Lab" infrastructure -> Set resource group): 
 	<font color="red"> Error inspecting states in the "azurerm" backend: Get https://terraformstatesapience.blob.core.windows.net/tfstate?comp=list&prefix=sapience.lab.kubernetes.terraform.tfstateenv%3A&restype=container: dial tcp: lookup terraformstatesapience.blob.core.windows.net on 64.238.96.12:53: no such host </font>
 	
