@@ -144,7 +144,7 @@ SECRET :b:
 		1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	    2. Edit "terraform/dev/canopy/main.tf"
 		    1. Edit "terraform { backend {} }" as needed
-		    2. Edit "locals { * }" as needed
+		    2. Edit "locals { * }" as needed   *** be sure to change the "default_token" property based on the K8S namespace default token that is generated automatically (look in K8S Secrets)
 		3. cd /c/projects-sapience/terraform/dev/canopy
 		4. terraform init
 		5. terraform apply
