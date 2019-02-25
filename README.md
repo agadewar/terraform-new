@@ -99,14 +99,8 @@ SECRET :b:
 	6. Configure user(s) in Gremlin
 	    1. Create graph database in Cosmos
 		![Image](../AddGraph.png)
-	    2. Download Gremlin / Tinkerpop console http://tinkerpop.apache.org/docs/current/tutorials/the-gremlin-console/
-		3. conf/remote.yaml
-		4. hosts: [168.61.37.11]
-		5. port: 8182
-		6. serializer: { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV1d0, config: { serializeResultToString: true }}
-		7. bin/gremlin.sh
-		    - :remote connect tinkerpop.server conf/remote.yaml
-			- :> g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))
+	    2. Execute this Gremlin query via the Cosmos portal:
+			- g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))
 	7. Setup SQL Server
 		1. Run DDL in canopy-sql/ddl
 		2. Run DML in canopy-sql/dml
