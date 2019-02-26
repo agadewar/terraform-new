@@ -1,7 +1,7 @@
 terraform {
   backend "azurerm" {
-    access_key           = "lo8HUaHNNDrFRHsTL+5uNuykv+WfQSHNxgXWqdcxE2vbk/eiSgaZx+gP2bHdU9TWKJk+PqhhyB0wY95wOCLDoQ=="
-    storage_account_name = "tfstatelower"
+    access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
+    storage_account_name = "sapiencetfstatelab"
 	  container_name       = "tfstate"
     key                  = "sapience.dev.canopy.terraform.tfstate"
   }
@@ -13,7 +13,7 @@ locals {
   container_registry_hostname       = "406661537381.dkr.ecr.us-east-1.amazonaws.com"
   deployment_image_pull_secret_name = "canopy-container-registry-credential"
 
-  default_token = "default-token-phrtl"
+  default_token = "default-token-m5mqz"
 
   common_labels = {
     "app.kubernetes.io/customer"    = "Sapience"

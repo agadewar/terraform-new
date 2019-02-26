@@ -1,7 +1,7 @@
 terraform {
   backend "azurerm" {
-    access_key           = "lo8HUaHNNDrFRHsTL+5uNuykv+WfQSHNxgXWqdcxE2vbk/eiSgaZx+gP2bHdU9TWKJk+PqhhyB0wY95wOCLDoQ=="
-    storage_account_name = "tfstatelower"
+    access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
+    storage_account_name = "sapiencetfstatelab"
 	  container_name       = "tfstate"
     key                  = "sapience.lab.resource-group.terraform.tfstate"
   }
@@ -15,7 +15,7 @@ provider "azurerm" {
 locals {
   subscription_id = "a450fc5d-cebe-4c62-b61a-0069ab902ee7"
 
-  resource_group_name = "LabEnvironment"
+  resource_group_name = "Lab"
 
   common_tags = {
     Customer = "Sapience"
