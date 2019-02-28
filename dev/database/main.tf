@@ -87,8 +87,8 @@ resource "azurerm_sql_firewall_rule" "banyan" {
   end_ip_address      = "50.20.0.62"
 }
 
-resource "azurerm_cosmosdb_account" "mdm" {
-  name                = "sapience-mdm-${local.environment}"
+resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
+  name                = "sapience-canopy-hierarchy-${local.environment}"
   resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
   location            = "${data.terraform_remote_state.resource_group.resource_group_location}"
   offer_type          = "Standard"
@@ -100,12 +100,48 @@ resource "azurerm_cosmosdb_account" "mdm" {
     }
   ]
 
-  enable_automatic_failover = false
+  consistency_policy {
+    consistency_level = "Strong"
+  }
+
+  geo_location {
+    location          = "${local.cosmos_failover_location}"
+    failover_priority = 0
+  }
+}
+
+resource "azurerm_cosmosdb_account" "sapience_graph" {
+  name                = "sapience-graph-${local.environment}"
+  resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
+  location            = "${data.terraform_remote_state.resource_group.resource_group_location}"
+  offer_type          = "Standard"
+  kind                = "GlobalDocumentDB"
+
+  capabilities = [
+    {
+      name = "EnableGremlin"
+    }
+  ]
 
   consistency_policy {
-    consistency_level       = "BoundedStaleness"
-    max_interval_in_seconds = 10
-    max_staleness_prefix    = 200
+    consistency_level = "Strong"
+  }
+
+  geo_location {
+    location          = "${local.cosmos_failover_location}"
+    failover_priority = 0
+  }
+}
+
+resource "azurerm_cosmosdb_account" "sapience_mdm" {
+  name                = "sapience-mdm-${local.environment}"
+  resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
+  location            = "${data.terraform_remote_state.resource_group.resource_group_location}"
+  offer_type          = "Standard"
+  kind                = "MongoDB"
+
+  consistency_policy {
+    consistency_level = "Strong"
   }
 
   geo_location {
