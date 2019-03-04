@@ -40,13 +40,13 @@ resource "kubernetes_namespace" "namespace" {
   }
 }
 
+#See: https://akomljen.com/get-kubernetes-cluster-metrics-with-prometheus-in-5-minutes/
+
 resource "helm_release" "prometheus" {
     name       = "prometheus"
     namespace  = "${local.namespace}"
     chart      = "stable/prometheus-operator"
+    values = [
+      "${file("custom-values.yaml")}"
+    ]
 }
-
-
-
-
-

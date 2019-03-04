@@ -3,7 +3,7 @@ terraform {
     access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
     storage_account_name = "sapiencetfstatelab"
 	  container_name       = "tfstate"
-    key                  = "sapience.lab.efk.terraform.tfstate"
+    key                  = "sapience.lab.logging.terraform.tfstate"
   }
 }
 
@@ -29,7 +29,7 @@ locals {
     Customer = "Sapience"
     Product = "Sapience"
     Environment = "Lab"
-    Component = "EFK"
+    Component = "Logging"
     ManagedBy = "Terraform"
   }
 }
@@ -40,7 +40,7 @@ resource "kubernetes_namespace" "namespace" {
   }
 }
 
-
+# See: https://akomljen.com/get-kubernetes-logs-with-efk-stack-in-5-minutes/
 resource "helm_repository" "akomljen_charts" {
     name = "akomljen-charts"
     url  = "https://raw.githubusercontent.com/komljen/helm-charts/master/charts/"
@@ -54,12 +54,10 @@ resource "helm_release" "es_operator" {
 }
 
 resource "helm_release" "efk" {
+    depends_on = [ "helm_release.es_operator" ]
+
     name       = "efk"
     namespace = "${local.namespace}"
     repository = "${helm_repository.akomljen_charts.name}"
     chart      = "akomljen-charts/efk"
 }
-
-
-
-

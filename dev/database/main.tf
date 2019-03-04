@@ -140,6 +140,12 @@ resource "azurerm_cosmosdb_account" "sapience_mdm" {
   offer_type          = "Standard"
   kind                = "MongoDB"
 
+  capabilities = [
+    {
+      name = "MongoDBv3.4"
+    }
+  ]
+
   consistency_policy {
     consistency_level = "Strong"
   }
