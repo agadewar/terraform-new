@@ -40,7 +40,7 @@ data "terraform_remote_state" "resource_group" {
 locals {
   kubernetes_version        = "1.12.5"
   cluster_name              = "lab"
-  min_count                 = "2"
+  min_count                 = "3"
   max_count                 = "8"
   agent_pool_profile_1_name = "default"
   agent_pool_profile_1_vm_size = "Standard_D2_v2"
