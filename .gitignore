@@ -30,6 +30,9 @@ override.tf.json
 
 #### (End) https://raw.githubusercontent.com/github/gitignore/master/Terraform.gitignore
 
+**/secrets.tfvars
+**/backend.config
+
 **/*_original
 **/*_original_*
 

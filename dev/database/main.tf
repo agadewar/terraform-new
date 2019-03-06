@@ -24,6 +24,7 @@ data "terraform_remote_state" "resource_group" {
 
 data "terraform_remote_state" "kubernetes_namespace" {
   backend = "azurerm"
+  
   config {
     access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
     storage_account_name = "sapiencetfstatelab"
