@@ -94,7 +94,7 @@ module "eventpipeline_leaf_broker" {
 
   service_spec = [
     {
-      type = "LoadBalancer"
+      # type = "LoadBalancer"
       selector {
         "app.kubernetes.io/name" = "eventpipeline-leaf-broker"
       }
@@ -107,11 +107,11 @@ module "eventpipeline_leaf_broker" {
         }
       ]
 
-      load_balancer_source_ranges = [
-        "50.20.0.62/32",     # Banyan office
-        "24.99.117.169/32",  # Ardis home
-        "47.187.167.223/32"  # Sapience office
-      ]
+      # load_balancer_source_ranges = [
+      #   "50.20.0.62/32",     # Banyan office
+      #   "24.99.117.169/32",  # Ardis home
+      #   "47.187.167.223/32"  # Sapience office
+      # ]
     }
   ]
 
@@ -191,7 +191,7 @@ module "canopy_user_service" {
 
   service_spec = [
     {
-      type = "LoadBalancer"
+      # type = "LoadBalancer"
       selector {
         "app.kubernetes.io/name" = "canopy-user-service"
       }
@@ -208,11 +208,11 @@ module "canopy_user_service" {
         }
       ]
 
-      load_balancer_source_ranges = [
-        "50.20.0.62/32",     # Banyan office
-        "24.99.117.169/32",  # Ardis home
-        "47.187.167.223/32"  # Sapience office
-      ]
+      # load_balancer_source_ranges = [
+      #   "50.20.0.62/32",     # Banyan office
+      #   "24.99.117.169/32",  # Ardis home
+      #   "47.187.167.223/32"  # Sapience office
+      # ]
     }
   ]
 
@@ -250,7 +250,7 @@ module "canopy_hierarchy_service" {
 
   service_spec = [
     {
-      type = "LoadBalancer"
+      # type = "LoadBalancer"
       selector {
         "app.kubernetes.io/name" = "canopy-hierarchy-service"
       }
@@ -263,11 +263,11 @@ module "canopy_hierarchy_service" {
         }
       ]
 
-      load_balancer_source_ranges = [
-        "50.20.0.62/32",     # Banyan office
-        "24.99.117.169/32",  # Ardis home
-        "47.187.167.223/32"  # Sapience office
-      ]
+      # load_balancer_source_ranges = [
+      #   "50.20.0.62/32",     # Banyan office
+      #   "24.99.117.169/32",  # Ardis home
+      #   "47.187.167.223/32"  # Sapience office
+      # ]
     }
   ]
 
@@ -360,7 +360,7 @@ module "canopy_device_service" {
 
   service_spec = [
     {
-      type = "LoadBalancer"
+      # type = "LoadBalancer"
       selector {
         "app.kubernetes.io/name" = "canopy-device-service"
       }
@@ -373,12 +373,12 @@ module "canopy_device_service" {
         }
       ]
 
-      load_balancer_source_ranges = [
-        "50.20.0.62/32",     # Banyan office
-        "24.99.117.169/32",  # Ardis home
-        "47.187.167.223/32", # Sapience office
-        "208.82.111.61/32"   # Drury hotel
-      ]
+      # load_balancer_source_ranges = [
+      #   "50.20.0.62/32",     # Banyan office
+      #   "24.99.117.169/32",  # Ardis home
+      #   "47.187.167.223/32", # Sapience office
+      #   "208.82.111.61/32"   # Drury hotel
+      # ]
     }
   ]
 
@@ -461,7 +461,7 @@ module "eventpipeline_service" {
 
   service_spec = [
     {
-      type = "LoadBalancer"
+      # type = "LoadBalancer"
       selector {
         "app.kubernetes.io/name" = "eventpipeline-service"
       }
@@ -474,11 +474,11 @@ module "eventpipeline_service" {
         }
       ]
 
-      load_balancer_source_ranges = [
-        "50.20.0.62/32",     # Banyan office
-        "24.99.117.169/32",  # Ardis home
-        "47.187.167.223/32"  # Sapience office
-      ]
+      # load_balancer_source_ranges = [
+      #   "50.20.0.62/32",     # Banyan office
+      #   "24.99.117.169/32",  # Ardis home
+      #   "47.187.167.223/32"  # Sapience office
+      # ]
     }
   ]
 
@@ -545,7 +545,7 @@ module "sapience_event_hub_journal" {
 
   service_spec = [
     {
-      type = "LoadBalancer"
+      # type = "LoadBalancer"
       selector {
         "app.kubernetes.io/name" = "sapience-event-hub-journal"
       }
@@ -558,11 +558,11 @@ module "sapience_event_hub_journal" {
         }
       ]
 
-      load_balancer_source_ranges = [
-        "50.20.0.62/32",     # Banyan office
-        "24.99.117.169/32",  # Ardis home
-        "47.187.167.223/32"  # Sapience office
-      ]
+      # load_balancer_source_ranges = [
+      #   "50.20.0.62/32",     # Banyan office
+      #   "24.99.117.169/32",  # Ardis home
+      #   "47.187.167.223/32"  # Sapience office
+      # ]
     }
   ]
 
