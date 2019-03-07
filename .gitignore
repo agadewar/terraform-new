@@ -30,10 +30,7 @@ override.tf.json
 
 #### (End) https://raw.githubusercontent.com/github/gitignore/master/Terraform.gitignore
 
-*/*.secrets.tfvars
-*/*/*.secrets.auto.tfvars
-
-**/backend.config
+/secrets/**
 
 **/*_original
 **/*_original_*

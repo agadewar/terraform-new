@@ -12,18 +12,19 @@ provider "azurerm" {
   subscription_id = "${local.subscription_id}"
 }
 
+provider "helm" {
+  kubernetes {
+    config_path = "${local.config_path}"
+  }
+
+  #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
+  service_account = "tiller"
+
+}
+
 provider "kubernetes" {
     config_path = "${local.config_path}"
 }
-
-# provider "helm" {
-#   kubernetes {
-#     config_path = "${local.config_path}"
-#   }
-
-#   #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
-#   service_account = "tiller"
-# }
 
 data "terraform_remote_state" "resource_group" {
   backend = "azurerm"
@@ -69,173 +70,6 @@ locals {
   )}"
 }
 
-# resource "kubernetes_cluster_role" "traefik_ingress_controller" {
-#     metadata {
-#         name = "traefik-ingress-controller"
-#     }
-
-#     rule {
-#         api_groups = [""]
-#         resources  = ["services", "endpoints", "secrets"]
-#         verbs      = ["get", "list", "watch"]
-#     }
-
-#     rule {
-#         api_groups = ["extensions"]
-#         resources  = ["ingresses"]
-#         verbs      = ["get", "list", "watch"]
-#     }
-# }
-
-# resource "kubernetes_cluster_role_binding" "traefik_ingress_controller" {
-#     metadata {
-#         name = "traefik-ingress-controller"
-#     }
-#     role_ref {
-#         api_group = "rbac.authorization.k8s.io"
-#         kind = "ClusterRole"
-#         name = "traefik-ingress-controller"
-#     }
-#     subject {
-#         kind = "ServiceAccount"
-#         name = "traefik-ingress-controller"
-#         namespace = "kube-system"
-#     }
-# }
-
-# resource "kubernetes_service_account" "traefik_ingress_controller" {
-#   metadata {
-#     name = "traefik-ingress-controller"
-#     namespace = "kube-system"
-#   }
-#   # secret {
-#   #   name = "${kubernetes_secret.example.metadata.0.name}"
-#   # }
-# }
-
-
-# resource "kubernetes_daemonset" "traefik_ingress_controller" {
-#   metadata {
-#     name = "traefik-ingress-controller"
-#     namespace = "kube-system"
-#     labels {
-#       k8s-app = "traefik-ingress-lb"
-#     }
-#   }
-
-#   spec {
-#     selector {
-#       match_labels {
-#         k8s-app = "traefik-ingress-lb"
-#         name    = "traefik-ingress-lb"
-#       }
-#     }
-
-#     template {
-#       metadata {
-#         # namespace = "something"
-#         labels {
-#           k8s-app = "traefik-ingress-lb"
-#           name    = "traefik-ingress-lb"
-#         }
-#       }
-
-#       spec {
-#         service_account_name = "traefik-ingress-controller"
-#         termination_grace_period_seconds = 60
-
-#         container {
-#           image = "traefik"
-#           name  = "traefik-ingress-lb"
-
-#           port {
-#             name           = "http"
-#             container_port = 80
-#             host_port      = 80
-#           }
-
-#           port {
-#             name = "admin"
-#             container_port = 8080
-#           }
-
-#           security_context {
-#             capabilities {
-#               drop = [ "ALL" ]
-#               add  = [ "NET_BIND_SERVICE" ]
-#             }
-#           }
-
-#           args = []
-#         }
-#       }
-#     }
-#   }
-# }
-
-# resource "kubernetes_service" "traefik_ingress_service" {
-#   metadata {
-#     name = "traefik-ingress-service"
-#     namespace = "kube-system"
-#   }
-#   spec {
-#     selector {
-#       k8s-app = "traefik-ingress-lb"
-#     }
-#     # session_affinity = "ClientIP"
-#     port {
-#       protocol = "TCP"
-#       port = 80
-#       name = "web"
-#     }
-#     port {
-#       protocol = "TCP"
-#       port = 8080
-#       name = "admin"
-#     }
-
-#     # type = "LoadBalancer"
-#   }
-# }
-
-# resource "kubernetes_service" "traefik_web_ui" {
-#   metadata {
-#     name = "traefik-web-ui"
-#     namespace = "kube-system"
-#   }
-#   spec {
-#     selector {
-#       k8s-app = "traefik-ingress-lb"
-#     }
-#     # session_affinity = "ClientIP"
-#     port {
-#       name = "web"
-#       port = 80
-#       target_port = 8080
-#     }
-
-#     # type = "LoadBalancer"
-#   }
-# }
-
-# See: https://www.getambassador.io/user-guide/getting-started/#1-deploying-ambassador
-# data "template_file" "ambassador_rbac" {
-#   template = "${file("templates/ambassador-rbac.yaml.tpl")}"
-#   # vars {
-#   #   HOSTNAME ="api.${local.namespace}.sapience.net"
-#   # }
-# }
-
-# resource "null_resource" "ambassador_rbac" {
-#   triggers = {
-#     manifest_sha1 = "${sha1("${data.template_file.ambassador_rbac.rendered}")}"
-#   }
-
-#   provisioner "local-exec" {
-#     command = "kubectl apply --kubeconfig=${local.config_path} -f -<<EOF\n${data.template_file.ambassador_rbac.rendered}\nEOF"
-#   }
-# }
-
 # See: https://www.getambassador.io/user-guide/getting-started/#1-deploying-ambassador
 resource "null_resource" "ambassador_rbac" {
   triggers = {
@@ -252,7 +86,7 @@ resource "null_resource" "ambassador_rbac" {
 resource "kubernetes_service" "ambassador" {
   metadata {
     name = "ambassador"
-    namespace = "dev"
+    namespace = "${local.namespace}"
   }
 
   spec {
@@ -261,12 +95,21 @@ resource "kubernetes_service" "ambassador" {
     }
     # session_affinity = "ClientIP"
     port {
-      # name = "web"
+      name = "http"
       port = 80
       # target_port = 8080
     }
 
+    port {
+      name = "https"
+      port = 443
+      target_port = "https"
+    }
+
+    # See: https://github.com/terraform-providers/terraform-provider-kubernetes/pull/59
+    # Note: Due to issue above, use "null_resource.patch_ambassador_service" to patch the "externalTrafficPolicy" property
     # external_traffic_policy = "Local"
+    
     type = "LoadBalancer"
   }
 }
@@ -281,7 +124,7 @@ resource "null_resource" "patch_ambassador_service" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl patch --kubeconfig=${local.config_path} svc ambassador -n dev -p '{\"spec\":{\"externalTrafficPolicy\":\"Local\"}}'"
+    command = "kubectl patch --kubeconfig=${local.config_path} svc ambassador -n ${local.namespace} -p '{\"spec\":{\"externalTrafficPolicy\":\"Local\"}}'"
   }
 }
 
@@ -289,7 +132,7 @@ resource "null_resource" "patch_ambassador_service" {
 resource "kubernetes_service" "httpbin" {
   metadata {
     name = "httpbin"
-    namespace = "dev"
+    namespace = "${local.namespace}"
     annotations {
       "getambassador.io/config" = <<EOF
 ---
@@ -315,7 +158,7 @@ EOF
 resource "kubernetes_service" "api" {
   metadata {
     name = "api"
-    namespace = "dev"
+    namespace = "${local.namespace}"
     annotations {
       "getambassador.io/config" = <<EOF
 ---
@@ -365,4 +208,33 @@ resource "azurerm_dns_a_record" "api" {
   resource_group_name = "${local.resource_group_name}"
   ttl                 = 30
   records             = [ "${kubernetes_service.ambassador.load_balancer_ingress.0.ip}" ]
+}
+
+# See: https://www.getambassador.io/user-guide/cert-manager
+# See: https://raw.githubusercontent.com/jetstack/cert-manager/release-0.6/deploy/manifests/00-crds.yaml
+resource "null_resource" "create_cert_manager_crd" {
+  # depends_on = [ "kubernetes_service.ambassador" ]
+
+  triggers {
+    manifest_sha1 = "${sha1("${file("files/cert-manager-crds.yaml")}")}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f -<<EOF\n${file("files/cert-manager-crds.yaml")}\nEOF"
+  }
+}
+
+# #See: https://akomljen.com/get-kubernetes-cluster-metrics-with-prometheus-in-5-minutes/
+
+resource "helm_release" "cert_manager" {
+  depends_on = [ "null_resource.create_cert_manager_crd" ]
+
+  name       = "cert-manager"
+  namespace  = "${local.namespace}"
+  chart      = "stable/cert-manager"
+  
+  set {
+    name  = "webhook.enabled"
+    value = false
+  }
 }
