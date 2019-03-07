@@ -1,8 +1,5 @@
 terraform {
   backend "azurerm" {
-    access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
-    storage_account_name = "sapiencetfstatelab"
-	  container_name       = "tfstate"
     key                  = "sapience.lab.kubernetes.terraform.tfstate"
   }
 }
@@ -30,9 +27,9 @@ data "terraform_remote_state" "resource_group" {
   backend = "azurerm"
 
   config {
-    access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
-    storage_account_name = "sapiencetfstatelab"
-	  container_name       = "tfstate"
+    access_key           = "${local.backend_access_key}"
+    storage_account_name = "${local.backend_storage_account_name}"
+	  container_name       = "${local.backend_container_name}"
     key                  = "sapience.lab.resource-group.terraform.tfstate"
   }
 }
@@ -40,26 +37,28 @@ data "terraform_remote_state" "resource_group" {
 locals {
   kubernetes_version        = "1.12.5"
   cluster_name              = "lab"
-  min_count                 = "3"
+  min_count                 = "2"
   max_count                 = "8"
   agent_pool_profile_1_name = "default"
   agent_pool_profile_1_vm_size = "Standard_D2_v2"
   dns_prefix                = "${local.cluster_name}"
-  subscription_id           = "a450fc5d-cebe-4c62-b61a-0069ab902ee7"
+  subscription_id = "${var.subscription_id}"
+  /*   subscription_id           = "a450fc5d-cebe-4c62-b61a-0069ab902ee7" */
+  backend_access_key = "${var.backend_access_key}"
+  backend_storage_account_name = "${var.backend_storage_account_name}"
+  backend_container_name = "${var.backend_container_name}"
   app_id                    = "e68bc794-bad9-4605-9a84-69722969e2fc"
   tenant                    = "9c5c9da2-8ba9-4f91-8fa6-2c4382395477"
-  password                  = "1b24afc1-3f4e-4351-8727-29917fde1991"
+  password                  = "${var.password}"
   linux_profile_admin_username = "sapience"
   linux_profile_ssh_key_loc = "/home/scardis/.ssh/id_rsa.pub"
 
-
-  common_tags = {
-    Customer = "Sapience"
-    Product = "Sapience"
-    Environment = "Lab"
-    Component = "Kubernetes"
-    ManagedBy = "Terraform"
-  }
+  common_tags = "${merge(
+    var.common_tags,
+      map(
+        "Component", "Kubernetes"
+      )
+  )}"
 }
 
 #See: https://docs.microsoft.com/en-us/azure/terraform/terraform-create-k8s-cluster-with-tf-and-aks

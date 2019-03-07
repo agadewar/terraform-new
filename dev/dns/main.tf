@@ -21,12 +21,12 @@ data "terraform_remote_state" "resource_group" {
 }
 
 locals {
-  environment          = "${var.environment}"
-  subscription_id      = "${var.subscription_id}"
-  backend_access_key   = "${var.backend_access_key}"
+  environment = "${var.environment}"
+  subscription_id = "${var.subscription_id}"
+  backend_access_key = "${var.backend_access_key}"
   backend_storage_account_name = "${var.backend_storage_account_name}"
-  backend_container_name       = "${var.backend_container_name}"
-  resource_group_name  = "${data.terraform_remote_state.resource_group.resource_group_name}"
+  backend_container_name = "${var.backend_container_name}"
+  resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
   common_tags = "${merge(
     var.common_tags,
       map(

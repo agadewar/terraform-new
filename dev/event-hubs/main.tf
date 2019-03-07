@@ -1,8 +1,5 @@
 terraform {
   backend "azurerm" {
-    access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
-    storage_account_name = "sapiencetfstatelab"
-	  container_name       = "tfstate"
     key                  = "sapience.dev.event-hubs.terraform.tfstate"
   }
 }
@@ -15,23 +12,25 @@ provider "azurerm" {
 data "terraform_remote_state" "resource_group" {
   backend = "azurerm"
   config {
-    access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
-    storage_account_name = "sapiencetfstatelab"
-	  container_name       = "tfstate"
+    access_key           = "${local.backend_access_key}"
+    storage_account_name = "${local.backend_storage_account_name}"
+	  container_name       = "${local.backend_container_name}"
     key                  = "sapience.lab.resource-group.terraform.tfstate"
   }
 }
 
 locals {
-  environment = "dev"
-  subscription_id = "a450fc5d-cebe-4c62-b61a-0069ab902ee7"
-  common_tags = {
-    Customer = "Sapience"
-    Product = "Sapience"
-    Environment = "Dev"
-    Component = "Event Hubs"
-    ManagedBy = "Terraform"
-  }
+  environment = "${var.environment}"
+  subscription_id = "${var.subscription_id}"
+  backend_access_key = "${var.backend_access_key}"
+  backend_storage_account_name = "${var.backend_storage_account_name}"
+  backend_container_name = "${var.backend_container_name}"
+  common_tags = "${merge(
+    var.common_tags,
+      map(
+        "Component", "Event Hubs"
+      )
+  )}"
 }
 
 resource "azurerm_eventhub_namespace" "sapience_event_hub_journal" {

@@ -1,8 +1,5 @@
 terraform {
   backend "azurerm" {
-    access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
-    storage_account_name = "sapiencetfstatelab"
-	  container_name       = "tfstate"
     key                  = "sapience.dev.cronjob.terraform.tfstate"
   }
 }

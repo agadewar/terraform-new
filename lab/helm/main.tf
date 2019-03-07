@@ -1,8 +1,5 @@
 terraform {
   backend "azurerm" {
-    access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
-    storage_account_name = "sapiencetfstatelab"
-	  container_name       = "tfstate"
     key                  = "sapience.lab.helm.terraform.tfstate"
   }
 }
@@ -24,13 +21,12 @@ provider "helm" {
 locals {
   config_path = "../kubernetes/kubeconfig"
 
-  common_tags = {
-    Customer = "Sapience"
-    Product = "Sapience"
-    Environment = "Lab"
-    Component = "Helm"
-    ManagedBy = "Terraform"
-  }
+  common_tags = "${merge(
+    var.common_tags,
+      map(
+        "Component", "Helm"
+      )
+  )}"
 }
 
 

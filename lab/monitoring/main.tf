@@ -1,8 +1,5 @@
 terraform {
   backend "azurerm" {
-    access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
-    storage_account_name = "sapiencetfstatelab"
-	  container_name       = "tfstate"
     key                  = "sapience.lab.monitoring.terraform.tfstate"
   }
 }
@@ -25,13 +22,12 @@ locals {
   config_path = "../kubernetes/kubeconfig"
   namespace = "monitoring"
   
-  common_tags = {
-    Customer = "Sapience"
-    Product = "Sapience"
-    Environment = "Lab"
-    Component = "Monitoring"
-    ManagedBy = "Terraform"
-  }
+    common_tags = "${merge(
+    var.common_tags,
+      map(
+        "Component", "Monitoring"
+      )
+  )}"
 }
 
 resource "kubernetes_namespace" "namespace" {
