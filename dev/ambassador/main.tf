@@ -61,6 +61,10 @@ locals {
   resource_group_name  = "${data.terraform_remote_state.resource_group.resource_group_name}"
   config_path = "../../lab/kubernetes/kubeconfig"
   namespace = "dev"
+  letsencrypt_email = "${var.letsencrypt_email}"
+  letsencrypt_acme_http_domain = "${var.letsencrypt_acme_http_domain}"
+  letsencrypt_acme_http_token  = "${var.letsencrypt_acme_http_token}"
+
   
   common_tags = "${merge(
     var.common_tags,
@@ -87,6 +91,20 @@ resource "kubernetes_service" "ambassador" {
   metadata {
     name = "ambassador"
     namespace = "${local.namespace}"
+
+    annotations {
+      "getambassador.io/config" = <<EOF
+---
+apiVersion: ambassador/v1
+kind: Module
+name: tls
+config:
+  server:
+    enabled: True
+    redirect_cleartext_from: 80
+    secret: ambassador-certs
+EOF
+    }
   }
 
   spec {
@@ -103,7 +121,7 @@ resource "kubernetes_service" "ambassador" {
     port {
       name = "https"
       port = 443
-      target_port = "https"
+      # target_port = "https"
     }
 
     # See: https://github.com/terraform-providers/terraform-provider-kubernetes/pull/59
@@ -128,31 +146,31 @@ resource "null_resource" "patch_ambassador_service" {
   }
 }
 
-# See: https://www.getambassador.io/user-guide/getting-started/#3-creating-your-first-route
-resource "kubernetes_service" "httpbin" {
-  metadata {
-    name = "httpbin"
-    namespace = "${local.namespace}"
-    annotations {
-      "getambassador.io/config" = <<EOF
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  httpbin_mapping
-prefix: /httpbin/
-service: httpbin.org:80
-host_rewrite: httpbin.org
-EOF
-    }
-  }
+# # See: https://www.getambassador.io/user-guide/getting-started/#3-creating-your-first-route
+# resource "kubernetes_service" "httpbin" {
+#   metadata {
+#     name = "httpbin"
+#     namespace = "${local.namespace}"
+#     annotations {
+#       "getambassador.io/config" = <<EOF
+# ---
+# apiVersion: ambassador/v1
+# kind:  Mapping
+# name:  httpbin_mapping
+# prefix: /httpbin/
+# service: httpbin.org:80
+# host_rewrite: httpbin.org
+# EOF
+#     }
+#   }
 
-  spec {
-    port {
-      name = "httpbin"
-      port = 80
-    }
-  }
-}
+#   spec {
+#     port {
+#       name = "httpbin"
+#       port = 80
+#     }
+#   }
+# }
 
 # See: https://www.getambassador.io/user-guide/getting-started/#5-adding-a-service
 resource "kubernetes_service" "api" {
@@ -197,8 +215,14 @@ EOF
 
   spec {
     port {
+      name = "http"
       port = 80
     }
+
+    # port {
+    #   name = "https"
+    #   port = 443
+    # }
   }
 }
 
@@ -235,6 +259,80 @@ resource "helm_release" "cert_manager" {
   
   set {
     name  = "webhook.enabled"
-    value = false
+    value = "false"
+  }
+
+  set {
+    name  = "resources.requests.cpu"
+    value = "10m"
+  }
+
+  set {
+    name  = "resources.requests.memory"
+    value = "32Mi"
+  }
+}
+
+# See: https://www.getambassador.io/user-guide/cert-manager
+data "template_file" "letsencrypt_cluster_issuer" {
+  template = "${file("templates/letsencrypt-cluster-issuer.yaml.tpl")}"
+
+  vars {
+     email = "${local.letsencrypt_email}"
+  }
+}
+
+resource "null_resource" "letsencrypt_cluster_issuer" {
+  depends_on = ["helm_release.cert_manager"]
+
+  triggers {
+    template_changed = "${data.template_file.letsencrypt_cluster_issuer.rendered}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=../../lab/kubernetes/kubeconfig -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_cluster_issuer.rendered}\nEOF"
+  }
+}
+
+# See: https://www.getambassador.io/user-guide/cert-manager
+data "template_file" "letsencrypt_certificate" {
+  template = "${file("templates/letsencrypt-certificate.yaml.tpl")}"
+
+  vars {
+     namespace = "${local.namespace}"
+  }
+}
+
+resource "null_resource" "letsencrypt_certificate" {
+  depends_on = ["helm_release.cert_manager"]
+
+  triggers {
+    template_changed = "${data.template_file.letsencrypt_certificate.rendered}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=../../lab/kubernetes/kubeconfig -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_certificate.rendered}\nEOF"
+  }
+}
+
+# See: https://www.getambassador.io/user-guide/cert-manager
+data "template_file" "letsencrypt_acme_challenge_service" {
+  template = "${file("templates/letsencrypt-acme-challenge-service.yaml.tpl")}"
+
+  vars {
+    acme_http_domain = "${local.letsencrypt_acme_http_domain}"
+    acme_http_token  = "${local.letsencrypt_acme_http_token}"
+  }
+}
+
+resource "null_resource" "letsencrypt_acme_challenge_service" {
+  depends_on = ["helm_release.cert_manager"]
+
+  triggers {
+    template_changed = "${data.template_file.letsencrypt_acme_challenge_service.rendered}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=../../lab/kubernetes/kubeconfig -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_acme_challenge_service.rendered}\nEOF"
   }
 }
