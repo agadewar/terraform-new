@@ -1,8 +1,5 @@
 terraform {
   backend "azurerm" {
-/*     access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
-    storage_account_name = "sapiencetfstatelab"
-	  container_name       = "tfstate" */
     key                  = "sapience.dev.ambassador.terraform.tfstate"
   }
 }
@@ -29,9 +26,6 @@ provider "kubernetes" {
 data "terraform_remote_state" "resource_group" {
   backend = "azurerm"
   config {
-/*     access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
-    storage_account_name = "sapiencetfstatelab"
-	  container_name       = "tfstate" */
     access_key           = "${local.backend_access_key}"
     storage_account_name = "${local.backend_storage_account_name}"
 	  container_name       = "${local.backend_container_name}"
@@ -42,9 +36,6 @@ data "terraform_remote_state" "resource_group" {
 data "terraform_remote_state" "dns" {
   backend = "azurerm"
   config {
-/*     access_key           = "f6c42IJmnIymEm3ziDX2GdgrrqUVNSV82CX5/2LWcrc4bwHnCJWhPHHzQFRaQqoLLjZIle9+BsfFguI4epFNeA=="
-    storage_account_name = "sapiencetfstatelab"
-	  container_name       = "tfstate" */
     access_key           = "${local.backend_access_key}"
     storage_account_name = "${local.backend_storage_account_name}"
 	  container_name       = "${local.backend_container_name}"
@@ -111,17 +102,15 @@ EOF
     selector {
       service = "ambassador"
     }
-    # session_affinity = "ClientIP"
+
     port {
       name = "http"
       port = 80
-      # target_port = 8080
     }
 
     port {
       name = "https"
       port = 443
-      # target_port = "https"
     }
 
     # See: https://github.com/terraform-providers/terraform-provider-kubernetes/pull/59
@@ -145,32 +134,6 @@ resource "null_resource" "patch_ambassador_service" {
     command = "kubectl patch --kubeconfig=${local.config_path} svc ambassador -n ${local.namespace} -p '{\"spec\":{\"externalTrafficPolicy\":\"Local\"}}'"
   }
 }
-
-# # See: https://www.getambassador.io/user-guide/getting-started/#3-creating-your-first-route
-# resource "kubernetes_service" "httpbin" {
-#   metadata {
-#     name = "httpbin"
-#     namespace = "${local.namespace}"
-#     annotations {
-#       "getambassador.io/config" = <<EOF
-# ---
-# apiVersion: ambassador/v1
-# kind:  Mapping
-# name:  httpbin_mapping
-# prefix: /httpbin/
-# service: httpbin.org:80
-# host_rewrite: httpbin.org
-# EOF
-#     }
-#   }
-
-#   spec {
-#     port {
-#       name = "httpbin"
-#       port = 80
-#     }
-#   }
-# }
 
 # See: https://www.getambassador.io/user-guide/getting-started/#5-adding-a-service
 resource "kubernetes_service" "api" {
@@ -218,11 +181,6 @@ EOF
       name = "http"
       port = 80
     }
-
-    # port {
-    #   name = "https"
-    #   port = 443
-    # }
   }
 }
 
@@ -237,8 +195,6 @@ resource "azurerm_dns_a_record" "api" {
 # See: https://www.getambassador.io/user-guide/cert-manager
 # See: https://raw.githubusercontent.com/jetstack/cert-manager/release-0.6/deploy/manifests/00-crds.yaml
 resource "null_resource" "create_cert_manager_crd" {
-  # depends_on = [ "kubernetes_service.ambassador" ]
-
   triggers {
     manifest_sha1 = "${sha1("${file("files/cert-manager-crds.yaml")}")}"
   }
@@ -247,8 +203,6 @@ resource "null_resource" "create_cert_manager_crd" {
     command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f -<<EOF\n${file("files/cert-manager-crds.yaml")}\nEOF"
   }
 }
-
-# #See: https://akomljen.com/get-kubernetes-cluster-metrics-with-prometheus-in-5-minutes/
 
 resource "helm_release" "cert_manager" {
   depends_on = [ "null_resource.create_cert_manager_crd" ]
