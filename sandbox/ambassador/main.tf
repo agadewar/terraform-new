@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key                  = "sapience.dev.ambassador.terraform.tfstate"
+    key                  = "sapience.sandbox.ambassador.terraform.tfstate"
   }
 }
 
@@ -29,7 +29,7 @@ data "terraform_remote_state" "resource_group" {
     access_key           = "${local.backend_access_key}"
     storage_account_name = "${local.backend_storage_account_name}"
 	  container_name       = "${local.backend_container_name}"
-    key                  = "sapience.lab.resource-group.terraform.tfstate"
+    key                  = "sapience.sandbox.resource-group.terraform.tfstate"
   }
 }
 
@@ -39,7 +39,7 @@ data "terraform_remote_state" "dns" {
     access_key           = "${local.backend_access_key}"
     storage_account_name = "${local.backend_storage_account_name}"
 	  container_name       = "${local.backend_container_name}"
-    key                  = "sapience.dev.dns.terraform.tfstate"
+    key                  = "sapience.sandbox.dns.terraform.tfstate"
   }
 }
 
@@ -50,8 +50,8 @@ locals {
   backend_storage_account_name = "${var.backend_storage_account_name}"
   backend_container_name       = "${var.backend_container_name}"
   resource_group_name  = "${data.terraform_remote_state.resource_group.resource_group_name}"
-  config_path = "../../lab/kubernetes/kubeconfig"
-  namespace = "dev"
+  config_path = "../../sandbox/kubernetes/kubeconfig"
+  namespace = "sandbox"
   letsencrypt_email = "${var.letsencrypt_email}"
   letsencrypt_acme_http_domain = "${var.letsencrypt_acme_http_domain}"
   letsencrypt_acme_http_token  = "${var.letsencrypt_acme_http_token}"
@@ -73,7 +73,7 @@ resource "null_resource" "ambassador_rbac" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n dev -f -<<EOF\n${file("files/ambassador-rbac.yaml")}\nEOF"
+    command = "kubectl apply --kubeconfig=${local.config_path} -n sandbox -f -<<EOF\n${file("files/ambassador-rbac.yaml")}\nEOF"
   }
 }
 
@@ -286,8 +286,6 @@ resource "kubernetes_deployment" "ambassador" {
   }
 }
 
-
-
 # See: https://www.getambassador.io/user-guide/getting-started/#5-adding-a-service
 resource "kubernetes_service" "api" {
   metadata {
@@ -397,9 +395,40 @@ resource "null_resource" "letsencrypt_cluster_issuer" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=../../lab/kubernetes/kubeconfig -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_cluster_issuer.rendered}\nEOF"
+    command = "kubectl apply --kubeconfig=../../sandbox/kubernetes/kubeconfig -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_cluster_issuer.rendered}\nEOF"
   }
 }
+
+resource "kubernetes_service" "acme_challenge_servicename" {
+  metadata {
+    name = "acme-challenge-service"
+
+    annotations {
+      "getambassador.io/config" = <<EOF
+      ---
+      apiVersion: ambassador/v1
+      kind:  Mapping
+      name:  acme-challenge-mapping
+      prefix: /.well-known/acme-challenge
+      rewrite: ""
+      service: acme-challenge-service
+      EOF
+    }
+  }
+
+  spec {
+    selector {
+      "certmanager.k8s.io/acme-http-domain" = "${local.letsencrypt_acme_http_domain}"
+      "certmanager.k8s.io/acme-http-token" = "${local.letsencrypt_acme_http_token}"
+    }
+
+    port {
+      port = 80
+      target_port = 8089
+    }
+  }
+}
+
 
 # See: https://www.getambassador.io/user-guide/cert-manager
 data "template_file" "letsencrypt_certificate" {
@@ -418,7 +447,7 @@ resource "null_resource" "letsencrypt_certificate" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=../../lab/kubernetes/kubeconfig -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_certificate.rendered}\nEOF"
+    command = "kubectl apply --kubeconfig=../../sandbox/kubernetes/kubeconfig -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_certificate.rendered}\nEOF"
   }
 }
 
@@ -440,6 +469,6 @@ resource "null_resource" "letsencrypt_acme_challenge_service" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=../../lab/kubernetes/kubeconfig -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_acme_challenge_service.rendered}\nEOF"
+    command = "kubectl apply --kubeconfig=../../sandbox/kubernetes/kubeconfig -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_acme_challenge_service.rendered}\nEOF"
   }
 }
