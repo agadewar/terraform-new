@@ -290,3 +290,105 @@ resource "null_resource" "letsencrypt_acme_challenge_service" {
     command = "kubectl apply --kubeconfig=../../lab/kubernetes/kubeconfig -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_acme_challenge_service.rendered}\nEOF"
   }
 }
+
+# resource "kubernetes_deployment" "statsd_sink" {
+#   metadata {
+#     # creation_timestamp = null
+#     name = "statsd-sink"
+#     namespace = "${local.namespace}"
+#   }
+
+#   spec {
+#     replicas = 1
+
+#     selector {
+#       match_labels {
+#         service = "statsd-sink"
+#       }
+#     }
+
+#     template {
+#       metadata {
+#         labels {
+#           service = "statsd-sink"
+#         }
+#       }
+
+#       spec {
+#         container {
+#           name = "statsd-sink"
+#           image = "prom/statsd-exporter:v0.8.1"
+
+#           resources{
+#             requests{
+#               cpu    = "100m"
+#               memory = "25Mi"
+#             }
+#           }
+#         }
+
+#         restart_policy = "Always"
+#       }
+#     }
+#   }
+# }
+
+# resource "kubernetes_service" "statsd-sink" {
+#   metadata {
+#     name = "statsd-sink"
+#     namespace = "${local.namespace}"
+
+#     labels {
+#       "service" = "statsd-sink"
+#     }
+
+#     annotations {
+#       # "prometheus.io/probe" = "true"
+#       # "prometheus.io/scrape" = "true"
+#       # "prometheus.io/scheme" = "http"
+#       # "prometheus.io/path" = "/metrics"
+#     }
+#   }
+
+#   spec {
+#     port {
+#       protocol = "UDP"
+#       port = 8125
+#       name = "statsd-sink"
+#     }
+
+#     port {
+#       protocol = "TCP"
+#       port = 9102
+#       name = "prometheus-metrics"
+#     }
+
+#     selector {
+#       "service" = "statsd-sink"
+#     }
+#   }
+# }
+
+# # See: https://www.getambassador.io/user-guide/getting-started/#1-deploying-ambassador
+# resource "null_resource" "statsd_sink" {
+#   triggers = {
+#     manifest_sha1 = "${sha1("${file("files/statsd-sink.yaml")}")}"
+#     timestamp = "${timestamp()}"   # DELETE ME
+#   }
+
+#   provisioner "local-exec" {
+#     command = "kubectl apply --kubeconfig=${local.config_path} -n monitoring -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
+#   }
+# }
+
+# # See: https://www.getambassador.io/user-guide/getting-started/#1-deploying-ambassador
+# resource "null_resource" "service_monitor" {
+#   triggers = {
+#     manifest_sha1 = "${sha1("${file("files/statsd-sink.yaml")}")}"
+#     timestamp = "${timestamp()}"   # DELETE ME
+#   }
+
+#   provisioner "local-exec" {
+#     command = "kubectl apply --kubeconfig=${local.config_path} -n dev -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
+#   }
+# }
