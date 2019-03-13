@@ -97,7 +97,7 @@ SECRET :b:
 	4. terraform init
 	5. terraform apply
 	6. Configure user(s) in Gremlin
-	    1. Create graph database in Cosmos
+	    1. Create graph database in Cosmos  (SHOULD BE "Database id = canopy" AND "Graph Id = hierarchy")
 		![Image](../AddGraph.png)
 	    2. Execute this Gremlin query via the Cosmos portal:
 			- g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))

@@ -116,6 +116,18 @@ resource "azurerm_sql_database" "user" {
   )}"
 }
 
+resource "azurerm_sql_database" "mdm" {
+  name                = "mdm"
+  resource_group_name = "${local.resource_group_name}"
+  location            = "${local.resource_group_location}"
+  server_name         = "${azurerm_sql_server.sapience.name}"
+
+  tags = "${merge(
+    local.common_tags,
+    map()
+  )}"
+}
+
 resource "azurerm_sql_firewall_rule" "aks_egress" {
   name                = "aks-egress"
   resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
@@ -186,25 +198,25 @@ resource "azurerm_cosmosdb_account" "sapience_graph" {
   }
 }
 
-resource "azurerm_cosmosdb_account" "sapience_mdm" {
-  name                = "sapience-mdm-${local.environment}"
-  resource_group_name = "${local.resource_group_name}"
-  location            = "${local.resource_group_location}"
-  offer_type          = "Standard"
-  kind                = "GlobalDocumentDB"
+# resource "azurerm_cosmosdb_account" "sapience_mdm" {
+#   name                = "sapience-mdm-${local.environment}"
+#   resource_group_name = "${local.resource_group_name}"
+#   location            = "${local.resource_group_location}"
+#   offer_type          = "Standard"
+#   kind                = "GlobalDocumentDB"
 
-/*   capabilities = [
-    {
-      name = "MongoDBv3.4"
-    }
-  ] */
+# /*   capabilities = [
+#     {
+#       name = "MongoDBv3.4"
+#     }
+#   ] */
 
-  consistency_policy {
-    consistency_level = "Strong"
-  }
+#   consistency_policy {
+#     consistency_level = "Strong"
+#   }
 
-  geo_location {
-    location          = "${local.cosmos_failover_location}"
-    failover_priority = 0
-  }
-}
+#   geo_location {
+#     location          = "${local.cosmos_failover_location}"
+#     failover_priority = 0
+#   }
+# }
