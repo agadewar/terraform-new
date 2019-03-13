@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key                  = "sapience.lab.monitoring.terraform.tfstate"
+    key                  = "sapience.sandbox.sandbox.monitoring.terraform.tfstate"
   }
 }
 
@@ -22,12 +22,13 @@ locals {
   config_path = "../kubernetes/kubeconfig"
   namespace = "monitoring"
   
-    common_tags = "${merge(
-    var.common_tags,
-      map(
-        "Component", "Monitoring"
-      )
-  )}"
+  common_tags = "${map(
+    "Customer", "Sapience",
+    "Product", "Sapience",
+    "Realm", "Sandbox",
+    "Component", "Monitoring",
+    "ManagedBy", "Terraform"
+    )}"
 }
 
 resource "kubernetes_namespace" "namespace" {

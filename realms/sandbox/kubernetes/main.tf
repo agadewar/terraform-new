@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key                  = "sapience.lab.kubernetes.terraform.tfstate"
+    key                  = "sapience.sandbox.sandbox.kubernetes.terraform.tfstate"
   }
 }
 
@@ -30,7 +30,7 @@ data "terraform_remote_state" "resource_group" {
     access_key           = "${local.backend_access_key}"
     storage_account_name = "${local.backend_storage_account_name}"
 	  container_name       = "${local.backend_container_name}"
-    key                  = "sapience.lab.resource-group.terraform.tfstate"
+    key                  = "sapience.sandbox.sandbox.resource-group.terraform.tfstate"
   }
 }
 
@@ -42,22 +42,21 @@ locals {
   agent_pool_profile_1_name = "default"
   agent_pool_profile_1_vm_size = "Standard_D2_v2"
   dns_prefix                = "${local.cluster_name}"
-  subscription_id = "${var.subscription_id}"
-  /*   subscription_id           = "a450fc5d-cebe-4c62-b61a-0069ab902ee7" */
+  subscription_id = "c57d6dfd-85ff-46a6-8038-1f6d97197cb6"
   backend_access_key = "${var.backend_access_key}"
   backend_storage_account_name = "${var.backend_storage_account_name}"
-  backend_container_name = "${var.backend_container_name}"
+  backend_container_name    = "${var.backend_container_name}"
   app_id                    = "e68bc794-bad9-4605-9a84-69722969e2fc"
   tenant                    = "9c5c9da2-8ba9-4f91-8fa6-2c4382395477"
-  password                  = "${var.password}"
+  kubernetes_password       = "${var.kubernetes_password}"
   linux_profile_admin_username = "sapience"
   linux_profile_ssh_key_loc = "/home/scardis/.ssh/id_rsa.pub"
-
-  common_tags = "${merge(
-    var.common_tags,
-      map(
-        "Component", "Kubernetes"
-      )
+  common_tags = "${map(
+    "Customer", "Sapience",
+    "Product", "Sapience",
+    "Realm", "Sandbox",
+    "Component", "Kubernetes",
+    "ManagedBy", "Terraform"
   )}"
 }
 
@@ -89,7 +88,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
 
   service_principal {
     client_id     = "${local.app_id}"
-    client_secret = "${local.password}"
+    client_secret = "${local.kubernetes_password}"
   }
 
   tags = "${merge(
@@ -115,7 +114,7 @@ data "template_file" "autoscaler_config" {
 
   vars {
     autoscaler_client_id           = "${base64encode(local.app_id)}"
-    autoscaler_client_secret       = "${base64encode(local.password)}"
+    autoscaler_client_secret       = "${base64encode(local.kubernetes_password)}"
     autoscaler_resource_group      = "${base64encode(azurerm_kubernetes_cluster.kubernetes.resource_group_name)}"
     autoscaler_subscription_id     = "${base64encode(local.subscription_id)}"
     autoscaler_tenant_id           = "${base64encode(local.tenant)}"

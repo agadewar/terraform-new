@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key                  = "sapience.lab.helm.terraform.tfstate"
+    key                  = "sapience.sandbox.sandbox.helm.terraform.tfstate"
   }
 }
 
@@ -20,12 +20,12 @@ provider "helm" {
 
 locals {
   config_path = "../kubernetes/kubeconfig"
-
-  common_tags = "${merge(
-    var.common_tags,
-      map(
-        "Component", "Helm"
-      )
+  common_tags = "${map(
+    "Customer", "Sapience",
+    "Product", "Sapience",
+    "Realm", "Sandbox",
+    "Component", "Helm",
+    "ManagedBy", "Terraform"
   )}"
 }
 
@@ -47,9 +47,10 @@ locals {
  resource "kubernetes_service_account" "tiller" {
   metadata {
     annotations {
-      Customer = "Banyan"
-      Product = "Global"
-      Environment = "Lab"
+      Customer = "Sapience"
+      Product = "Sapience"
+      Realm = "Sandbox"      
+      Environment = "Sandbox"
       ManagedBy = "Terraform"
     }
 
@@ -68,11 +69,12 @@ resource "kubernetes_cluster_role_binding" "tiller_cluster_rule" {
 
     metadata {
       annotations {
-        Customer = "Banyan"
-        Product = "Global"
-        Environment = "Lab"
+        Customer = "Sapience"
+        Product = "Sapience"
+        Realm = "Sandbox"      
+        Environment = "Sandbox"
         ManagedBy = "Terraform"
-        }
+      }
       
       name = "tiller-cluster-rule"
     }

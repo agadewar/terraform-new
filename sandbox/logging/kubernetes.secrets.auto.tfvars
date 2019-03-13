@@ -1,1 +1,0 @@
-../../secrets/lab/kubernetes.secrets.tfvars

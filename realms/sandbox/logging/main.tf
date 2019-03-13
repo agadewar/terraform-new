@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key                  = "sapience.lab.logging.terraform.tfstate"
+    key                  = "sapience.sandbox.sandbox.logging.terraform.tfstate"
   }
 }
 
@@ -22,11 +22,12 @@ locals {
   config_path = "../kubernetes/kubeconfig"
   namespace = "logging"
   
-    common_tags = "${merge(
-    var.common_tags,
-      map(
-        "Component", "Logging"
-      )
+  common_tags = "${map(
+    "Customer", "Sapience",
+    "Product", "Sapience",
+    "Realm", "Sandbox",
+    "Component", "Logging",
+    "ManagedBy", "Terraform"
   )}"
 }
 
