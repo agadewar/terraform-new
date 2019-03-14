@@ -10,19 +10,19 @@ provider "azurerm" {
 }
 
 locals {
-  subscription_id = "c57d6dfd-85ff-46a6-8038-1f6d97197cb6"
+  subscription_id = "${var.subscription_id}"
 
-  resource_group_name = "Sandbox"
+  resource_group_name = "${var.resource_group_name}"
 
-  resource_group_location = "eastus"
+  resource_group_location = "${var.resource_group_location}"
 
-  realm = "sandbox"
-  common_tags = "${map(
-    "Customer", "Sapience",
-    "Product", "Sapience",
-    "Realm", "Sandbox",
-    "Component", "Init",
-    "ManagedBy", "Terraform"
+  realm = "${var.realm}"
+  
+  common_tags = "${merge(
+    var.common_tags,
+      map(
+        "Component", "Resource Group"
+      )
   )}"
 }
 

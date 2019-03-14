@@ -20,12 +20,12 @@ provider "helm" {
 
 locals {
   config_path = "../kubernetes/kubeconfig"
-  common_tags = "${map(
-    "Customer", "Sapience",
-    "Product", "Sapience",
-    "Realm", "Sandbox",
-    "Component", "Helm",
-    "ManagedBy", "Terraform"
+
+  common_tags = "${merge(
+    var.common_tags,
+      map(
+        "Component", "Helm"
+      )
   )}"
 }
 
@@ -41,8 +41,6 @@ locals {
   }
 }
  */
-
-
 
  resource "kubernetes_service_account" "tiller" {
   metadata {

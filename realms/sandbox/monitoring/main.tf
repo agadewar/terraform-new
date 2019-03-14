@@ -15,20 +15,18 @@ provider "helm" {
 
   #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
   service_account = "tiller"
-
 }
 
 locals {
   config_path = "../kubernetes/kubeconfig"
   namespace = "monitoring"
-  
-  common_tags = "${map(
-    "Customer", "Sapience",
-    "Product", "Sapience",
-    "Realm", "Sandbox",
-    "Component", "Monitoring",
-    "ManagedBy", "Terraform"
-    )}"
+
+  common_tags = "${merge(
+    var.common_tags,
+      map(
+        "Component", "Monitoring"
+      )
+  )}"
 }
 
 resource "kubernetes_namespace" "namespace" {

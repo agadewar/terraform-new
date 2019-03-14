@@ -9,12 +9,6 @@ provider "azurerm" {
   subscription_id = "${local.subscription_id}"
 }
 
-/* provider "kubernetes" {
-  version = "1.5.0"
-
-  config_path = "../kubernetes/kubeconfig"
-} */
-
 provider "null" {
   version = "2.0.0"
 }
@@ -35,28 +29,28 @@ data "terraform_remote_state" "resource_group" {
 }
 
 locals {
-  kubernetes_version        = "1.12.5"
-  cluster_name              = "lab"
-  min_count                 = "2"
-  max_count                 = "8"
-  agent_pool_profile_1_name = "default"
-  agent_pool_profile_1_vm_size = "Standard_D2_v2"
-  dns_prefix                = "${local.cluster_name}"
-  subscription_id = "c57d6dfd-85ff-46a6-8038-1f6d97197cb6"
-  backend_access_key = "${var.backend_access_key}"
+  kubernetes_version           = "${var.kubernetes_version}"
+  cluster_name                 = "${var.realm}"
+  min_count                    = "${var.kubernetes_min_count}"
+  max_count                    = "${var.kubernetes_max_count}"
+  agent_pool_profile_1_name    = "default"
+  agent_pool_profile_1_vm_size = "${var.kubernetes_agent_pool_profile_1_vm_size}"
+  dns_prefix                   = "${local.cluster_name}"
+  subscription_id              = "${var.subscription_id}"
+  app_id                       = "${var.service_principal_app_id}"
+  tenant                       = "${var.service_principal_tenant}"
+  backend_access_key           = "${var.backend_access_key}"
   backend_storage_account_name = "${var.backend_storage_account_name}"
-  backend_container_name    = "${var.backend_container_name}"
-  app_id                    = "e68bc794-bad9-4605-9a84-69722969e2fc"
-  tenant                    = "9c5c9da2-8ba9-4f91-8fa6-2c4382395477"
-  kubernetes_password       = "${var.kubernetes_password}"
+  backend_container_name       = "${var.backend_container_name}"
+  kubernetes_password          = "${var.kubernetes_password}"
   linux_profile_admin_username = "sapience"
-  linux_profile_ssh_key_loc = "/home/scardis/.ssh/id_rsa.pub"
-  common_tags = "${map(
-    "Customer", "Sapience",
-    "Product", "Sapience",
-    "Realm", "Sandbox",
-    "Component", "Kubernetes",
-    "ManagedBy", "Terraform"
+  linux_profile_ssh_key_loc    = "${var.kubernetes_linux_profile_ssh_key_loc}"
+
+  common_tags = "${merge(
+    var.common_tags,
+      map(
+        "Component", "Kubernetes"
+      )
   )}"
 }
 
@@ -155,60 +149,3 @@ resource "null_resource" "kubernetes_config_autoscaler" {
     command = "kubectl apply --kubeconfig=kubeconfig -f - <<EOF\n${data.template_file.autoscaler_config.rendered}\nEOF"
   }
 }
-
-
-# ##### "dev" evironment (BEGIN)
-# resource "kubernetes_namespace" "lab" {
-#   depends_on = ["null_resource.kubeconfig"]
-
-#   metadata {
-#     name = "lab"
-#   }
-# }
-
-# resource "kubernetes_resource_quota" "resource_quota_dev" {
-#   metadata {
-#     name = "resource-quota-dev"
-#     namespace = "lab"
-#   }
-
-#   spec {
-#     hard {
-#       requests.memory = "7Gi"
-#       requests.cpu = "2"
-#     }
-#   }
-# }
-
-# resource "azurerm_public_ip" "aks_egress_dev" {
-#   name                = "aks-egress-dev"
-#   location            = "${azurerm_kubernetes_cluster.kubernetes.location}"
-#   # resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
-#   resource_group_name = "${data.template_file.node_resource_group.rendered}"
-#   public_ip_address_allocation   = "Static"
-
-#   tags = "${merge(
-#     local.common_tags,
-#     map()
-#   )}"
-# }
-
-# resource "kubernetes_service" "aks_egress_dev" {
-#   metadata {
-#     labels {
-#       "app.kubernetes.io/name" = "azure-egress"
-#     }
-
-#     name = "azure-egress"
-#     namespace = "lab"
-#   }
-
-#   spec {
-#     load_balancer_ip = "${azurerm_public_ip.aks_egress_dev.ip_address}"
-#     type = "LoadBalancer"
-#     port {
-#       port = "80"
-#     }
-#   }
-# }
-# ##### "dev" evironment (END)

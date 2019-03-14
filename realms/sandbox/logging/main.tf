@@ -22,12 +22,11 @@ locals {
   config_path = "../kubernetes/kubeconfig"
   namespace = "logging"
   
-  common_tags = "${map(
-    "Customer", "Sapience",
-    "Product", "Sapience",
-    "Realm", "Sandbox",
-    "Component", "Logging",
-    "ManagedBy", "Terraform"
+  common_tags = "${merge(
+    var.common_tags,
+      map(
+        "Component", "Logging"
+      )
   )}"
 }
 
@@ -38,7 +37,7 @@ resource "kubernetes_namespace" "namespace" {
 }
 
 # See: https://akomljen.com/get-kubernetes-logs-with-efk-stack-in-5-minutes/
-resource "helm_repository" "akomljen_charts" {
+data "helm_repository" "akomljen_charts" {
     name = "akomljen-charts"
     url  = "https://raw.githubusercontent.com/komljen/helm-charts/master/charts/"
 }
@@ -46,7 +45,7 @@ resource "helm_repository" "akomljen_charts" {
 resource "helm_release" "es_operator" {
     name       = "es-operator"
     namespace = "${local.namespace}"
-    repository = "${helm_repository.akomljen_charts.name}"
+    repository = "${data.helm_repository.akomljen_charts.name}"
     chart      = "akomljen-charts/elasticsearch-operator"
 }
 
@@ -55,6 +54,6 @@ resource "helm_release" "efk" {
 
     name       = "efk"
     namespace = "${local.namespace}"
-    repository = "${helm_repository.akomljen_charts.name}"
+    repository = "${data.helm_repository.akomljen_charts.name}"
     chart      = "akomljen-charts/efk"
 }
