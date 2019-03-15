@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key                  = "sapience.sandbox.dns.terraform.tfstate"
+    key                  = "sapience.sandbox.sandbox.dns.terraform.tfstate"
   }
 }
 
@@ -16,7 +16,7 @@ data "terraform_remote_state" "resource_group" {
     access_key           = "${local.backend_access_key}"
     storage_account_name = "${local.backend_storage_account_name}"
 	  container_name       = "${local.backend_container_name}"
-    key                  = "sapience.sandbox.resource-group.terraform.tfstate"
+    key                  = "sapience.sandbox.sandbox.resource-group.terraform.tfstate"
   }
 }
 

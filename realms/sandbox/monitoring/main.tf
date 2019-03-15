@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key                  = "sapience.sandbox.sandbox.monitoring.terraform.tfstate"
+    key = "sapience.sandbox.sandbox.monitoring.terraform.tfstate"
   }
 }
 
@@ -37,11 +37,86 @@ resource "kubernetes_namespace" "namespace" {
 
 #See: https://akomljen.com/get-kubernetes-cluster-metrics-with-prometheus-in-5-minutes/
 
+resource "null_resource" "alertmanagers_crd" {
+
+  # triggers {
+  #   manifest_sha1 = "${sha1("${file("files/crd_alertmanagers.monitoring.coreos.com.yaml")}")}"
+  # }
+
+  provisioner "local-exec" {
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/alertmanager.crd.yaml"
+  }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete customresourcedefinition alertmanagers.monitoring.coreos.com --ignore-not-found"
+  }
+}
+
+resource "null_resource" "prometheuses_crd" {
+
+  # triggers {
+  #   manifest_sha1 = "${sha1("${file("files/crd_prometheuses.monitoring.coreos.com.yaml")}")}"
+  # }
+
+  provisioner "local-exec" {
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheus.crd.yaml"
+  }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete customresourcedefinition prometheuses.monitoring.coreos.com --ignore-not-found"
+  }
+}
+
+resource "null_resource" "prometheusrules_crd" {
+
+  # triggers {
+  #   manifest_sha1 = "${sha1("${file("files/crd_prometheusrules.monitoring.coreos.com.yaml")}")}"
+  # }
+
+  provisioner "local-exec" {
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheusrule.crd.yaml"
+  }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete customresourcedefinition prometheusrules.monitoring.coreos.com --ignore-not-found"
+  }
+}
+
+resource "null_resource" "servicemonitors_crd" {
+
+  # triggers {
+  #   manifest_sha1 = "${sha1("${file("files/crd_servicemonitors.monitoring.coreos.com.yaml")}")}"
+  # }
+
+  provisioner "local-exec" {
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/servicemonitor.crd.yaml"
+  }
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete customresourcedefinition servicemonitors.monitoring.coreos.com --ignore-not-found"
+  }
+}
+
 resource "helm_release" "prometheus" {
-    name       = "prometheus"
-    namespace  = "${local.namespace}"
-    chart      = "stable/prometheus-operator"
-    values = [
-      "${file("custom-values.yaml")}"
-    ]
+  # depends_on = [ "null_resource.alertmanagers_crd", "null_resource.prometheuses_crd", "null_resource.prometheusrules_crd", "null_resource.servicemonitors_crd" ]
+  depends_on = [ "null_resource.prometheusrules_crd", "null_resource.servicemonitors_crd" ]
+
+  name       = "prometheus"
+  namespace  = "${local.namespace}"
+  chart      = "stable/prometheus-operator"
+  values = [
+    "${file("custom-values.yaml")}"
+  ]
+
+  set {
+    name  = "prometheusOperator.createCustomResource"
+    value = "false"
+  }
 }

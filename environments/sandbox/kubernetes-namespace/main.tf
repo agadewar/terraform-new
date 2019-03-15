@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key                  = "sapience.sandbox.kubernetes-namespace.terraform.tfstate"
+    key                  = "sapience.sandbox.sandbox.kubernetes-namespace.terraform.tfstate"
   }
 }
 
@@ -11,7 +11,7 @@ provider "azurerm" {
 
 provider "kubernetes" {
   version = "1.5.0"
-  config_path = "../../lab/kubernetes/kubeconfig"
+  config_path = "../../../realms/sandbox/kubernetes/kubeconfig"
 }
 
 data "terraform_remote_state" "kubernetes" {
@@ -21,7 +21,7 @@ data "terraform_remote_state" "kubernetes" {
     access_key           = "${local.backend_access_key}"
     storage_account_name = "${local.backend_storage_account_name}"
 	  container_name       = "${local.backend_container_name}"
-    key                  = "sapience.sandbox.kubernetes.terraform.tfstate"
+    key                  = "sapience.sandbox.sandbox.kubernetes.terraform.tfstate"
   }
 }
 

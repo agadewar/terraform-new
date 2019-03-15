@@ -1,0 +1,12 @@
+Acquiring state lock. This may take a few moments...
+[0m[1mnull_resource.ambassador_rbac: Refreshing state... (ID: 3301016401301404984)[0m
+[0m[1mdata.terraform_remote_state.resource_group: Refreshing state...[0m
+[0m[1mdata.terraform_remote_state.dns: Refreshing state...[0m
+[0m[1mnull_resource.create_cert_manager_crd: Refreshing state... (ID: 6496657578594342737)[0m
+[0m[1mnull_resource.delete_cert_manager_crd: Refreshing state... (ID: 6919832698678892211)[0m
+[0m[1mkubernetes_service.ambassador: Refreshing state... (ID: sandbox/ambassador)[0m
+[0m[1mkubernetes_service.api: Refreshing state... (ID: sandbox/api)[0m
+[0m[1mnull_resource.patch_ambassador_service: Refreshing state... (ID: 2151127904118585286)[0m
+Interrupt received.
+Please wait for Terraform to exit or data loss may occur.
+Gracefully shutting down...

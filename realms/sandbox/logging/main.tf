@@ -53,7 +53,7 @@ resource "helm_release" "efk" {
     depends_on = [ "helm_release.es_operator" ]
 
     name       = "efk"
-    namespace = "${local.namespace}"
+    namespace  = "${local.namespace}"
     repository = "${data.helm_repository.akomljen_charts.name}"
     chart      = "akomljen-charts/efk"
 }
