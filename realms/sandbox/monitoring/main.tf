@@ -31,6 +31,14 @@ locals {
   )}"
 }
 
+data "template_file" "custom_values" {
+  template = "${file("custom-values.yaml.tpl")}"
+
+  vars {
+    admin_password = "${var.monitoring_grafana_admin_password}"
+  }
+}
+
 resource "kubernetes_namespace" "namespace" {
   metadata {
     name = "${local.namespace}"
