@@ -1,3 +1,3 @@
-variable "common_tags" {
-    type = "map"
+variable "realm_common_tags" {
+  type = "map"
 }

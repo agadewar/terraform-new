@@ -26,7 +26,7 @@ prometheus:
               storage: 10Gi
 
 grafana:
-  adminPassword: "steve!rocks1"
+  adminPassword: "f935GxM8FRy3"
 #   ingress:
 #     enabled: true
 #     # annotations:

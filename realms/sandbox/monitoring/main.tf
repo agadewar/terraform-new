@@ -1,8 +1,10 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.sandbox.sandbox.monitoring.terraform.tfstate"
+    key = "sapience.realm.sandbox.monitoring.terraform.tfstate"
   }
 }
+
+# See: https://akomljen.com/get-kubernetes-cluster-metrics-with-prometheus-in-5-minutes/
 
 provider "kubernetes" {
     config_path = "${local.config_path}"
@@ -22,10 +24,10 @@ locals {
   namespace = "monitoring"
 
   common_tags = "${merge(
-    var.common_tags,
-      map(
-        "Component", "Monitoring"
-      )
+    var.realm_common_tags,
+    map(
+      "Component", "Monitoring"
+    )
   )}"
 }
 
@@ -35,13 +37,7 @@ resource "kubernetes_namespace" "namespace" {
   }
 }
 
-#See: https://akomljen.com/get-kubernetes-cluster-metrics-with-prometheus-in-5-minutes/
-
 resource "null_resource" "alertmanagers_crd" {
-
-  # triggers {
-  #   manifest_sha1 = "${sha1("${file("files/crd_alertmanagers.monitoring.coreos.com.yaml")}")}"
-  # }
 
   provisioner "local-exec" {
     command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/alertmanager.crd.yaml"
@@ -56,10 +52,6 @@ resource "null_resource" "alertmanagers_crd" {
 
 resource "null_resource" "prometheuses_crd" {
 
-  # triggers {
-  #   manifest_sha1 = "${sha1("${file("files/crd_prometheuses.monitoring.coreos.com.yaml")}")}"
-  # }
-
   provisioner "local-exec" {
     command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheus.crd.yaml"
   }
@@ -72,10 +64,6 @@ resource "null_resource" "prometheuses_crd" {
 }
 
 resource "null_resource" "prometheusrules_crd" {
-
-  # triggers {
-  #   manifest_sha1 = "${sha1("${file("files/crd_prometheusrules.monitoring.coreos.com.yaml")}")}"
-  # }
 
   provisioner "local-exec" {
     command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheusrule.crd.yaml"
@@ -90,10 +78,6 @@ resource "null_resource" "prometheusrules_crd" {
 
 resource "null_resource" "servicemonitors_crd" {
 
-  # triggers {
-  #   manifest_sha1 = "${sha1("${file("files/crd_servicemonitors.monitoring.coreos.com.yaml")}")}"
-  # }
-
   provisioner "local-exec" {
     command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/servicemonitor.crd.yaml"
   }
@@ -105,8 +89,7 @@ resource "null_resource" "servicemonitors_crd" {
 }
 
 resource "helm_release" "prometheus" {
-  # depends_on = [ "null_resource.alertmanagers_crd", "null_resource.prometheuses_crd", "null_resource.prometheusrules_crd", "null_resource.servicemonitors_crd" ]
-  depends_on = [ "null_resource.prometheusrules_crd", "null_resource.servicemonitors_crd" ]
+  depends_on = [ "null_resource.alertmanagers_crd", "null_resource.prometheuses_crd", "null_resource.prometheusrules_crd", "null_resource.servicemonitors_crd" ]
 
   name       = "prometheus"
   namespace  = "${local.namespace}"

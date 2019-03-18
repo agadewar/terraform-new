@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key                  = "sapience.sandbox.sandbox.helm.terraform.tfstate"
+    key = "sapience.realm.sandbox.helm.terraform.tfstate"
   }
 }
 
@@ -16,41 +16,23 @@ provider "helm" {
   service_account = "${kubernetes_service_account.tiller.metadata.0.name}"
 }
 
-
-
 locals {
   config_path = "../kubernetes/kubeconfig"
 
   common_tags = "${merge(
-    var.common_tags,
-      map(
-        "Component", "Helm"
-      )
+    var.realm_common_tags,
+    map(
+      "Component", "Helm"
+    )
   )}"
 }
 
-
-/* resource "null_resource" "cronjob_canopy_container_registry_credential_helper" {
-
-  triggers {
-    config_changed = "${sha1(file("./config/canopy-container-registry-credential-helper.yaml"))}"
-  }
-
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=../../lab/kubernetes/kubeconfig -f ./config/canopy-container-registry-credential-helper.yaml"
-  }
-}
- */
-
- resource "kubernetes_service_account" "tiller" {
+resource "kubernetes_service_account" "tiller" {
   metadata {
-    annotations {
-      Customer = "Sapience"
-      Product = "Sapience"
-      Realm = "Sandbox"      
-      Environment = "Sandbox"
-      ManagedBy = "Terraform"
-    }
+    annotations = "${merge(
+      local.common_tags,
+      map()
+    )}"
 
     name = "tiller"
     namespace = "kube-system"
@@ -66,13 +48,10 @@ resource "kubernetes_cluster_role_binding" "tiller_cluster_rule" {
     depends_on = [ "kubernetes_service_account.tiller" ]
 
     metadata {
-      annotations {
-        Customer = "Sapience"
-        Product = "Sapience"
-        Realm = "Sandbox"      
-        Environment = "Sandbox"
-        ManagedBy = "Terraform"
-      }
+      annotations = "${merge(
+        local.common_tags,
+        map()
+      )}"
       
       name = "tiller-cluster-rule"
     }
@@ -94,25 +73,10 @@ resource "kubernetes_cluster_role_binding" "tiller_cluster_rule" {
     # }
 }
 
-# resource "null_resource" "tiller_deploy_patch" {
-#   depends_on = [ "kubernetes_cluster_role_binding.tiller_cluster_rule" ]
-#   provisioner "local-exec" {
-#     command = "kubectl --kubeconfig ../eks/kubeconfig_banyan-global-lab-eks-cluster patch deploy --namespace kube-system tiller-deploy -p '{\"spec\":{\"template\":{\"spec\":{\"serviceAccount\":\"tiller\"}}}}'"
-#     #command = "kubectl --kubeconfig ../eks/kubeconfig_banyan-global-lab-eks-cluster patch deploy --namespace kube-system tiller-deploy -p '{\"spec\":{\"template\":{\"spec\":{\"serviceAccount\":\"tiller\", \"automountServiceAccountToken\":true}}}}'"
-#   }
-
-#   provisioner "local-exec" {
-#     command = "kubectl --kubeconfig ../eks/kubeconfig_banyan-global-lab-eks-cluster patch deploy --namespace kube-system tiller-deploy -p '{\"spec\":{\"template\":{\"spec\":{\"automountServiceAccountToken\":true}}}}'"
-#   }
-# }
-
 resource "null_resource" "helm_init" {
-  # depends_on = [ "null_resource.tiller_deploy_patch" ]
   depends_on = [ "kubernetes_cluster_role_binding.tiller_cluster_rule" ]
   
   provisioner "local-exec" {
     command = "helm --kubeconfig ${local.config_path} init --service-account tiller --automount-service-account-token --upgrade"
   }
 }
-
-

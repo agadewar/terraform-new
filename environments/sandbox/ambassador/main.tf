@@ -1,12 +1,12 @@
 terraform {
   backend "azurerm" {
-    key                  = "sapience.sandbox.sandbox.ambassador.terraform.tfstate"
+    key = "sapience.environment.sandbox.ambassador.terraform.tfstate"
   }
 }
 
 provider "azurerm" {
   version = "1.20.0"
-  subscription_id = "${local.subscription_id}"
+  subscription_id = "${var.subscription_id}"
 }
 
 provider "helm" {
@@ -16,52 +16,32 @@ provider "helm" {
 
   #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
   service_account = "tiller"
-
 }
 
 provider "kubernetes" {
     config_path = "${local.config_path}"
 }
 
-data "terraform_remote_state" "resource_group" {
-  backend = "azurerm"
-  config {
-    access_key           = "${local.backend_access_key}"
-    storage_account_name = "${local.backend_storage_account_name}"
-	  container_name       = "${local.backend_container_name}"
-    key                  = "sapience.sandbox.sandbox.resource-group.terraform.tfstate"
-  }
-}
-
 data "terraform_remote_state" "dns" {
   backend = "azurerm"
   config {
-    access_key           = "${local.backend_access_key}"
-    storage_account_name = "${local.backend_storage_account_name}"
-	  container_name       = "${local.backend_container_name}"
-    key                  = "sapience.sandbox.sandbox.dns.terraform.tfstate"
+    access_key           = "${var.backend_access_key}"
+    storage_account_name = "${var.backend_storage_account_name}"
+	  container_name       = "${var.backend_container_name}"
+    key                  = "sapience.environment.sandbox.dns.terraform.tfstate"
   }
 }
 
 locals {
-  environment          = "${var.environment}"
-  subscription_id      = "${var.subscription_id}"
-  backend_access_key   = "${var.backend_access_key}"
-  backend_storage_account_name = "${var.backend_storage_account_name}"
-  backend_container_name       = "${var.backend_container_name}"
-  resource_group_name  = "${data.terraform_remote_state.resource_group.resource_group_name}"
-  config_path = "../../../realms/sandbox/kubernetes/kubeconfig"
-  namespace = "${local.environment}"
-  letsencrypt_email            = "${var.ambassador_letsencrypt_email}"
-  letsencrypt_acme_http_domain = "${var.ambassador_letsencrypt_acme_http_domain}"
-  letsencrypt_acme_http_token  = "${var.ambassador_letsencrypt_acme_http_token}"
-
+  config_path = "../../../realms/${var.realm}/kubernetes/kubeconfig"
+  namespace = "${var.environment}"
   
   common_tags = "${merge(
-    var.common_tags,
-      map(
-        "Component", "Ambassador"
-      )
+    var.realm_common_tags,
+    var.environment_common_tags,
+    map(
+      "Component", "Ambassador"
+    )
   )}"
 }
 
@@ -187,7 +167,7 @@ EOF
 resource "azurerm_dns_a_record" "api" {
   name                = "api"
   zone_name           = "${data.terraform_remote_state.dns.zone_name}"
-  resource_group_name = "${local.resource_group_name}"
+  resource_group_name = "${var.resource_group_name}"
   ttl                 = 30
   records             = [ "${kubernetes_service.ambassador.load_balancer_ingress.0.ip}" ]
 }
@@ -288,7 +268,7 @@ data "template_file" "letsencrypt_cluster_issuer" {
   template = "${file("templates/letsencrypt-cluster-issuer.yaml.tpl")}"
 
   vars {
-     email = "${local.letsencrypt_email}"
+     email = "${var.ambassador_letsencrypt_email}"
   }
 }
 
@@ -330,8 +310,8 @@ data "template_file" "letsencrypt_acme_challenge_service" {
   template = "${file("templates/letsencrypt-acme-challenge-service.yaml.tpl")}"
 
   vars {
-    acme_http_domain = "${local.letsencrypt_acme_http_domain}"
-    acme_http_token  = "${local.letsencrypt_acme_http_token}"
+    acme_http_domain = "${var.ambassador_letsencrypt_acme_http_domain}"
+    acme_http_token  = "${var.ambassador_letsencrypt_acme_http_token}"
   }
 }
 

@@ -1,42 +1,41 @@
 terraform {
   backend "azurerm" {
-    key                  = "sapience.sandbox.sandbox.kubernetes-namespace.terraform.tfstate"
+    key = "sapience.environment.sandbox.kubernetes-namespace.terraform.tfstate"
   }
 }
 
 provider "azurerm" {
   version = "1.20.0"
-  subscription_id = "${local.subscription_id}"
+  subscription_id = "${var.subscription_id}"
 }
 
 provider "kubernetes" {
   version = "1.5.0"
-  config_path = "../../../realms/sandbox/kubernetes/kubeconfig"
+  config_path = "${local.config_path}"
 }
 
 data "terraform_remote_state" "kubernetes" {
   backend = "azurerm"
 
   config {
-    access_key           = "${local.backend_access_key}"
-    storage_account_name = "${local.backend_storage_account_name}"
-	  container_name       = "${local.backend_container_name}"
-    key                  = "sapience.sandbox.sandbox.kubernetes.terraform.tfstate"
+    access_key           = "${var.backend_access_key}"
+    storage_account_name = "${var.backend_storage_account_name}"
+	  container_name       = "${var.backend_container_name}"
+    key                  = "sapience.realm.sandbox.kubernetes.terraform.tfstate"
   }
 }
 
 locals {
-  subscription_id = "${var.subscription_id}"
-  backend_access_key = "${var.backend_access_key}"
-  backend_storage_account_name = "${var.backend_storage_account_name}"
-  backend_container_name = "${var.backend_container_name}"
-  namespace = "sandbox"
+  namespace = "${var.environment}"
+
+  config_path = "../../../realms/${var.realm}/kubernetes/kubeconfig"
 
   common_tags = "${merge(
-    var.common_tags,
-      map(
-        "Component", "Kubernetes Namespace"
-      )
+    var.realm_common_tags,
+    var.environment_common_tags,
+    map(
+      "Component", "Kubernetes Namespace"
+    )
   )}"
 }
 
@@ -48,7 +47,7 @@ resource "kubernetes_namespace" "namespace" {
 
 resource "kubernetes_resource_quota" "resource_quota" {
   metadata {
-    name = "resource-quota-${local.namespace}"
+    name      = "resource-quota-${local.namespace}"
     namespace = "${local.namespace}"
   }
 
@@ -62,9 +61,10 @@ resource "kubernetes_resource_quota" "resource_quota" {
 
 resource "azurerm_public_ip" "aks_egress" {
   name                = "aks-egress-${local.namespace}"
+  location            = "${var.resource_group_location}"
   location            = "${data.terraform_remote_state.kubernetes.kubernetes_location}"
-  # resource_group_name = "${data.terraform_remote_state.resource_group.resource_group_name}"
   resource_group_name = "${data.terraform_remote_state.kubernetes.kubernetes_node_resource_group_name}"
+  
   public_ip_address_allocation = "Static"
 
   tags = "${merge(
