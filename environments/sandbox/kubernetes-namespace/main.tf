@@ -21,7 +21,7 @@ data "terraform_remote_state" "kubernetes" {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
 	  container_name       = "${var.backend_container_name}"
-    key                  = "sapience.realm.sandbox.kubernetes.terraform.tfstate"
+    key                  = "sapience.realm.${var.realm}.kubernetes.terraform.tfstate"
   }
 }
 

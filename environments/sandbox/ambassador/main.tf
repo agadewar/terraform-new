@@ -28,7 +28,7 @@ data "terraform_remote_state" "dns" {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
 	  container_name       = "${var.backend_container_name}"
-    key                  = "sapience.environment.sandbox.dns.terraform.tfstate"
+    key                  = "sapience.environment.${var.environment}.dns.terraform.tfstate"
   }
 }
 
