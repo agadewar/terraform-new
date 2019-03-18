@@ -103,7 +103,6 @@ resource "helm_release" "prometheus" {
   namespace  = "${local.namespace}"
   chart      = "stable/prometheus-operator"
   values = [
-    # "${file("custom-values.yaml")}"
     "${data.template_file.custom_values.rendered}"
   ]
 
