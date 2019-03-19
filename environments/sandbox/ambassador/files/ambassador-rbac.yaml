@@ -49,7 +49,7 @@ kind: Deployment
 metadata:
   name: ambassador
 spec:
-  replicas: 3
+  replicas: 1
   template:
     metadata:
       annotations:

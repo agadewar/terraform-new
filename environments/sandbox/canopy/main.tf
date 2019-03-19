@@ -4,6 +4,11 @@ terraform {
   }
 }
 
+provider "kubernetes" {
+  version = "1.5.0"
+  config_path = "${local.config_path}"
+}
+
 locals {
   namespace                         = "${var.environment}"
   config_path                       = "../../../realms/${var.realm}/kubernetes/kubeconfig"
@@ -19,7 +24,44 @@ locals {
   }
 }
 
+data "template_file" "global_properties" {
+  template = "${file("templates/global.properties.tpl")}"
+
+  vars {
+     environment = "${var.environment}"
+  }
+}
+
+resource "kubernetes_config_map" "eventpipeline_leaf_broker" {
+  metadata {
+    name      = "eventpipeline-leaf-broker"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "global.properties"      = "${data.template_file.global_properties.rendered}"
+    "application.properties" = "${file("files/eventpipeline-leaf-broker.properties")}"
+  }
+}
+
+resource "kubernetes_secret" "eventpipeline_leaf_broker" {
+  metadata {
+    name      = "eventpipeline-leaf-broker"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "canopy.amqp.password"     = "${var.canopy_amqp_password}"
+    "canopy.database.username" = "${var.sql_server_administrator_login}"
+    "canopy.database.password" = "${var.sql_server_administrator_password}"
+  }
+
+  type = "Opaque"
+}
+
 module "eventpipeline_leaf_broker" {
+  # depends_on = [ "kubernetes_config_map.eventpipeline_leaf_broker", "kubernetes_secret.eventpipeline_leaf_broker" ]
+
   source = "../../../../terraform-canopy-service-module/"
 
   kubeconfig_path = "${local.config_path}"
@@ -114,6 +156,33 @@ module "eventpipeline_leaf_broker" {
     local.common_labels,
     map()
   )}"
+}
+
+resource "kubernetes_config_map" "canopy_user_service" {
+  metadata {
+    name      = "canopy-user-service"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "global.properties"      = "${data.template_file.global_properties.rendered}"
+    "application.properties" = "${file("files/canopy-user-service.properties")}"
+  }
+}
+
+resource "kubernetes_secret" "canopy_user_service" {
+  metadata {
+    name      = "canopy-user-service"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "canopy.amqp.password"     = "${var.canopy_amqp_password}"
+    "canopy.database.username" = "${var.sql_server_administrator_login}"
+    "canopy.database.password" = "${var.sql_server_administrator_password}"
+  }
+
+  type = "Opaque"
 }
 
 module "canopy_user_service" {
@@ -217,6 +286,39 @@ module "canopy_user_service" {
   )}"
 }
 
+data "template_file" "gremlin_cosmos" {
+  template = "${file("templates/gremlin-cosmos.yaml.tpl")}"
+
+  vars {
+     environment                      = "${var.environment}"
+     canopy_hierarchy_cosmos_password = "${var.canopy_hierarchy_cosmos_password}"
+  }
+}
+
+resource "kubernetes_config_map" "canopy_hierarchy_service" {
+  metadata {
+    name      = "canopy-hierarchy-service"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "global.properties"      = "${data.template_file.global_properties.rendered}"
+    "application.properties" = "${file("files/canopy-hierarchy-service.properties")}"
+    "gremlin.yaml"           = "${data.template_file.gremlin_cosmos.rendered}"
+  }
+}
+
+resource "kubernetes_secret" "canopy_hierarchy_service" {
+  metadata {
+    name      = "canopy-hierarchy-service"
+    namespace = "${local.namespace}"
+  }
+
+  data {}
+
+  type = "Opaque"
+}
+
 module "canopy_hierarchy_service" {
   source = "../../../../terraform-canopy-service-module/"
 
@@ -270,6 +372,34 @@ module "canopy_hierarchy_service" {
     local.common_labels,
     map()
   )}"
+}
+
+resource "kubernetes_config_map" "canopy_device_service" {
+  metadata {
+    name      = "canopy-device-service"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "global.properties"      = "${data.template_file.global_properties.rendered}"
+    "application.properties" = "${file("files/canopy-device-service.properties")}"
+  }
+}
+
+resource "kubernetes_secret" "canopy_device_service" {
+  metadata {
+    name      = "canopy-device-service"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "canopy.amqp.password"     = "${var.canopy_amqp_password}"
+    "canopy.database.username" = "${var.sql_server_administrator_login}"
+    "canopy.database.password" = "${var.sql_server_administrator_password}"
+    "google.api.key"           = "${var.google_api_key}"
+  }
+
+  type = "Opaque"
 }
 
 module "canopy_device_service" {
@@ -383,6 +513,33 @@ module "canopy_device_service" {
   )}"
 }
 
+resource "kubernetes_config_map" "eventpipeline_service" {
+  metadata {
+    name      = "eventpipeline-service"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "global.properties"      = "${data.template_file.global_properties.rendered}"
+    "application.properties" = "${file("files/eventpipeline-service.properties")}"
+  }
+}
+
+resource "kubernetes_secret" "eventpipeline_service" {
+  metadata {
+    name      = "eventpipeline-service"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "canopy.amqp.password"     = "${var.canopy_amqp_password}"
+    "canopy.database.username" = "${var.sql_server_administrator_login}"
+    "canopy.database.password" = "${var.sql_server_administrator_password}"
+  }
+
+  type = "Opaque"
+}
+
 module "eventpipeline_service" {
   source = "../../../../terraform-canopy-service-module/"
 
@@ -481,6 +638,32 @@ module "eventpipeline_service" {
     local.common_labels,
     map()
   )}"
+}
+
+resource "kubernetes_config_map" "sapience_event_hub_journal" {
+  metadata {
+    name      = "sapience-event-hub-journal"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "global.properties"      = "${data.template_file.global_properties.rendered}"
+    "application.properties" = "${file("files/sapience-event-hub-journal.properties")}"
+  }
+}
+
+resource "kubernetes_secret" "sapience_event_hub_journal" {
+  metadata {
+    name      = "sapience-event-hub-journal"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "canopy.amqp.password"      = "${var.canopy_amqp_password}"
+    "canopy.event-hub.password" = "${var.canopy_event_hub_password}"
+  }
+
+  type = "Opaque"
 }
 
 module "sapience_event_hub_journal" {

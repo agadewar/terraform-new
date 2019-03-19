@@ -4,6 +4,11 @@ terraform {
   }
 }
 
+provider "kubernetes" {
+  version = "1.5.0"
+  config_path = "${local.config_path}"
+}
+
 provider "null" {
   version = "2.0.0"
 }
@@ -22,7 +27,22 @@ locals {
   )}"
 }
 
+resource "kubernetes_secret" "banyan_aws" {
+  metadata {
+    name      = "banyan-aws"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "aws_access_key_id"     = "${var.canopy_aws_access_key_id}"
+    "aws_secret_access_key" = "${var.canopy_aws_secret_access_key}"
+  }
+
+  type = "Opaque"
+}
+
 resource "null_resource" "cronjob_canopy_container_registry_credential_helper" {
+  depends_on = [ "kubernetes_secret.banyan_aws" ]
 
   triggers {
     config_changed = "${sha1(file("./config/canopy-container-registry-credential-helper.yaml"))}"

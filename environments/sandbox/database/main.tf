@@ -21,9 +21,10 @@ data "terraform_remote_state" "kubernetes_namespace" {
 }
 
 locals {
-  sql_server_version = "12.0"
-  sql_server_adminstrator_login = "${var.sql_server_adminstrator_login}"
+  sql_server_version                = "12.0"
+  sql_server_adminstrator_login     = "${var.sql_server_administrator_login}"
   sql_server_administrator_password = "${var.sql_server_administrator_password}"
+
   cosmos_failover_location = "eastus2"
 
   common_tags = "${merge(
@@ -40,7 +41,7 @@ resource "azurerm_sql_server" "sapience" {
   resource_group_name          = "${var.resource_group_name}"
   location                     = "${var.resource_group_location}"
   version                      = "${local.sql_server_version}"
-  administrator_login          = "${var.sql_server_adminstrator_login}"
+  administrator_login          = "${var.sql_server_administrator_login}"
   administrator_login_password = "${var.sql_server_administrator_password}"
 
   tags = "${merge(
