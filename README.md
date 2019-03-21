@@ -49,7 +49,7 @@
     4. terraform init -backend-config="../../../config/backend.config"
 	5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
 
-1. Setup service-bus *** NEED TO DO.  HAD TO WAIT 4 HOURS AFTER DELETING SERVICE-BUS FROM OLD DEV SUBSCRIPTION
+1. Setup service-bus
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/environments/dev/service-bus/main.tf"
 		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.resource-group.terraform.tfstate"
@@ -66,19 +66,22 @@
 	5. terraform init -backend-config="../../../config/backend.config"
 	6. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
 
-5. Setup Event Hubs *** NEED TO DO
+5. Setup Event Hubs
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
-	2. Edit "terraform/dev/event-hubs/main.tf"
-		1. Edit "terraform { backend {} }" as needed
-		2. Edit "locals { * }" as needed
-		3. Edit "data.terraform_remote_state.resource_group { config {} }" as needed
-	3. cd terraform/dev/event-hubs
-	4. terraform init
-	5. terraform apply
+	2. Edit "terraform/environments/dev/event-hubs/main.tf"
+		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.resource-group.terraform.tfstate"
+	3. cd terraform/environments/dev/event-hubs
+	4. terraform init -backend-config="../../../config/backend.config"
+	5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
 	6. Give permissions to the "datalake" Event Hub to capture into the Data Lake configured above (see: https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-archive-eventhub-capture#assign-permissions-to-event-hubs)
 		1. Create a New Folder in the Data Lake named "raw_data"
 		2. Follow the instructions in the link above
-	7. Go to Azure Portal and configure the "datalake" Event Hub to "Capture" -> On and into the Data Lake configured above at path "/raw_data" (see: https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-capture-enable-through-portal)
+	7. Go to Azure Portal and configure the "datalake" Event Hub to "Capture" (see: https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-capture-enable-through-portal)
+		1. From the 'Overview' tab, scroll to the bottom and click on 'datalake'
+			1. Click on the 'Captures' link and set Capture = On
+			2. Set 'Capture Provider' = Azure Data Lake Store
+			3. Set 'Data Lake Store' = sapiencedev
+			4. Set 'Data Lake Path' = /raw_data
 
 2. Setup Databases
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
@@ -87,49 +90,34 @@
 	3. cd terraform/environments/dev/database
 	4. terraform init -backend-config="../../../config/backend.config"
 	5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
-	6. Configure user(s) in Gremlin *** LEFT OFF HERE
-	    1. Create graph database in Cosmos  (SHOULD BE "Database id = canopy" AND "Graph Id = hierarchy")
-		![Image](../AddGraph.png)
+	6. Configure user(s) in Gremlin
+	    1. Create graph database in Cosmos
+			1. In Azure Portal, go to Azure Cosmos DB
+			2. Click on sapience-canopy-hierarchy-dev
+			3. Click 'Add Graph'
+			4. Set "Database id = canopy" AND "Graph Id = hierarchy"
+			5. For Dev, we set Storage Capacity = 'Fixed (10GB) and Throughput = 400
 	    2. Execute this Gremlin query via the Cosmos portal:
 			- g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))
-	7. Setup SQL Server
+	7. Setup SQL Server (from Repo: canopy-sql)
 		1. Run DDL in canopy-sql/ddl
 		2. Run DML in canopy-sql/dml
 
 3. Setup Canopy
-	1. Setup Canopy container registry credentials
-		1. Setup AWS credentials as secrets
-			1. cd canopy-kubernetes-config/dev/canopy
-			2. echo "<c>" > secrets/aws_access_key_id
-			3. echo "<d>" > secrets/aws_secret_access_key
-			4. kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig  --ignore-not-found=true --namespace=dev delete secret banyan-aws
-			5. kubectl --kubeconfig ../../../terraform/lab/kubernetes/kubeconfig create secret generic banyan-aws --namespace=dev --from-file=secrets/aws_access_key_id --from-file=secrets/aws_secret_access_key
-		2. Deploy CronJob(s)
-			1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
-	        2. Edit "terraform/dev/cronjob/main.tf"
-		        1. Edit "terraform { backend {} }" as needed
-		        2. Edit "locals { * }" as needed
-			3. cd terraform/dev/cronjob
-			4. terraform init
-			5. terraform apply
-			6. To make sure the secret for the "Setup Canopy" step is created, manually trigger this through the Kubernetes dashboard
-	
-	2. Configure secrets
-		1. Edit canopy-kubernetes-config/dev/canopy/secrets
-			1. canopy.amqp.password
-			2. canopy.database.password
-			3. canopy.database.username
-			4. canopy.event-hub.password
-			5. google.api.key
-		2. Edit canopy-kubernetes-config/dev/canopy/gremlin-cosmos.yaml
-		3. cd canopy-kubernetes-config
-		4. ./update_all.sh dev
-	
-	3. Deploy Canopy containers
+	1. Deploy CronJob(s)
 		1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
-	    2. Edit "terraform/dev/canopy/main.tf"
+		2. Edit "terraform/environments/dev/cronjob/main.tf"
+			1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.resource-group.terraform.tfstate"
+		3. cd terraform/environments/dev/cronjob
+		4. terraform init -backend-config="../../../config/backend.config"
+		5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
+		6. To make sure the secret for the "Setup Canopy" step is created, manually trigger this through the Kubernetes dashboard
+	
+	2. Deploy Canopy containers
+		1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
+	    2. Edit "terraform/environments/dev/canopy/main.tf"
 		    1. Edit "terraform { backend {} }" as needed
 		    2. Edit "locals { * }" as needed   *** be sure to change the "default_token" property based on the K8S namespace default token that is generated automatically (look in K8S Secrets)
-		3. cd /c/projects-sapience/terraform/dev/canopy
-		4. terraform init
-		5. terraform apply
+		3. cd /c/projects-sapience/terraform/environments/dev/canopy
+		4. terraform init -backend-config="../../../config/backend.config"
+		5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
