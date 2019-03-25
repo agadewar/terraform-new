@@ -33,7 +33,7 @@
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Remove any existing terraform/lab/kubernetes/kubeconfig
 	3. Edit "terraform/realms/lab/kubernetes/main.tf"
-		1. Change 'key' in terraform{} block: "sapience.realm.<font color="red">lab</font>.resource-group.terraform.tfstate"
+		1. Change 'key' in terraform{} block: "sapience.realm.<font color="red">lab</font>.kubernetes.terraform.tfstate"
 	4. cd terraform/realms/lab/kubernetes
 	5. terraform init -backend-config="../../../config/backend.config"
 	6. terraform apply -var-file="../../../config/realm.lab.tfvars"
@@ -44,32 +44,33 @@
 1. Setup Kubernetes namespace
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/environments/dev/kubernetes-namespace/main.tf"
-		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.resource-group.terraform.tfstate"
+		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.kubernetes-namespace.terraform.tfstate"
 	3. cd terraform/environments/dev/kubernetes-namespace
     4. terraform init -backend-config="../../../config/backend.config"
 	5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
+	6. The new Namespace will get a default-token-* secret that needs to be added to environment.dev.tfvars. Set kubernetes_namespace_default_token.Retrieve this from the Kubernetes Portal -> Secrets.
 
-1. Setup service-bus
+2. Setup service-bus
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/environments/dev/service-bus/main.tf"
-		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.resource-group.terraform.tfstate"
+		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.service-bus.terraform.tfstate"
 	3. cd terraform/environments/dev/service-bus
     4. terraform init -backend-config="../../../config/backend.config"
 	5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
 
-4. Setup Data Lake
+3. Setup Data Lake
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/environments/dev/data-lake/main.tf"
-		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.resource-group.terraform.tfstate"
+		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.data-lake.terraform.tfstate"
 	3. cd terraform/environments/dev/data-lake
 	4. Review the "azurerm_data_lake_store_firewall_rule"(s) that are configured in "main.tf"
 	5. terraform init -backend-config="../../../config/backend.config"
 	6. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
 
-5. Setup Event Hubs
+4. Setup Event Hubs
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/environments/dev/event-hubs/main.tf"
-		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.resource-group.terraform.tfstate"
+		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.event-hubs.terraform.tfstate"
 	3. cd terraform/environments/dev/event-hubs
 	4. terraform init -backend-config="../../../config/backend.config"
 	5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
@@ -83,10 +84,10 @@
 			3. Set 'Data Lake Store' = sapiencedev
 			4. Set 'Data Lake Path' = /raw_data
 
-2. Setup Databases
+5. Setup Databases
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/environments/dev/database/main.tf"
-		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.resource-group.terraform.tfstate"
+		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.database.terraform.tfstate"
 	3. cd terraform/environments/dev/database
 	4. terraform init -backend-config="../../../config/backend.config"
 	5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
@@ -103,11 +104,25 @@
 		1. Run DDL in canopy-sql/ddl
 		2. Run DML in canopy-sql/dml
 
-3. Setup Canopy
+6. Retrieve Keys
+	1. Service Bus
+		1. From Azure Portal -> Service Bus -> Click on sapience-dev -> 'Shared access policies' -> 'RootManageSharedAccessKey'
+		2. Copy the Primary Key
+		3. In environment.dev.tfvars, set canopy_amqp_password to the Primary Key
+	2. Event Hubs
+		1. From Azure Portal -> Event Hubs -> Click on sapience-event-hub-journal-dev -> 'Shared access policies' -> 'RootManageSharedAccessKey'
+		2. Copy the Primary Key
+		3. In environment.dev.tfvars, set canopy_event_hub_password to the Primary Key
+	3. Cosmos DB
+		1. From Azure Portal -> Event Hubs -> Click on sapience-canopy-hierarchy-dev -> Keys
+		2. Copy the Primary Key
+		3. In environment.dev.tfvars, set canopy_hierarchy_cosmos_password to the Primary Key
+
+7. Setup Canopy
 	1. Deploy CronJob(s)
 		1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 		2. Edit "terraform/environments/dev/cronjob/main.tf"
-			1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.resource-group.terraform.tfstate"
+			1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.cronjob.terraform.tfstate"
 		3. cd terraform/environments/dev/cronjob
 		4. terraform init -backend-config="../../../config/backend.config"
 		5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
@@ -121,3 +136,28 @@
 		3. cd /c/projects-sapience/terraform/environments/dev/canopy
 		4. terraform init -backend-config="../../../config/backend.config"
 		5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
+
+8. Setup DNS Zone
+    1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
+	2. Edit "terraform/environments/dev/dns/main.tf"
+		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.dns.terraform.tfstate"
+	3. cd terraform/environments/dev/dns
+    4. terraform init -backend-config="../../../config/backend.config"
+	5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
+
+9. Setup Databricks
+    1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
+	2. Edit "terraform/environments/dev/databricks/main.tf"
+		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.databricks.terraform.tfstate"
+	3. cd terraform/environments/dev/databricks
+    4. terraform init -backend-config="../../../config/backend.config"
+	5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
+
+10. Setup Ambassador
+    1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
+	2. Edit "terraform/environments/dev/ambassador/main.tf"
+		1. Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.ambassador.terraform.tfstate"
+	3. cd terraform/environments/dev/ambassador
+    4. terraform init -backend-config="../../../config/backend.config"
+	5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
+
