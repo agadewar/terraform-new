@@ -4,6 +4,8 @@ terraform {
   }
 }
 
+# See: https://github.com/Mimetis/ambassadorandtls
+
 provider "azurerm" {
   version = "1.20.0"
   subscription_id = "${var.subscription_id}"
@@ -72,7 +74,7 @@ name: tls
 config:
   server:
     enabled: True
-    # redirect_cleartext_from: 80
+    redirect_cleartext_from: 80
     secret: ambassador-certs
 EOF
     }

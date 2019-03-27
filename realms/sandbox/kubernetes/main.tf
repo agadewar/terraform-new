@@ -4,6 +4,9 @@ terraform {
   }
 }
 
+# See: https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/azure
+# See: https://docs.microsoft.com/en-us/azure/aks/cluster-autoscaler
+
 provider "azurerm" {
   version = "1.20.0"
   subscription_id = "${var.subscription_id}"
@@ -119,9 +122,26 @@ resource "null_resource" "kubernetes_config_autoscaler" {
 
   triggers {
     autoscaler_config_changed = "${data.template_file.autoscaler_config.rendered}"
+    timestamp = "${timestamp()}"
   }
 
   provisioner "local-exec" {
     command = "kubectl apply --kubeconfig=kubeconfig -f - <<EOF\n${data.template_file.autoscaler_config.rendered}\nEOF"
   }
 }
+
+# az extension add --name aks-preview
+# az feature register --name VMSSPreview --namespace Microsoft.ContainerService
+# az feature list -o table --subscription=c57d6dfd-85ff-46a6-8038-1f6d97197cb6 --query "[?contains(name, 'Microsoft.ContainerService/VMSSPreview')].{Name:name,State:properties.state}"
+# az provider register --namespace Microsoft.ContainerService --subscription=c57d6dfd-85ff-46a6-8038-1f6d97197cb6
+# az aks update \
+#   --subscription=c57d6dfd-85ff-46a6-8038-1f6d97197cb6 \
+#   --resource-group Sandbox \
+#   --name sandbox \
+#   --enable-vmss \
+#   --enable-cluster-autoscaler \
+#   --min-count 2 \
+#   --max-count 8
+#
+#
+# az ad sp list --output json --all | less

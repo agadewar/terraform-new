@@ -82,7 +82,7 @@ name: tls
 config:
   server:
     enabled: True
-    # redirect_cleartext_from: 80
+    redirect_cleartext_from: 80
     secret: ambassador-certs
 EOF
     }
