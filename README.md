@@ -3,6 +3,15 @@
 #<font color="orange"> **Setup Sapience Azure Account via Terraform** </font>
 
 ---
+### Requirements
+
+	1. Azure CLI locally installed.  Version 2.0.60+.  
+		Find version by running 'az --version'
+		Run this: 'az extension add --name storage-preview'
+	2. Helm locally installed
+	3. Docker locally installed?
+
+
 ### Create Storage Account and Access Key (Only do this when creating the very first Terraform environment)
 
 1. Create a Storage Account (via the Azure Portal) for Terraform remote state storage for the resource group (i.e. "tfstatelab")
@@ -80,9 +89,10 @@
 	7. Go to Azure Portal and configure the "datalake" Event Hub to "Capture" (see: https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-capture-enable-through-portal)
 		1. From the 'Overview' tab, scroll to the bottom and click on 'datalake'
 			1. Click on the 'Captures' link and set Capture = On
-			2. Set 'Capture Provider' = Azure Data Lake Store
-			3. Set 'Data Lake Store' = sapiencedev
-			4. Set 'Data Lake Path' = /raw_data
+			2. Check the box for 'Do not emit empty files when no events occur during the Capture time window'
+			3. Set 'Capture Provider' = Azure Data Lake Store
+			4. Set 'Data Lake Store' = sapiencedev
+			5. Set 'Data Lake Path' = /raw_data
 
 5. Setup Databases
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
@@ -132,7 +142,10 @@
 		1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	    2. Edit "terraform/environments/dev/canopy/main.tf"
 		    1. Edit "terraform { backend {} }" as needed
-		    2. Edit "locals { * }" as needed   *** be sure to change the "default_token" property based on the K8S namespace default token that is generated automatically (look in K8S Secrets)
+			2. Update kubernetes_namespace_default_token in the environment.<font color="red">dev</font>.tfvars file in the config folder.  This token is automatically generated.
+				1. In the Kubernetes Portal, switch to the current environment Namespace
+				2. Click on Secrets and find the Secret named default-token-XXXXX
+				3. Copy the characters in place of the XXXXX and replace it in the environment.<font color="red">dev</font>.tfvars file.
 		3. cd /c/projects-sapience/terraform/environments/dev/canopy
 		4. terraform init -backend-config="../../../config/backend.config"
 		5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
@@ -144,6 +157,10 @@
 	3. cd terraform/environments/dev/dns
     4. terraform init -backend-config="../../../config/backend.config"
 	5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
+	6. You will need to manually add NS records if the DNS is hosted by another provider.  You don't need to do this step if the Zone is hosted by Azure in the same Subscription.
+		1. In Azure, go to DNS Zones and click on the newly created Zone.
+		2. Copy the 4 Name Servers listed.
+		3. At the DNS host, create the NS records.  _(Today, this is in Net4India)_
 
 9. Setup Databricks
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
@@ -160,4 +177,11 @@
 	3. cd terraform/environments/dev/ambassador
     4. terraform init -backend-config="../../../config/backend.config"
 	5. terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
+	6. After the pods are running, you will need to update the LetsEncrypt domain and token in the environment.<font color="red">dev</font>.tfvars file
+		1. In the Kubernetes Portal, find the Cert Manager pod and view its logs.  Near the top, you'll find a line containing the domain and token.
+			1. Example: "Looking up Ingresses for selector certmanager.k8s.io/acme-http-domain=1937180995,certmanager.k8s.io/acme-http-token=869731899"
+		2. Update the following settings in environment.<font color="red">dev</font>.tfvars
+			1. ambassador_letsencrypt_acme_http_domain
+			2. ambassador_letsencrypt_acme_http_token
+
 
