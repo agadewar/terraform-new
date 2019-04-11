@@ -1,0 +1,10 @@
+echo "Usage: ./tfapply.sh  <realm> <environment>"
+
+i="$IFS";IFS='/';set -f;p=($PWD);set +f;IFS="$i"
+realm="${p[-4]}"
+environment="${p[-2]}"
+
+echo $realm
+echo $environment
+
+terraform apply -var-file ../../../../../config/realm.$realm.tfvars -var-file ../../../../../config/environment.$environment.tfvars
