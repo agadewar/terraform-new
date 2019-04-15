@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.realm.global.acrf.terraform.tfstate"
+    key = "sapience.realm.global.acr.terraform.tfstate"
   }
 }
 
@@ -25,7 +25,7 @@ resource "azurerm_container_registry" "acr" {
   resource_group_name      = "${var.resource_group_name}"
   location                 = "${var.resource_group_location}"
   sku                      = "Basic"
-  admin_enabled            = "false"
+  admin_enabled            = "true"
   # georeplication_locations = ["East US", "West Europe"]
 
   tags = "${merge(
