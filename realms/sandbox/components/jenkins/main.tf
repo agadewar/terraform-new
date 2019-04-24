@@ -159,7 +159,8 @@ resource "kubernetes_service" "jenkins" {
       "162.236.22.89/32",  # Mark W Home
       "24.125.218.36/32",  # Benji Home
       "47.187.167.223/32", # Sapience office
-      #"0.0.0.0/0",        # Open to the world
+      # "208.82.111.61/32",  # Drury Hotel
+      # "0.0.0.0/0",        # Open to the world
       "52.224.108.229/32", # Jenkins Windows Agent / Slave
     ]
   }

@@ -3,6 +3,8 @@ variable "environment" {}
 
 variable "canopy_container_registry_hostname" {}
 
+variable "sapience_container_registry_hostname" {}
+
 variable "kubernetes_namespace_default_token" {}
 
 variable "sql_server_administrator_login" {}

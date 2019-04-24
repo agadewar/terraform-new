@@ -12,7 +12,9 @@ provider "kubernetes" {
 locals {
   namespace                         = "${var.environment}"
   config_path                       = "../../../../../realms/${var.realm}/components/kubernetes/kubeconfig"
-  deployment_image_pull_secret_name = "canopy-container-registry-credential"
+
+  canopy_container_registry_image_pull_secret_name   = "canopy-container-registry-credential"
+  sapience_container_registry_image_pull_secret_name = "sapience-container-registry-credential"
 
   common_labels = {
     "app.kubernetes.io/customer"    = "${var.realm_common_tags["Customer"]}"
@@ -31,6 +33,21 @@ data "template_file" "global_properties" {
      environment = "${var.environment}"
   }
 }
+
+# resource "kubernetes_secret" "sapience_container_registry_credential" {
+#   metadata {
+#     name      = "sapience-container-registry-credential"
+#     namespace = "${local.namespace}"
+#   }
+
+#   S=A8bcw7zeGezpzO4Mj9smthLgXy3pEU
+
+#   data {
+#     ".dockerconfigjson" = "${file("${path.module}/.docker/config.json")}"
+#   }
+
+#   type = "kubernetes.io/dockerconfigjson"
+# }
 
 resource "kubernetes_config_map" "eventpipeline_leaf_broker" {
   metadata {
@@ -72,7 +89,7 @@ module "eventpipeline_leaf_broker" {
   deployment_image                  = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.2.3.docker-SNAPSHOT"
   deployment_replicas               = 1
   deployment_image_pull_policy      = "Always"
-  deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
+  deployment_image_pull_secret_name = "${local.canopy_container_registry_image_pull_secret_name}"
 
   resources = [
     {
@@ -196,7 +213,7 @@ module "canopy_user_service" {
   deployment_image             = "${var.canopy_container_registry_hostname}/canopy-user-service:1.3.4.docker-SNAPSHOT"
   deployment_replicas          = 1
   deployment_image_pull_policy = "Always"
-  deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
+  deployment_image_pull_secret_name = "${local.canopy_container_registry_image_pull_secret_name}"
 
   resources = [
     {
@@ -330,7 +347,7 @@ module "canopy_hierarchy_service" {
   deployment_image             = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.4.8.docker-SNAPSHOT"
   deployment_replicas          = 1
   deployment_image_pull_policy = "Always"
-  deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
+  deployment_image_pull_secret_name = "${local.canopy_container_registry_image_pull_secret_name}"
 
   resources = [
     {
@@ -413,7 +430,7 @@ module "canopy_device_service" {
   deployment_image             = "${var.canopy_container_registry_hostname}/canopy-device-service:1.7.4.docker-SNAPSHOT"
   deployment_replicas          = 1
   deployment_image_pull_policy = "Always"
-  deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
+  deployment_image_pull_secret_name = "${local.canopy_container_registry_image_pull_secret_name}"
 
   resources = [
     {
@@ -551,7 +568,7 @@ module "eventpipeline_service" {
   deployment_image             = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.2.1.docker-SNAPSHOT"
   deployment_replicas          = 1
   deployment_image_pull_policy = "Always"
-  deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
+  deployment_image_pull_secret_name = "${local.canopy_container_registry_image_pull_secret_name}"
 
   resources = [
     {
@@ -674,10 +691,10 @@ module "sapience_event_hub_journal" {
   name      = "sapience-event-hub-journal"
   namespace = "${local.namespace}"
 
-  deployment_image             = "${var.canopy_container_registry_hostname}/sapience-event-hub-journal:1.0.0-SNAPSHOT"
+  deployment_image             = "${var.sapience_container_registry_hostname}/sapience-event-hub-journal:1.0.0-SNAPSHOT"
   deployment_replicas          = 1
   deployment_image_pull_policy = "Always"
-  deployment_image_pull_secret_name = "${local.deployment_image_pull_secret_name}"
+  deployment_image_pull_secret_name = "${local.sapience_container_registry_image_pull_secret_name}"
 
   resources = [
     {
