@@ -774,3 +774,110 @@ module "sapience_event_hub_journal" {
     map()
   )}"
 }
+
+resource "kubernetes_config_map" "eventpipeline_registry" {
+  metadata {
+    name      = "eventpipeline-registry"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "global.properties"      = "${data.template_file.global_properties.rendered}"
+  }
+}
+
+resource "kubernetes_secret" "sapience_event_hub_journaleventpipeline_registry" {
+  metadata {
+    name      = "eventpipeline-registry"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+  }
+
+  type = "Opaque"
+}
+
+module "eventpipeline_registry" {
+  source = "../../../../../../terraform-canopy-service-module/"
+
+  kubeconfig_path = "${local.config_path}"
+
+  name      = "eventpipeline-registry"
+  namespace = "${local.namespace}"
+
+  deployment_image             = "${var.sapience_container_registry_hostname}/eventpipeline-registry:1.0.0-SNAPSHOT"
+  deployment_replicas          = 1
+  deployment_image_pull_policy = "Always"
+  deployment_image_pull_secret_name = "${kubernetes_secret.sapience_container_registry_credential.metadata.0.name}"   # don't use the local value string here... we need a dependency on the secret being created
+
+  resources = [
+    {
+      requests = [
+        {
+          memory = "256M"
+          cpu = "10m"
+        }
+      ]
+    }
+  ]
+
+  default_token = "${var.kubernetes_namespace_default_token}"
+
+  deployment_env = [
+  #   {
+  #     name = "CANOPY_AMQP_PASSWORD"
+  #     value_from = [
+  #       {
+  #         secret_key_ref = [
+  #           {
+  #             name = "sapience-event-hub-journal"
+  #             key = "canopy.amqp.password"
+  #           }
+  #         ]
+  #       }
+  #     ]
+  #   },
+  #  {
+  #     name = "CANOPY_EVENT_HUB_PASSWORD"
+  #     value_from = [
+  #       {
+  #         secret_key_ref = [
+  #           {
+  #             name = "sapience-event-hub-journal"
+  #             key = "canopy.event-hub.password"
+  #           }
+  #         ]
+  #       }
+  #     ]
+  #   } 
+  ]
+
+  service_spec = [
+    {
+      # type = "LoadBalancer"
+      selector {
+        "app.kubernetes.io/name" = "eventpipeline-registry"
+      }
+
+      port = [
+        {
+          name        = "application"
+          port        = 80
+          target_port = 8080
+        }
+      ]
+
+      # load_balancer_source_ranges = [
+      #   "50.20.0.62/32",     # Banyan office
+      #   "24.99.117.169/32",  # Ardis home
+      #   "47.187.167.223/32"  # Sapience office
+      # ]
+    }
+  ]
+
+  labels = "${merge(
+    local.common_labels,
+    map()
+  )}"
+}

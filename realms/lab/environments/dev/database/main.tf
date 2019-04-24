@@ -193,3 +193,25 @@ resource "azurerm_cosmosdb_account" "sapience_graph" {
     failover_priority = 0
   }
 }
+
+resource "azurerm_cosmosdb_account" "event_archive" {
+  name                = "sapience-event-archive-${var.environment}"
+  resource_group_name = "${var.resource_group_name}"
+  location            = "${var.resource_group_location}"
+  offer_type          = "Standard"
+
+  capabilities = [
+    {
+      name = "EnableCassandra"
+    }
+  ]
+
+  consistency_policy {
+    consistency_level = "Eventual"
+  }
+
+  geo_location {
+    location          = "${local.cosmos_failover_location}"
+    failover_priority = 0
+  }
+}

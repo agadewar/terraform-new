@@ -34,20 +34,28 @@ data "template_file" "global_properties" {
   }
 }
 
-# resource "kubernetes_secret" "sapience_container_registry_credential" {
-#   metadata {
-#     name      = "sapience-container-registry-credential"
-#     namespace = "${local.namespace}"
-#   }
+data "template_file" "sapience_container_registry_credential" {
+  template = "${file("templates/dockerconfigjson.tpl")}"
 
-#   S=A8bcw7zeGezpzO4Mj9smthLgXy3pEU
+  vars {
+     server   = "${var.sapience_container_registry_hostname}"
+     username = "${var.sapience_container_registry_username}"
+     password = "${var.sapience_container_registry_password}"
+  }
+}
 
-#   data {
-#     ".dockerconfigjson" = "${file("${path.module}/.docker/config.json")}"
-#   }
+resource "kubernetes_secret" "sapience_container_registry_credential" {
+  metadata {
+    name      = "${local.sapience_container_registry_image_pull_secret_name}"
+    namespace = "${local.namespace}"
+  }
 
-#   type = "kubernetes.io/dockerconfigjson"
-# }
+  data {
+    ".dockerconfigjson" = "${data.template_file.sapience_container_registry_credential.rendered}"
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+}
 
 resource "kubernetes_config_map" "eventpipeline_leaf_broker" {
   metadata {
@@ -694,7 +702,7 @@ module "sapience_event_hub_journal" {
   deployment_image             = "${var.sapience_container_registry_hostname}/sapience-event-hub-journal:1.0.0-SNAPSHOT"
   deployment_replicas          = 1
   deployment_image_pull_policy = "Always"
-  deployment_image_pull_secret_name = "${local.sapience_container_registry_image_pull_secret_name}"
+  deployment_image_pull_secret_name = "${kubernetes_secret.sapience_container_registry_credential.metadata.0.name}"   # don't use the local value string here... we need a dependency on the secret being created
 
   resources = [
     {
