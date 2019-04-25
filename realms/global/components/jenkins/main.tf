@@ -26,6 +26,17 @@ data "terraform_remote_state" "jenkins_storage" {
   }
 }
 
+data "terraform_remote_state" "kubernetes" {
+  backend = "azurerm"
+
+  config {
+    access_key           = "${var.backend_access_key}"
+    storage_account_name = "${var.backend_storage_account_name}"
+	  container_name       = "${var.backend_container_name}"
+    key                  = "sapience.realm.${var.realm}.kubernetes.terraform.tfstate"
+  }
+}
+
 /* data "terraform_remote_state" "dns" {
   backend = "azurerm"
   config {
@@ -39,6 +50,7 @@ data "terraform_remote_state" "jenkins_storage" {
 locals {
   config_path = "../kubernetes/kubeconfig"
   namespace = "cicd"
+  sapience_container_registry_image_pull_secret_name = "sapience-container-registry-credential"
 
   common_tags = "${merge(
     var.realm_common_tags,
@@ -46,6 +58,29 @@ locals {
       "Component", "Jenkins"
     )
   )}"
+}
+
+data "template_file" "sapience_container_registry_credential" {
+  template = "${file("templates/dockerconfigjson.tpl")}"
+
+  vars {
+     server   = "${var.sapience_container_registry_hostname}"
+     username = "${var.sapience_container_registry_username}"
+     password = "${var.sapience_container_registry_password}"
+  }
+}
+
+resource "kubernetes_secret" "sapience_container_registry_credential" {
+  metadata {
+    name      = "${local.sapience_container_registry_image_pull_secret_name}"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    ".dockerconfigjson" = "${data.template_file.sapience_container_registry_credential.rendered}"
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
 }
 
 resource "kubernetes_namespace" "namespace" {
@@ -84,8 +119,10 @@ resource "kubernetes_deployment" "jenkins" {
         }
         container {
           name = "jenkins"
-          image = "jenkins/jenkins:2.169"
+          # image = "jenkins/jenkins:2.169"
+          image = "${var.sapience_container_registry_hostname}/jenkins:1.0"
           image_pull_policy = "Always"
+
           env {
             name = "JAVA_OPTS"
             value = "-Djenkins.install.runSetupWizard=false"
@@ -103,12 +140,17 @@ resource "kubernetes_deployment" "jenkins" {
             mount_path = "/var/jenkins_home"
           }
         }
+
         volume {
           name = "jenkins-home"
           persistent_volume_claim { 
             claim_name = "${kubernetes_persistent_volume_claim.jenkins_home.metadata.0.name}"
           }
         }
+
+        image_pull_secrets {
+          name = "${kubernetes_secret.sapience_container_registry_credential.metadata.0.name}"
+        }        
       }
     }
   }
@@ -179,32 +221,6 @@ resource "kubernetes_persistent_volume_claim" "jenkins_home" {
   }
 }
 
-/* resource "kubernetes_persistent_volume" "jenkins_home" {
-  metadata {
-    annotations = "${merge(
-      local.common_tags,
-      map()
-    )}"
-    
-    name = "jenkins"
-  }
-
-  spec {
-    capacity {
-      storage = "10Gi"
-    }
-    access_modes = ["ReadWriteMany"]
-    persistent_volume_source {
-      azure_disk {
-        caching_mode  = "ReadWrite"
-        data_disk_uri = "/subscriptions/${var.subscription_id}/resourceGroups/${var.resource_group_name}/providers/Microsoft.Compute/disks/jenkins-home"
-        disk_name     = "jenkins-home"
-      }
-    }
-    storage_class_name = "${kubernetes_storage_class.jenkins_home.metadata.0.name}"
-  }
-}
- */
 data "template_file" "jenkins_home_pv" {
   template = "${file("templates/jenkins-home-pv.yaml.tpl")}"
 
@@ -231,8 +247,6 @@ resource "null_resource" "jenkins_home_pv" {
   }  
 }
 
-
-
 resource "kubernetes_storage_class" "jenkins_home" {
   metadata {
     annotations = "${merge(
@@ -250,7 +264,9 @@ resource "kubernetes_storage_class" "jenkins_home" {
   }
 }
 
-/* resource "kubernetes_persistent_volume_claim" "maven_repo" {
+resource "kubernetes_persistent_volume_claim" "maven_repo" {
+  depends_on = [ "null_resource.maven_repo_pv" ]
+  
   metadata {
     annotations = "${merge(
       local.common_tags,
@@ -265,38 +281,38 @@ resource "kubernetes_storage_class" "jenkins_home" {
     access_modes = ["ReadWriteMany"]
     resources {
       requests {
-        storage = "10Gi"
+        storage = "20G"
       }
     }
-    volume_name = "${kubernetes_persistent_volume.maven_repo.metadata.0.name}"
+    volume_name = "maven-repo-${var.realm}"  // This is what it should be when PV is created under TF: "${null_resource.maven_repo.metadata.0.name}"
     storage_class_name = "${kubernetes_storage_class.maven_repo.metadata.0.name}"
   }
 }
 
-resource "kubernetes_persistent_volume" "maven_repo" {
-  metadata {
-    annotations = "${merge(
-      local.common_tags,
-      map()
-    )}"
-    
-    name = "maven-repo"
+data "template_file" "maven_repo_pv" {
+  template = "${file("templates/maven-repo-pv.yaml.tpl")}"
+
+  vars {
+    realm = "${var.realm}"
+    subscription_id = "${var.subscription_id}"
+    resource_group_name = "${var.resource_group_name}"
+  }
+}
+
+resource "null_resource" "maven_repo_pv" {
+  triggers {
+    template_changed = "${data.template_file.maven_repo_pv.rendered}"
   }
 
-  spec {
-    capacity {
-      storage = "10Gi"
-    }
-    access_modes = ["ReadWriteMany"]
-    persistent_volume_source {
-      azure_disk {
-        caching_mode  = "ReadWrite"
-        data_disk_uri = "/subscriptions/${var.subscription_id}/resourceGroups/${var.resource_group_name}/providers/Microsoft.Compute/disks/maven-repo"
-        disk_name = "maven-repo"
-      }
-    }
-    storage_class_name = "${kubernetes_storage_class.maven_repo.metadata.0.name}"
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.maven_repo_pv.rendered}\nEOF"
   }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "kubectl delete --kubeconfig=${local.config_path} persistentvolume maven-repo-${var.realm}"
+  }  
 }
 
 resource "kubernetes_storage_class" "maven_repo" {
@@ -314,20 +330,7 @@ resource "kubernetes_storage_class" "maven_repo" {
   parameters {
     storageaccounttype = "Standard_LRS"
   }
-} */
-
-# resource "aws_ebs_volume" "jenkins_home" {
-#   availability_zone = "us-east-1a"
-#   size              = 10
-#   tags {
-#     Customer    = "Banyan"
-#     Product     = "Global"
-#     Environment = "Lab"
-#     Component   = "Jenkins"
-#     ManagedBy   = "Terraform"
-#     Name        = "jenkins-home"
-#   }
-# }
+}
 
 resource "kubernetes_service_account" "jenkins" {
   metadata {

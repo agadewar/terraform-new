@@ -22,7 +22,7 @@ locals {
 
 resource "azurerm_managed_disk" "jenkins_home" {
   name                 = "jenkins-home-${var.realm}"
-  location             = "eastus"
+  location             = "${var.resource_group_location}"
   resource_group_name  = "${var.resource_group_name}"
   storage_account_type = "Standard_LRS"
   create_option        = "Empty"
@@ -38,13 +38,13 @@ resource "azurerm_managed_disk" "jenkins_home" {
   }
 }
 
-/* resource "azurerm_managed_disk" "maven_repo" {
+resource "azurerm_managed_disk" "maven_repo" {
   name                 = "maven-repo-${var.realm}"
-  location             = "eastus"
+  location             = "${var.resource_group_location}"
   resource_group_name  = "${var.resource_group_name}"
   storage_account_type = "Standard_LRS"
   create_option        = "Empty"
-  disk_size_gb         = "10"
+  disk_size_gb         = "20"
 
   tags = "${merge(
     local.common_tags,
@@ -54,4 +54,4 @@ resource "azurerm_managed_disk" "jenkins_home" {
   lifecycle{
     prevent_destroy = "true"
   }
-} */
+}
