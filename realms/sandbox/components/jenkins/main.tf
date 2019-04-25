@@ -50,6 +50,7 @@ data "terraform_remote_state" "kubernetes" {
 locals {
   config_path = "../kubernetes/kubeconfig"
   namespace = "cicd"
+  sapience_container_registry_image_pull_secret_name = "sapience-container-registry-credential"
 
   common_tags = "${merge(
     var.realm_common_tags,
@@ -57,6 +58,29 @@ locals {
       "Component", "Jenkins"
     )
   )}"
+}
+
+data "template_file" "sapience_container_registry_credential" {
+  template = "${file("templates/dockerconfigjson.tpl")}"
+
+  vars {
+     server   = "${var.sapience_container_registry_hostname}"
+     username = "${var.sapience_container_registry_username}"
+     password = "${var.sapience_container_registry_password}"
+  }
+}
+
+resource "kubernetes_secret" "sapience_container_registry_credential" {
+  metadata {
+    name      = "${local.sapience_container_registry_image_pull_secret_name}"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    ".dockerconfigjson" = "${data.template_file.sapience_container_registry_credential.rendered}"
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
 }
 
 resource "kubernetes_namespace" "namespace" {
@@ -95,8 +119,10 @@ resource "kubernetes_deployment" "jenkins" {
         }
         container {
           name = "jenkins"
-          image = "jenkins/jenkins:2.169"
+          # image = "jenkins/jenkins:2.169"
+          image = "${var.sapience_container_registry_hostname}/jenkins:1.0"
           image_pull_policy = "Always"
+
           env {
             name = "JAVA_OPTS"
             value = "-Djenkins.install.runSetupWizard=false"
@@ -114,11 +140,16 @@ resource "kubernetes_deployment" "jenkins" {
             mount_path = "/var/jenkins_home"
           }
         }
+        
         volume {
           name = "jenkins-home"
           persistent_volume_claim { 
             claim_name = "${kubernetes_persistent_volume_claim.jenkins_home.metadata.0.name}"
           }
+        }
+
+        image_pull_secrets {
+          name = "${kubernetes_secret.sapience_container_registry_credential.metadata.0.name}"
         }
       }
     }
