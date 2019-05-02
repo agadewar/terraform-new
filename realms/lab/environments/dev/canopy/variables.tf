@@ -2,7 +2,6 @@ variable "realm" {}
 variable "environment" {}
 
 variable "canopy_container_registry_hostname" {}
-
 variable "sapience_container_registry_hostname" {}
 variable "sapience_container_registry_username" {}
 variable "sapience_container_registry_password" {}
