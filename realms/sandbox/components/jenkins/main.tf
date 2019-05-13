@@ -19,10 +19,10 @@ data "terraform_remote_state" "jenkins_storage" {
   backend = "azurerm"
 
   config {
-    access_key           = "${var.backend_access_key}"
-    storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "${var.backend_container_name}"
-    key                  = "sapience.realm.${var.realm}.jenkins-storage.terraform.tfstate"
+    access_key            = "${var.backend_access_key}"
+    storage_account_name  = "${var.backend_storage_account_name}"
+	  container_name        = "${var.backend_container_name}"
+    key                   = "sapience.realm.${var.realm}.jenkins-storage.terraform.tfstate"
   }
 }
 
@@ -36,6 +36,8 @@ data "terraform_remote_state" "kubernetes" {
     key                  = "sapience.realm.${var.realm}.kubernetes.terraform.tfstate"
   }
 }
+
+
 
 /* data "terraform_remote_state" "dns" {
   backend = "azurerm"
@@ -120,7 +122,7 @@ resource "kubernetes_deployment" "jenkins" {
         container {
           name = "jenkins"
           # image = "jenkins/jenkins:2.169"
-          image = "${var.sapience_container_registry_hostname}/jenkins:1.0"
+          image = "${var.sapience_container_registry_hostname}/jenkins:1.1"
           image_pull_policy = "Always"
 
           env {
@@ -264,8 +266,54 @@ resource "kubernetes_storage_class" "jenkins_home" {
   }
 }
 
+resource "kubernetes_secret" "maven_repo_azure_file" {
+  metadata {
+    annotations = "${merge(
+      local.common_tags,
+      map()
+    )}"
+    
+    name = "maven-repo-azure-file"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    azurestorageaccountname = "${data.terraform_remote_state.jenkins_storage.maven_repo_storage_account_name}"
+    azurestorageaccountkey  = "${data.terraform_remote_state.jenkins_storage.maven_repo_storage_account_access_key}"
+  }
+
+  # type = "Opaque"
+}
+
+                # data "template_file" "maven_repo_azure_file_secret" {
+                #   template = "${file("templates/maven-repo-azure-file-secret.yaml.tpl")}"
+
+                #   vars {
+                #     azurestorageaccountname = "${data.terraform_remote_state.jenkins_storage.maven_repo_storage_account_name}"
+                #     azurestorageaccountkey  = "${data.terraform_remote_state.jenkins_storage.maven_repo_storage_account_access_key}"
+                #   }
+                # }
+
+                # resource "null_resource" "maven_repo_azure_file_secret" {
+                #   triggers {
+                #     template_changed = "${data.template_file.maven_repo_azure_file_secret.rendered}"
+                #   }
+
+                #   provisioner "local-exec" {
+                #     command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.maven_repo_azure_file_secret.rendered}\nEOF"
+                #   }
+
+                #   provisioner "local-exec" {
+                #     when = "destroy"
+
+                #     command = "kubectl delete --kubeconfig=${local.config_path} persistentvolume maven-repo-${var.realm}"
+                #   }  
+                # }
+
+
+
 resource "kubernetes_persistent_volume_claim" "maven_repo" {
-  depends_on = [ "null_resource.maven_repo_pv" ]
+  depends_on = [ "null_resource.maven_repo_storage_class", "null_resource.maven_repo_pv" ]
   
   metadata {
     annotations = "${merge(
@@ -285,7 +333,7 @@ resource "kubernetes_persistent_volume_claim" "maven_repo" {
       }
     }
     volume_name = "maven-repo-${var.realm}"  // This is what it should be when PV is created under TF: "${null_resource.maven_repo.metadata.0.name}"
-    storage_class_name = "${kubernetes_storage_class.maven_repo.metadata.0.name}"
+    storage_class_name = "maven-repo"
   }
 }
 
@@ -296,10 +344,13 @@ data "template_file" "maven_repo_pv" {
     realm = "${var.realm}"
     subscription_id = "${var.subscription_id}"
     resource_group_name = "${var.resource_group_name}"
+    secret_name = "${kubernetes_secret.maven_repo_azure_file.metadata.0.name}"
+    share_name = "${data.terraform_remote_state.jenkins_storage.maven_repo_storage_account_name}"
   }
 }
 
 resource "null_resource" "maven_repo_pv" {
+  depends_on = [ "null_resource.maven_repo_storage_class" ]
   triggers {
     template_changed = "${data.template_file.maven_repo_pv.rendered}"
   }
@@ -310,27 +361,46 @@ resource "null_resource" "maven_repo_pv" {
 
   provisioner "local-exec" {
     when = "destroy"
-
     command = "kubectl delete --kubeconfig=${local.config_path} persistentvolume maven-repo-${var.realm}"
-  }  
-}
-
-resource "kubernetes_storage_class" "maven_repo" {
-  metadata {
-    annotations = "${merge(
-      local.common_tags,
-      map()
-    )}"
-    
-    name = "maven-repo"
-  }
-
-  storage_provisioner = "kubernetes.io/azure-disk"
-  reclaim_policy = "Retain"
-  parameters {
-    storageaccounttype = "Standard_LRS"
   }
 }
+
+data "template_file" "maven_repo_storage_class" {
+  template = "${file("templates/maven-repo-storage-class.yaml.tpl")}"
+}
+
+resource "null_resource" "maven_repo_storage_class" {
+  triggers {
+    template_changed = "${data.template_file.maven_repo_storage_class.rendered}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.maven_repo_storage_class.rendered}\nEOF"
+  }
+
+  # provisioner "local-exec" {
+  #   when = "destroy"
+
+  #   command = "kubectl delete --kubeconfig=${local.config_path} persistentvolume maven-repo-${var.realm}"
+  # }  
+}
+
+                      # resource "kubernetes_storage_class" "maven_repo" {
+                      #   metadata {
+                      #     annotations = "${merge(
+                      #       local.common_tags,
+                      #       map()
+                      #     )}"
+                          
+                      #     name = "maven-repo"
+                      #   }
+                        
+                      #   storage_provisioner = "kubernetes.io/azure-file"
+                      # //  reclaim_policy = "Retain"
+                      #   parameters {
+                      #     storageaccounttype = "Standard_LRS"
+                      #   }
+                      # }
 
 resource "kubernetes_service_account" "jenkins" {
   metadata {
@@ -399,3 +469,88 @@ resource "kubernetes_cluster_role_binding" "jenkins" {
   ttl                 = 1
   record              = [ "${kubernetes_service.jenkins.load_balancer_ingress.0.hostname}" ]
 } */
+
+data "azurerm_subnet" "default" {
+  name                 = "default"
+  virtual_network_name = "${var.resource_group_name}-vnet"
+  resource_group_name  = "${var.resource_group_name}"
+}
+
+resource "azurerm_public_ip" "jenkins_windows_slave" {
+  name                = "jenkins-windows-slave-${var.realm}"
+  location            = "East US"
+  resource_group_name = "${var.resource_group_name}"
+  public_ip_address_allocation   = "Static"
+}
+
+resource "azurerm_network_interface" "jenkins_windows_slave_nic" {
+  depends_on          = [ "azurerm_public_ip.jenkins_windows_slave", "azurerm_network_security_group.jenkins_windows_slave" ]
+  name                = "jenkins-windows-slave-nic-${var.realm}"
+  resource_group_name   = "${var.resource_group_name}"
+  location              = "${var.resource_group_location}"
+  network_security_group_id = "${azurerm_network_security_group.jenkins_windows_slave.id}"
+
+  ip_configuration {
+    name                          = "jenkins-windows-slave-${var.realm}"
+    subnet_id                     = "${data.azurerm_subnet.default.id}"
+    public_ip_address_id          = "${azurerm_public_ip.jenkins_windows_slave.id}"
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_network_security_group" "jenkins_windows_slave" {
+  name = "jenkins-windows-slave-${var.realm}"
+  location              = "${var.resource_group_location}"
+  resource_group_name   = "${var.resource_group_name}"
+
+  security_rule {
+    name = "Allow-AllTraffic-BanyanOffice"
+    priority = 100
+    direction = "Inbound"
+    access = "Allow"
+    protocol = "*"
+    source_port_range = "*"
+    destination_port_range = "*"
+    source_address_prefix = "50.20.0.62/32"
+    destination_address_prefix = "*"
+  }
+}
+
+resource "azurerm_virtual_machine" "jenkins_windows_slave" {
+  depends_on            = [ "azurerm_network_interface.jenkins_windows_slave_nic" ]
+  name                  = "jenkins-windows-slave-${var.realm}"
+  resource_group_name   = "${var.resource_group_name}"
+  location              = "${var.resource_group_location}"
+  network_interface_ids = ["${azurerm_network_interface.jenkins_windows_slave_nic.id}"]
+  vm_size               = "Standard_D2_v3"
+
+  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  delete_os_disk_on_termination = true
+
+  # This means the Data Disk Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  delete_data_disks_on_termination = true
+
+  storage_image_reference {
+    publisher = "MicrosoftWindowsDesktop"
+    offer     = "Windows-10"
+    sku       = "RS3-Pro"
+    version   = "latest"
+  }
+
+  storage_os_disk {
+    name              = "jenkins-windows-slave-os-${var.realm}"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  os_profile {
+    computer_name  = "jenkins-win-slv"
+    admin_username = "testadmin2"
+    admin_password = "Password1234!"
+  }
+
+  os_profile_windows_config {}
+}
