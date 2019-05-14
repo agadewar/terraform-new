@@ -573,7 +573,7 @@ module "eventpipeline_service" {
   name      = "eventpipeline-service"
   namespace = "${local.namespace}"
 
-  deployment_image             = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.2.1.docker-SNAPSHOT"
+  deployment_image             = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.2.2.docker-SNAPSHOT"
   deployment_replicas          = 1
   deployment_image_pull_policy = "Always"
   deployment_image_pull_secret_name = "${local.canopy_container_registry_image_pull_secret_name}"
