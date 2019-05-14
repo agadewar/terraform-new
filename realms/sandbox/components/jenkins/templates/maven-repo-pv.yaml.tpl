@@ -7,15 +7,19 @@ metadata:
 spec:
   capacity:
     storage: 20Gi
-  storageClassName: maven-repo
-  azureDisk:
-    kind: Managed
-    diskName: maven-repo-${realm}
-    diskURI: /subscriptions/${subscription_id}/resourceGroups/${resource_group_name}/providers/Microsoft.Compute/disks/maven-repo-${realm}
-    fsType: ext4
+  volumeMode: Filesystem
   accessModes:
-  - ReadWriteMany
+    - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: maven-repo
+  azureFile: 
+    secretName: "${secret_name}"
+    shareName: maven-repo
+#  azureDisk:
+#    kind: Managed
+#    diskName: maven-repo-${realm}
+#    diskURI: /subscriptions/${subscription_id}/resourceGroups/${resource_group_name}/providers/Microsoft.Compute/disks/maven-repo-${realm}
+#    fsType: ext4
 #  claimRef:
 #    name: maven-repo-pvc
 #    namespace: default
