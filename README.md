@@ -96,28 +96,7 @@
 		terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
 		```
 
-4. Setup Event Hubs
-    1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
-	2. Edit "terraform/environments/dev/event-hubs/main.tf"
-		- Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.event-hubs.terraform.tfstate"
-	3. Terraform Initialize and Apply
-		```
-		cd terraform/environments/dev/event-hubs
-		terraform init -backend-config="../../../config/backend.config"
-		terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
-		```
-	4. Give permissions to the "datalake" Event Hub to capture into the Data Lake configured above (see: https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-archive-eventhub-capture#assign-permissions-to-event-hubs)
-		1. Create a New Folder in the Data Lake named "raw_data"
-		2. Follow the instructions in the link above
-	5. Go to Azure Portal and configure the "datalake" Event Hub to "Capture" (see: https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-capture-enable-through-portal)
-		1. From the 'Overview' tab, scroll to the bottom and click on 'datalake'
-			1. Click on the 'Captures' link and set Capture = On
-			2. Check the box for 'Do not emit empty files when no events occur during the Capture time window'
-			3. Set 'Capture Provider' = Azure Data Lake Store
-			4. Set 'Data Lake Store' = sapiencedev
-			5. Set 'Data Lake Path' = /raw_data
-
-5. Setup Databases
+4. Setup Databases
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/environments/dev/database/main.tf"
 		- Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.database.terraform.tfstate"
@@ -140,7 +119,7 @@
 		1. Run DDL in canopy-sql/ddl
 		2. Run DML in canopy-sql/dml
 
-6. Retrieve Keys
+5. Retrieve Keys
 	1. Service Bus
 		1. From Azure Portal -> Service Bus -> Click on sapience-dev -> 'Shared access policies' -> 'RootManageSharedAccessKey'
 		2. Copy the Primary Key
@@ -154,7 +133,7 @@
 		2. Copy the Primary Key
 		3. In environment.dev.tfvars, set canopy_hierarchy_cosmos_password to the Primary Key
 
-7. Setup Canopy
+6. Setup Canopy
 	1. Deploy CronJob(s)
 		1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 		2. Edit "terraform/environments/dev/cronjob/main.tf"
@@ -182,7 +161,7 @@
 			terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
 			```
 
-8. Setup DNS Zone
+7. Setup DNS Zone
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/environments/dev/dns/main.tf"
 		- Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.dns.terraform.tfstate"
@@ -197,7 +176,7 @@
 		2. Copy the 4 Name Servers listed.
 		3. At the DNS host, create the NS records.  _(Today, this is in Net4India)_
 
-9. Setup Databricks
+8. Setup Databricks
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/environments/dev/databricks/main.tf"
 		- Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.databricks.terraform.tfstate"
@@ -208,7 +187,7 @@
 		terraform apply -var-file="../../../config/realm.lab.tfvars" -var-file="../../../config/environment.dev.tfvars"
 		```
 
-10. Setup Ambassador
+9. Setup Ambassador
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/environments/dev/ambassador/main.tf"
 		- Change 'key' in terraform{} block: "sapience.environment.<font color="red">dev</font>.ambassador.terraform.tfstate"
