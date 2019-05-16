@@ -194,6 +194,8 @@ resource "kubernetes_service" "jenkins" {
       "47.187.167.223/32", # Sapience office
       # "0.0.0.0/0",        # Open to the world
       "52.224.108.229/32", # Jenkins Windows Agent / Slave
+      "47.186.105.169/32" # Matt Curry Home
+
     ]
   }
 }

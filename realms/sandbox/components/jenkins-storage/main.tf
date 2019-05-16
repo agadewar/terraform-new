@@ -38,24 +38,6 @@ resource "azurerm_managed_disk" "jenkins_home" {
   }
 }
 
-# // DELETE MAVEN MANAGED DISK IF THE STORAGE ACCOUNT IS WORKING
-# resource "azurerm_managed_disk" "maven_repo" {
-#   name                 = "maven-repo-${var.realm}"
-#   location             = "${var.resource_group_location}"
-#   resource_group_name  = "${var.resource_group_name}"
-#   storage_account_type = "Standard_LRS"
-#   create_option        = "Empty"
-#   disk_size_gb         = "20"
-
-#   tags = "${merge(
-#     local.common_tags,
-#     map()
-#   )}"
-  
-#   lifecycle{
-#     prevent_destroy = "true"
-#   }
-# }
 
 // STORAGE ACCOUNT IN PLACE OF MANAGED DISK TO ALLOW READ/WRITE-MANY
 // SET UP WITH TERRAFORM KUBERNETES_SECRET
