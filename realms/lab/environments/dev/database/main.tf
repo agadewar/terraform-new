@@ -112,8 +112,8 @@ resource "azurerm_sql_database" "user" {
   )}"
 }
 
-resource "azurerm_sql_database" "md" {
-  name                = "md"
+resource "azurerm_sql_database" "mad" {
+  name                = "mad"
   resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
   location            = "${azurerm_sql_server.sapience.location}"
   server_name         = "${azurerm_sql_server.sapience.name}"
