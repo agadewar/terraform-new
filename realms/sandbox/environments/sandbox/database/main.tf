@@ -98,8 +98,8 @@ resource "azurerm_sql_database" "user" {
   )}"
 }
 
-resource "azurerm_sql_database" "mdm" {
-  name                = "mdm"
+resource "azurerm_sql_database" "mad" {
+  name                = "mad"
   resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
   location            = "${azurerm_sql_server.sapience.location}"
   server_name         = "${azurerm_sql_server.sapience.name}"
@@ -133,12 +133,21 @@ resource "azurerm_sql_firewall_rule" "banyan" {
   start_ip_address    = "50.20.0.62"
   end_ip_address      = "50.20.0.62"
 }
+
 resource "azurerm_sql_firewall_rule" "azure_portal" {
   name                = "azure-portal"
   resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
   server_name         = "${azurerm_sql_server.sapience.name}"
   start_ip_address    = "40.76.27.62"
   end_ip_address      = "40.76.27.62"
+}
+
+resource "azurerm_sql_firewall_rule" "benji_home" {
+  name                = "benji-home"
+  resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
+  server_name         = "${azurerm_sql_server.sapience.name}"
+  start_ip_address    = "24.125.218.36"
+  end_ip_address      = "24.125.218.36"
 }
 
 resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
