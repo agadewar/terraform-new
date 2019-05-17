@@ -37,6 +37,28 @@ data "terraform_remote_state" "kubernetes_namespace" {
   }
 }
 
+data "terraform_remote_state" "service_bus" {
+  backend = "azurerm"
+
+  config {
+    access_key           = "${var.backend_access_key}"
+    storage_account_name = "${var.backend_storage_account_name}"
+    container_name       = "${var.backend_container_name}"
+    key                  = "sapience.environment.${var.environment}.service-bus.terraform.tfstate"
+  }
+}
+
+data "terraform_remote_state" "database" {
+  backend = "azurerm"
+
+  config {
+    access_key           = "${var.backend_access_key}"
+    storage_account_name = "${var.backend_storage_account_name}"
+    container_name       = "${var.backend_container_name}"
+    key                  = "sapience.environment.${var.environment}.database.terraform.tfstate"
+  }
+}
+
 data "template_file" "global_properties" {
   template = "${file("templates/global.properties.tpl")}"
 
@@ -87,7 +109,7 @@ resource "kubernetes_secret" "eventpipeline_leaf_broker" {
   }
 
   data {
-    "canopy.amqp.password"     = "${var.canopy_amqp_password}"
+    "canopy.amqp.password"     = "${data.terraform_remote_state.service_bus.servicebus_namespace_default_primary_key}"
     "canopy.database.username" = "${var.sql_server_administrator_login}"
     "canopy.database.password" = "${var.sql_server_administrator_password}"
   }
@@ -213,7 +235,7 @@ resource "kubernetes_secret" "canopy_user_service" {
   }
 
   data {
-    "canopy.amqp.password"     = "${var.canopy_amqp_password}"
+    "canopy.amqp.password"     = "${data.terraform_remote_state.service_bus.servicebus_namespace_default_primary_key}"
     "canopy.database.username" = "${var.sql_server_administrator_login}"
     "canopy.database.password" = "${var.sql_server_administrator_password}"
   }
@@ -327,7 +349,7 @@ data "template_file" "gremlin_cosmos" {
 
   vars {
      environment                      = "${var.environment}"
-     canopy_hierarchy_cosmos_password = "${var.canopy_hierarchy_cosmos_password}"
+     canopy_hierarchy_cosmos_password = "${data.terraform_remote_state.database.canopy_hierarchy_cosmos_password}"
   }
 }
 
@@ -429,7 +451,7 @@ resource "kubernetes_secret" "canopy_device_service" {
   }
 
   data {
-    "canopy.amqp.password"     = "${var.canopy_amqp_password}"
+    "canopy.amqp.password"     = "${data.terraform_remote_state.service_bus.servicebus_namespace_default_primary_key}"
     "canopy.database.username" = "${var.sql_server_administrator_login}"
     "canopy.database.password" = "${var.sql_server_administrator_password}"
     "google.api.key"           = "${var.google_api_key}"
@@ -568,7 +590,7 @@ resource "kubernetes_secret" "eventpipeline_service" {
   }
 
   data {
-    "canopy.amqp.password"     = "${var.canopy_amqp_password}"
+    "canopy.amqp.password"     = "${data.terraform_remote_state.service_bus.servicebus_namespace_default_primary_key}"
     "canopy.database.username" = "${var.sql_server_administrator_login}"
     "canopy.database.password" = "${var.sql_server_administrator_password}"
   }
