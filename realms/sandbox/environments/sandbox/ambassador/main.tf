@@ -35,7 +35,7 @@ data "terraform_remote_state" "dns" {
 }
 
 locals {
-  config_path = "../../../../../realms/${var.realm}/components/kubernetes/kubeconfig"
+  config_path = "../../../components/kubernetes/kubeconfig"
   namespace = "${var.environment}"
   
   common_tags = "${merge(

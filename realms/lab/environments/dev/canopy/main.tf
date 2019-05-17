@@ -11,7 +11,7 @@ provider "kubernetes" {
 
 locals {
   namespace                         = "${var.environment}"
-  config_path                       = "../../../../../realms/${var.realm}/components/kubernetes/kubeconfig"
+  config_path                       = "../../../components/kubernetes/kubeconfig"
   
   canopy_container_registry_image_pull_secret_name   = "canopy-container-registry-credential"
   sapience_container_registry_image_pull_secret_name = "sapience-container-registry-credential"

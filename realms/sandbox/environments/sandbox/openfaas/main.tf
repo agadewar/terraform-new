@@ -29,7 +29,7 @@ provider "helm" {
 locals {
   namespace = "openfaas"
 
-  config_path = "../../../../../realms/${var.realm}/components/kubernetes/kubeconfig"
+  config_path = "../../../components/kubernetes/kubeconfig"
 
   common_tags = "${merge(
     var.realm_common_tags,

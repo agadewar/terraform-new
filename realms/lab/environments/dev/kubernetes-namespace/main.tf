@@ -28,7 +28,7 @@ data "terraform_remote_state" "kubernetes" {
 locals {
   namespace = "${var.environment}"
 
-  config_path = "../../../../../realms/${var.realm}/components/kubernetes/kubeconfig"
+  config_path = "../../../components/kubernetes/kubeconfig"
 
   common_tags = "${merge(
     var.realm_common_tags,
