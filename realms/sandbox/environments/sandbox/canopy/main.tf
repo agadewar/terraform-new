@@ -26,6 +26,17 @@ locals {
   }
 }
 
+data "terraform_remote_state" "kubernetes_namespace" {
+  backend = "azurerm"
+
+  config {
+    access_key           = "${var.backend_access_key}"
+    storage_account_name = "${var.backend_storage_account_name}"
+    container_name       = "${var.backend_container_name}"
+    key                  = "sapience.environment.${var.environment}.kubernetes-namespace.terraform.tfstate"
+  }
+}
+
 data "template_file" "global_properties" {
   template = "${file("templates/global.properties.tpl")}"
 
@@ -110,7 +121,7 @@ module "eventpipeline_leaf_broker" {
     }
   ]
 
-  default_token = "${var.kubernetes_namespace_default_token}"
+  default_token = "${data.terraform_remote_state.kubernetes_namespace.default_token_secret_name}"
 
   deployment_env = [
     {
@@ -234,7 +245,7 @@ module "canopy_user_service" {
     }
   ]
 
-  default_token = "${var.kubernetes_namespace_default_token}"
+  default_token = "${data.terraform_remote_state.kubernetes_namespace.default_token_secret_name}"
 
   deployment_env = [
     {
@@ -368,7 +379,7 @@ module "canopy_hierarchy_service" {
     }
   ]
 
-  default_token = "${var.kubernetes_namespace_default_token}"
+  default_token = "${data.terraform_remote_state.kubernetes_namespace.default_token_secret_name}"
 
   service_spec = [
     {
@@ -451,7 +462,7 @@ module "canopy_device_service" {
     }
   ]
 
-  default_token = "${var.kubernetes_namespace_default_token}"
+  default_token = "${data.terraform_remote_state.kubernetes_namespace.default_token_secret_name}"
 
   deployment_env = [
     {
@@ -589,7 +600,7 @@ module "eventpipeline_service" {
     }
   ]
 
-  default_token = "${var.kubernetes_namespace_default_token}"
+  default_token = "${data.terraform_remote_state.kubernetes_namespace.default_token_secret_name}"
 
   readiness_probe_timeout_seconds = 10
   liveness_probe_timeout_seconds  = 10
