@@ -5,7 +5,7 @@ terraform {
 }
 
 provider "kubernetes" {
-  version = "1.5.0"
+  version = "1.6.2"
   config_path = "${local.config_path}"
 }
 
@@ -17,12 +17,14 @@ locals {
   sapience_container_registry_image_pull_secret_name = "sapience-container-registry-credential"
 
   common_labels = {
-    "app.kubernetes.io/customer"    = "${var.realm_common_tags["Customer"]}"
-	  "app.kubernetes.io/product"     = "${var.realm_common_tags["Product"]}"
-    "app.kubernetes.io/realm"       = "${var.realm_common_tags["Realm"]}"
-	  "app.kubernetes.io/environment" = "${var.environment_common_tags["Environment"]}"
-	  "app.kubernetes.io/component"   = "Canopy"
-	  "app.kubernetes.io/managed-by"  = "${var.realm_common_tags["ManagedBy"]}"
+    "sapience.net/customer"    = "${replace(lower(var.realm_common_tags["Customer"]), " ", "-")}"
+	  "sapience.net/product"     = "${replace(lower(var.realm_common_tags["Product"]), " ", "-")}"
+    "sapience.net/realm"       = "${replace(lower(var.realm_common_tags["Realm"]), " ", "-")}"
+	  "sapience.net/environment" = "${replace(lower(var.environment_common_tags["Environment"]), " ", "-")}"
+    // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+    //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+	  "sapience.net/component"   = "canopy"
+	  "sapience.net/managed-by"  = "${replace(lower(var.realm_common_tags["ManagedBy"]), " ", "-")}"
   }
 }
 
@@ -168,8 +170,10 @@ module "eventpipeline_leaf_broker" {
   service_spec = [
     {
       # type = "LoadBalancer"
+      // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+      //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
       selector {
-        "app.kubernetes.io/name" = "eventpipeline-leaf-broker"
+        "sapience.net/name" = "eventpipeline-leaf-broker"
       }
 
       port = [
@@ -293,7 +297,9 @@ module "canopy_user_service" {
     {
       # type = "LoadBalancer"
       selector {
-        "app.kubernetes.io/name" = "canopy-user-service"
+        // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+        //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+        "sapience.net/name" = "canopy-user-service"
       }
 
       port = [
@@ -385,7 +391,9 @@ module "canopy_hierarchy_service" {
     {
       # type = "LoadBalancer"
       selector {
-        "app.kubernetes.io/name" = "canopy-hierarchy-service"
+        // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+        //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+        "sapience.net/name" = "canopy-hierarchy-service"
       }
 
       port = [
@@ -523,7 +531,9 @@ module "canopy_device_service" {
     {
       # type = "LoadBalancer"
       selector {
-        "app.kubernetes.io/name" = "canopy-device-service"
+        // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+        //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+        "sapience.net/name" = "canopy-device-service"
       }
 
       port = [
@@ -651,7 +661,9 @@ module "eventpipeline_service" {
     {
       # type = "LoadBalancer"
       selector {
-        "app.kubernetes.io/name" = "eventpipeline-service"
+        // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+        //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+        "sapience.net/name" = "eventpipeline-service"
       }
 
       port = [
