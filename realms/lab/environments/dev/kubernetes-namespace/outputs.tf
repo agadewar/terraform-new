@@ -3,5 +3,5 @@ output "aks_egress_ip_address" {
 }
 
 output "default_token_secret_name" {
-  value = "${data.local_file.default_token_secret_name.content}"
+  value = "${data.null_data_source.default_token_secret_name.outputs["data"]}"
 }
