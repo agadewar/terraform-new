@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key                  = "sapience.environment.sandbox.data-lake.terraform.tfstate"
+    key = "sapience.environment.sandbox.data-lake.terraform.tfstate"
   }
 }
 
