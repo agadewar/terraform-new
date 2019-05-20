@@ -49,14 +49,6 @@ resource "azurerm_servicebus_queue" "canopy_eventpipeline" {
   enable_partitioning = true
 }
 
-resource "azurerm_servicebus_queue" "canopy_datalake" {
-  name                = "sapience-canopy-datalake"
-  resource_group_name = "${var.resource_group_name}"
-  namespace_name      = "${azurerm_servicebus_namespace.namespace.name}"
-
-  enable_partitioning = true
-}
-
 resource "azurerm_servicebus_queue" "device_registration" {
   name                = "device-registration"
   resource_group_name = "${var.resource_group_name}"
