@@ -57,10 +57,17 @@ resource "null_resource" "default_token_secret_name" {
   }
 }
 
-data "local_file" "default_token_secret_name" {
-  depends_on = [ "null_resource.default_token_secret_name" ]
+# data "local_file" "default_token_secret_name" {
+#   depends_on = [ "null_resource.default_token_secret_name" ]
 
-  filename = ".local/default_token_secret_name.out"
+#   filename = ".local/default_token_secret_name.out"
+# }
+# see: https://github.com/hashicorp/terraform/issues/11806
+data "null_data_source" "default_token_secret_name" {
+  inputs = {
+    data = "${file(".local/default_token_secret_name.out")}"
+    dummy = "${format(null_resource.default_token_secret_name.id)}"
+  }
 }
 
 resource "kubernetes_resource_quota" "resource_quota" {
@@ -92,9 +99,11 @@ resource "azurerm_public_ip" "aks_egress" {
 }
 
 resource "kubernetes_service" "aks_egress" {
+  // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+  //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
   metadata {
     labels {
-      "app.kubernetes.io/name" = "azure-egress"
+      "sapience.net/name" = "azure-egress"
     }
 
     name = "azure-egress"

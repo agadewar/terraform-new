@@ -5,7 +5,7 @@ terraform {
 }
 
 provider "kubernetes" {
-  version = "1.5.0"
+  version = "1.6.2"
   config_path = "${local.config_path}"
 }
 
@@ -17,12 +17,14 @@ locals {
   sapience_container_registry_image_pull_secret_name = "sapience-container-registry-credential"
 
   common_labels = {
-    "app.kubernetes.io/customer"    = "${var.realm_common_tags["Customer"]}"
-	  "app.kubernetes.io/product"     = "${var.realm_common_tags["Product"]}"
-    "app.kubernetes.io/realm"       = "${var.realm_common_tags["Realm"]}"
-	  "app.kubernetes.io/environment" = "${var.environment_common_tags["Environment"]}"
-	  "app.kubernetes.io/component"   = "Canopy"
-	  "app.kubernetes.io/managed-by"  = "${var.realm_common_tags["ManagedBy"]}"
+    "sapience.net/customer"    = "${replace(lower(var.realm_common_tags["Customer"]), " ", "-")}"
+	  "sapience.net/product"     = "${replace(lower(var.realm_common_tags["Product"]), " ", "-")}"
+    "sapience.net/realm"       = "${replace(lower(var.realm_common_tags["Realm"]), " ", "-")}"
+	  "sapience.net/environment" = "${replace(lower(var.environment_common_tags["Environment"]), " ", "-")}"
+    // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+    //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+	  "sapience.net/component"   = "canopy"
+	  "sapience.net/managed-by"  = "${replace(lower(var.realm_common_tags["ManagedBy"]), " ", "-")}"
   }
 }
 
@@ -189,9 +191,10 @@ module "eventpipeline_leaf_broker" {
 
   service_spec = [
     {
-      # type = "LoadBalancer"
+      // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+      //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
       selector {
-        "app.kubernetes.io/name" = "eventpipeline-leaf-broker"
+        "sapience.net/name" = "eventpipeline-leaf-broker"
       }
 
       port = [
@@ -201,12 +204,6 @@ module "eventpipeline_leaf_broker" {
           target_port = 8080
         }
       ]
-
-      # load_balancer_source_ranges = [
-      #   "50.20.0.62/32",     # Banyan office
-      #   "24.99.117.169/32",  # Ardis home
-      #   "47.187.167.223/32"  # Sapience office
-      # ]
     }
   ]
 
@@ -313,9 +310,10 @@ module "canopy_user_service" {
 
   service_spec = [
     {
-      # type = "LoadBalancer"
       selector {
-        "app.kubernetes.io/name" = "canopy-user-service"
+        // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+        //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+        "sapience.net/name" = "canopy-user-service"
       }
 
       port = [
@@ -329,12 +327,6 @@ module "canopy_user_service" {
           port = 5701
         }
       ]
-
-      # load_balancer_source_ranges = [
-      #   "50.20.0.62/32",     # Banyan office
-      #   "24.99.117.169/32",  # Ardis home
-      #   "47.187.167.223/32"  # Sapience office
-      # ]
     }
   ]
 
@@ -405,9 +397,10 @@ module "canopy_hierarchy_service" {
 
   service_spec = [
     {
-      # type = "LoadBalancer"
       selector {
-        "app.kubernetes.io/name" = "canopy-hierarchy-service"
+        // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+        //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+        "sapience.net/name" = "canopy-hierarchy-service"
       }
 
       port = [
@@ -417,12 +410,6 @@ module "canopy_hierarchy_service" {
           target_port = 8080
         }
       ]
-
-      # load_balancer_source_ranges = [
-      #   "50.20.0.62/32",     # Banyan office
-      #   "24.99.117.169/32",  # Ardis home
-      #   "47.187.167.223/32"  # Sapience office
-      # ]
     }
   ]
 
@@ -543,9 +530,10 @@ module "canopy_device_service" {
 
   service_spec = [
     {
-      # type = "LoadBalancer"
       selector {
-        "app.kubernetes.io/name" = "canopy-device-service"
+        // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+        //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+        "sapience.net/name" = "canopy-device-service"
       }
 
       port = [
@@ -555,13 +543,6 @@ module "canopy_device_service" {
           target_port = 8080
         }
       ]
-
-      # load_balancer_source_ranges = [
-      #   "50.20.0.62/32",     # Banyan office
-      #   "24.99.117.169/32",  # Ardis home
-      #   "47.187.167.223/32", # Sapience office
-      #   "208.82.111.61/32"   # Drury hotel
-      # ]
     }
   ]
 
@@ -671,9 +652,10 @@ module "eventpipeline_service" {
 
   service_spec = [
     {
-      # type = "LoadBalancer"
       selector {
-        "app.kubernetes.io/name" = "eventpipeline-service"
+        // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+        //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+        "sapience.net/name" = "eventpipeline-service"
       }
 
       port = [
@@ -683,12 +665,6 @@ module "eventpipeline_service" {
           target_port = 8080
         }
       ]
-
-      # load_balancer_source_ranges = [
-      #   "50.20.0.62/32",     # Banyan office
-      #   "24.99.117.169/32",  # Ardis home
-      #   "47.187.167.223/32"  # Sapience office
-      # ]
     }
   ]
 
@@ -698,3 +674,77 @@ module "eventpipeline_service" {
   )}"
 }
 
+resource "kubernetes_config_map" "eventpipeline_registry" {
+  metadata {
+    name      = "eventpipeline-registry"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    "global.properties"      = "${data.template_file.global_properties.rendered}"
+  }
+}
+
+resource "kubernetes_secret" "eventpipeline_registry" {
+  metadata {
+    name      = "eventpipeline-registry"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+  }
+
+  type = "Opaque"
+}
+
+module "eventpipeline_registry" {
+  source = "../../../../../../terraform-canopy-service-module/"
+
+  kubeconfig_path = "${local.config_path}"
+
+  name      = "eventpipeline-registry"
+  namespace = "${local.namespace}"
+
+  deployment_image             = "${var.sapience_container_registry_hostname}/eventpipeline-registry:1.0.0-SNAPSHOT"
+  deployment_replicas          = 1
+  deployment_image_pull_policy = "Always"
+  deployment_image_pull_secret_name = "${kubernetes_secret.sapience_container_registry_credential.metadata.0.name}"   # don't use the local value string here... we need a dependency on the secret being created
+
+  resources = [
+    {
+      requests = [
+        {
+          memory = "256M"
+          cpu = "10m"
+        }
+      ]
+    }
+  ]
+
+  default_token = "${data.terraform_remote_state.kubernetes_namespace.default_token_secret_name}"
+
+  deployment_env = []
+
+  service_spec = [
+    {
+      // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+      //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+      selector {
+        "sapience.net/name" = "eventpipeline-registry"
+      }
+
+      port = [
+        {
+          name        = "application"
+          port        = 80
+          target_port = 8080
+        }
+      ]
+    }
+  ]
+
+  labels = "${merge(
+    local.common_labels,
+    map()
+  )}"
+}
