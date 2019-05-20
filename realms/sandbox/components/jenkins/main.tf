@@ -186,15 +186,8 @@ resource "kubernetes_service" "jenkins" {
       target_port = 38339
     }
 
-    load_balancer_source_ranges = [ 
-      "50.20.0.62/32",     # Banyan office
-      "24.99.117.169/32",  # Ardis Home
-      "162.236.22.89/32",  # Mark W Home
-      "24.125.218.36/32",  # Benji Home
-      "47.187.167.223/32", # Sapience office
-      # "0.0.0.0/0",        # Open to the world
-      "52.224.108.229/32", # Jenkins Windows Agent / Slave
-    ]
+    load_balancer_source_ranges = ["${var.load_balancer_source_ranges_allowed}"]
+
   }
 }
 
@@ -503,17 +496,17 @@ resource "azurerm_network_security_group" "jenkins_windows_slave" {
   location              = "${var.resource_group_location}"
   resource_group_name   = "${var.resource_group_name}"
 
-  security_rule {
-    name = "Allow-AllTraffic-BanyanOffice"
-    priority = 100
-    direction = "Inbound"
-    access = "Allow"
-    protocol = "*"
-    source_port_range = "*"
-    destination_port_range = "*"
-    source_address_prefix = "50.20.0.62/32"
-    destination_address_prefix = "*"
-  }
+  # security_rule {
+  #   name = "Allow-AllTraffic-BanyanOffice"
+  #   priority = 100
+  #   direction = "Inbound"
+  #   access = "Allow"
+  #   protocol = "*"
+  #   source_port_range = "*"
+  #   destination_port_range = "*"
+  #   source_address_prefix = "50.20.0.62/32"
+  #   destination_address_prefix = "*"
+  # }
 }
 
 resource "azurerm_virtual_machine" "jenkins_windows_slave" {
