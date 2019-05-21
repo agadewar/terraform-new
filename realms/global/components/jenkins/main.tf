@@ -92,6 +92,8 @@ resource "kubernetes_namespace" "namespace" {
 }
 
 resource "kubernetes_deployment" "jenkins" {
+  depends_on = [ "kubernetes_persistent_volume_claim.jenkins_home" ]
+
   metadata {
     annotations = "${merge(
       local.common_tags,
@@ -122,7 +124,7 @@ resource "kubernetes_deployment" "jenkins" {
         container {
           name = "jenkins"
           # image = "jenkins/jenkins:2.169"
-          image = "${var.sapience_container_registry_hostname}/jenkins:1.1"
+          image = "${var.sapience_container_registry_hostname}/jenkins:1.4"
           image_pull_policy = "Always"
 
           env {
@@ -193,7 +195,7 @@ resource "kubernetes_service" "jenkins" {
       "24.125.218.36/32",  # Benji Home
       "47.187.167.223/32", # Sapience office
       # "0.0.0.0/0",        # Open to the world
-      "52.224.108.229/32", # Jenkins Windows Agent / Slave
+      "137.117.56.29/32", # Jenkins Windows Agent / Slave
       "47.186.105.169/32" # Matt Curry Home
 
     ]
