@@ -14,11 +14,9 @@ variable "sapience_container_registry_password" {}
 variable "sql_server_administrator_login" {}
 variable "sql_server_administrator_password" {}
 
-# variable "canopy_amqp_password" {}
-
-# variable "canopy_hierarchy_cosmos_password" {}
-
-variable "google_api_key" {}
+variable "google_api_key" {
+    default = ""
+}
 
 variable "realm_common_tags" {
     type = "map"
