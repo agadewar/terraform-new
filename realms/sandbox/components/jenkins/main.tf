@@ -92,6 +92,8 @@ resource "kubernetes_namespace" "namespace" {
 }
 
 resource "kubernetes_deployment" "jenkins" {
+  depends_on = [ "kubernetes_persistent_volume_claim.jenkins_home" ]
+
   metadata {
     annotations = "${merge(
       local.common_tags,
@@ -122,7 +124,7 @@ resource "kubernetes_deployment" "jenkins" {
         container {
           name = "jenkins"
           # image = "jenkins/jenkins:2.169"
-          image = "${var.sapience_container_registry_hostname}/jenkins:1.1"
+          image = "${var.sapience_container_registry_hostname}/jenkins:1.2"
           image_pull_policy = "Always"
 
           env {
@@ -186,7 +188,7 @@ resource "kubernetes_service" "jenkins" {
       target_port = 38339
     }
 
-    load_balancer_source_ranges = ["${var.load_balancer_source_ranges_allowed}"]
+    load_balancer_source_ranges = "${var.load_balancer_source_ranges_allowed}"
 
   }
 }
