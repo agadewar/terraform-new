@@ -2,13 +2,46 @@
 
 regexp="terraform/realms/(.*)/environments/(.*)/.*"
 
+before() {
+    echo "Creating decrypted files..."
+
+	# $2 = realm
+    ansible-vault decrypt "$1/realm.$2.tfvars.vault" --output "$1/realm.$2.tfvars" --vault-password-file $1/vault.password
+
+	# $3 = environment
+	if [ $# -gt 2 ]
+		then
+			ansible-vault decrypt "$1/environment.$3.tfvars.vault" --output "$1/environment.$3.tfvars" --vault-password-file $1/vault.password
+	fi
+}
+
+after() {
+    echo "Removing decrypted files..."
+    
+	# $2 = realm
+    rm -f "$1/realm.$2.tfvars"
+
+	# $3 = environment
+	if [ $# -gt 2 ]
+		then
+			rm -f "$1/environment.$3.tfvars"
+	fi
+}
+
+trap 'after $config_location $realm $environment' EXIT ERR INT TERM
+
 if [[ $PWD =~ $regexp ]]
 then
 	realm="${BASH_REMATCH[1]}"
 	environment="${BASH_REMATCH[2]}"
 	echo "realm = ${realm}"
 	echo "environment = $environment"
-	terraform destroy -var-file ../../../../../config/realm.$realm.tfvars -var-file ../../../../../config/environment.$environment.tfvars
+
+	config_location="../../../../../config"
+
+	before $config_location $realm $environment
+	
+	terraform destroy -var-file $config_location/realm.$realm.tfvars -var-file $config_location/environment.$environment.tfvars
 else
 	regexp="terraform/realms/(.*)/components/.+"
 	
@@ -16,7 +49,12 @@ else
 	then
 		realm="${BASH_REMATCH[1]}"
 		echo "realm = ${realm}"
-		terraform destroy -var-file ../../../../config/realm.$realm.tfvars
+
+		config_location="../../../../config"
+
+		before $config_location $realm
+	
+		terraform destroy -var-file $config_location/realm.$realm.tfvars
 	fi
 fi
 

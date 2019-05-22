@@ -30,8 +30,9 @@ override.tf.json
 
 #### (End) https://raw.githubusercontent.com/github/gitignore/master/Terraform.gitignore
 
-/config/**
-/secrets/**
+/config/*
+!/config/*.vault
+
 
 **/*_original
 **/*_original_*

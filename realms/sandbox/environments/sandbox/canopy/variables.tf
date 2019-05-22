@@ -13,6 +13,7 @@ variable "sapience_container_registry_password" {}
 
 variable "sql_server_administrator_login" {}
 variable "sql_server_administrator_password" {}
+
 variable "google_api_key" {
     default = ""
 }
