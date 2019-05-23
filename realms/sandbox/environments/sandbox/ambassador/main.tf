@@ -247,88 +247,6 @@ resource "helm_release" "cert_manager" {
   }
 }
 
-# resource "null_resource" "delete_cert_manager_crd" {
-#   # cleanup CustomResourceDefinition(s) created by "helm_release.cert_manager"
-
-#   # depends_on = [ "helm_release.cert_manager" ]
-
-#   provisioner "local-exec" {
-#     when = "destroy"
-
-#     command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete customresourcedefinition certificates.certmanager.k8s.io --ignore-not-found"
-#   }
-
-#   provisioner "local-exec" {
-#     when = "destroy"
-
-#     command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete customresourcedefinition clusterissuers.certmanager.k8s.io --ignore-not-found"
-#   }
-# }
-
-# See: https://www.getambassador.io/user-guide/cert-manager
-data "template_file" "letsencrypt_cluster_issuer" {
-  template = "${file("templates/letsencrypt-cluster-issuer.yaml.tpl")}"
-
-  vars {
-     email = "${var.ambassador_letsencrypt_email}"
-  }
-}
-
-resource "null_resource" "letsencrypt_cluster_issuer" {
-  depends_on = ["helm_release.cert_manager"]
-
-  triggers {
-    template_changed = "${data.template_file.letsencrypt_cluster_issuer.rendered}"
-  }
-
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_cluster_issuer.rendered}\nEOF"
-  }
-}
-
-# See: https://www.getambassador.io/user-guide/cert-manager
-data "template_file" "letsencrypt_certificate" {
-  template = "${file("templates/letsencrypt-certificate.yaml.tpl")}"
-
-  vars {
-     namespace = "${local.namespace}"
-  }
-}
-
-resource "null_resource" "letsencrypt_certificate" {
-  depends_on = ["helm_release.cert_manager"]
-
-  triggers {
-    template_changed = "${data.template_file.letsencrypt_certificate.rendered}"
-  }
-
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_certificate.rendered}\nEOF"
-  }
-}
-
-# See: https://www.getambassador.io/user-guide/cert-manager
-data "template_file" "letsencrypt_acme_challenge_service" {
-  template = "${file("templates/letsencrypt-acme-challenge-service.yaml.tpl")}"
-
-  vars {
-    acme_http_domain = "${var.ambassador_letsencrypt_acme_http_domain}"
-    acme_http_token  = "${var.ambassador_letsencrypt_acme_http_token}"
-  }
-}
-
-resource "null_resource" "letsencrypt_acme_challenge_service" {
-  depends_on = ["helm_release.cert_manager"]
-
-  triggers {
-    template_changed = "${data.template_file.letsencrypt_acme_challenge_service.rendered}"
-  }
-
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_acme_challenge_service.rendered}\nEOF"
-  }
-}
-
 # # resource "kubernetes_deployment" "statsd_sink" {
 # #   metadata {
 # #     # creation_timestamp = null
@@ -430,3 +348,65 @@ resource "null_resource" "letsencrypt_acme_challenge_service" {
 # #     command = "kubectl apply --kubeconfig=${local.config_path} -n dev -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
 # #   }
 # # }
+
+# https://github.com/fbeltrao/aks-letsencrypt/blob/master/setup-wildcard-certificates-with-azure-dns.md
+resource "kubernetes_secret" "service_principal_password" {
+  metadata {
+    name = "service-principal-password"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    password = "${var.service_principal_password}"
+  }
+}
+
+# https://github.com/fbeltrao/aks-letsencrypt/blob/master/setup-wildcard-certificates-with-azure-dns.md
+data "template_file" "letsencrypt_cluster_issuer" {
+  template = "${file("templates/letsencrypt-cluster-issuer.yaml.tpl")}"
+
+  vars {
+    email = "${var.ambassador_letsencrypt_email}"
+    service_principal_client_id = "${var.service_principal_app_id}"
+    service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
+    dns_zone_name = "sandbox.sapience.net"
+    resource_group_name = "${var.resource_group_name}"
+    subscription_id = "${var.subscription_id}"
+    service_pricincipal_tenant_id = "${var.service_principal_tenant}"
+  }
+}
+
+resource "null_resource" "letsencrypt_cluster_issuer" {
+  depends_on = ["helm_release.cert_manager"]
+
+  triggers {
+    template_changed = "${data.template_file.letsencrypt_cluster_issuer.rendered}"
+    timestamp = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_cluster_issuer.rendered}\nEOF"
+  }
+}
+
+# https://github.com/fbeltrao/aks-letsencrypt/blob/master/setup-wildcard-certificates-with-azure-dns.md
+data "template_file" "letsencrypt_certificate" {
+  template = "${file("templates/letsencrypt-certificate.yaml.tpl")}"
+
+  vars {
+     namespace = "${local.namespace}"
+  }
+}
+
+resource "null_resource" "letsencrypt_certificate" {
+  depends_on = ["helm_release.cert_manager"]
+
+  triggers {
+    template_changed = "${data.template_file.letsencrypt_certificate.rendered}"
+    timestamp = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_certificate.rendered}\nEOF"
+  }
+}
