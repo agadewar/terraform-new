@@ -1,14 +1,13 @@
 apiVersion: certmanager.k8s.io/v1alpha1
-kind: ClusterIssuer
+kind: Issuer
 metadata:
-  name: letsencrypt-prod
+  name: letsencrypt${suffix}
 spec:
   acme:
-    server: https://acme-v02.api.letsencrypt.org/directory
-    #server: https://acme-staging-v02.api.letsencrypt.org/directory
+    server: ${letsencrypt_server}
     email: ${email}
     privateKeySecretRef:
-      name: letsencrypt-prod
+      name: letsencrypt${suffix}
     # use dns-01 challenges in order to support wildcard domain names
     dns01:
       providers:

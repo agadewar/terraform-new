@@ -11,15 +11,6 @@ provider "azurerm" {
   subscription_id = "${var.subscription_id}"
 }
 
-provider "helm" {
-  kubernetes {
-    config_path = "${local.config_path}"
-  }
-
-  #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
-  service_account = "tiller"
-}
-
 provider "kubernetes" {
     config_path = "${local.config_path}"
 }
@@ -47,15 +38,25 @@ locals {
   )}"
 }
 
+data "template_file" "ambassador-rbac" {
+  template = "${file("templates/ambassador-rbac.yaml.tpl")}"
+
+  vars {
+     replicas = "${var.ambassador_rbac_replicas}"
+  }
+}
+
 # See: https://www.getambassador.io/user-guide/getting-started/#1-deploying-ambassador
 resource "null_resource" "ambassador_rbac" {
   triggers = {
-    manifest_sha1 = "${sha1("${file("files/ambassador-rbac.yaml")}")}"
-    timestamp = "${timestamp()}"   # DELETE ME
+/*     manifest_sha1 = "${sha1("${file("files/ambassador-rbac.yaml")}")}"
+    timestamp = "${timestamp()}"   # DELETE ME */
+    template_changed = "${data.template_file.ambassador-rbac.rendered}"
   }
 
   provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f -<<EOF\n${file("files/ambassador-rbac.yaml")}\nEOF"
+/*     command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f -<<EOF\n${file("files/ambassador-rbac.yaml")}\nEOF" */
+    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.ambassador-rbac.rendered}\nEOF"
   }
 }
 
@@ -174,220 +175,107 @@ resource "azurerm_dns_a_record" "api" {
   records             = [ "${kubernetes_service.ambassador.load_balancer_ingress.0.ip}" ]
 }
 
-# See: https://www.getambassador.io/user-guide/cert-manager
-# See: https://raw.githubusercontent.com/jetstack/cert-manager/release-0.6/deploy/manifests/00-crds.yaml
-resource "null_resource" "create_cert_manager_crd" {
-  triggers {
-    manifest_sha1 = "${sha1("${file("files/cert-manager-crds.yaml")}")}"
-  }
+# resource "kubernetes_deployment" "statsd_sink" {
+#   metadata {
+#     # creation_timestamp = null
+#     name = "statsd-sink"
+#     namespace = "${local.namespace}"
+#   }
 
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f -<<EOF\n${file("files/cert-manager-crds.yaml")}\nEOF"
-  }
+#   spec {
+#     replicas = 1
 
-  provisioner "local-exec" {
-    when = "destroy"
+#     selector {
+#       match_labels {
+#         service = "statsd-sink"
+#       }
+#     }
 
-    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete customresourcedefinition challenges.certmanager.k8s.io --ignore-not-found"
-  }
+#     template {
+#       metadata {
+#         labels {
+#           service = "statsd-sink"
+#         }
+#       }
 
-  provisioner "local-exec" {
-    when = "destroy"
+#       spec {
+#         container {
+#           name = "statsd-sink"
+#           image = "prom/statsd-exporter:v0.8.1"
 
-    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete customresourcedefinition issuers.certmanager.k8s.io --ignore-not-found"
-  }
+#           resources{
+#             requests{
+#               cpu    = "100m"
+#               memory = "25Mi"
+#             }
+#           }
+#         }
 
-  provisioner "local-exec" {
-    when = "destroy"
+#         restart_policy = "Always"
+#       }
+#     }
+#   }
+# }
 
-    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete customresourcedefinition orders.certmanager.k8s.io --ignore-not-found"
-  }
+# resource "kubernetes_service" "statsd-sink" {
+#   metadata {
+#     name = "statsd-sink"
+#     namespace = "${local.namespace}"
 
-  provisioner "local-exec" {
-    when = "destroy"
+#     labels {
+#       "service" = "statsd-sink"
+#     }
 
-    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete customresourcedefinition certificates.certmanager.k8s.io --ignore-not-found"
-  }
+#     annotations {
+#       # "prometheus.io/probe" = "true"
+#       # "prometheus.io/scrape" = "true"
+#       # "prometheus.io/scheme" = "http"
+#       # "prometheus.io/path" = "/metrics"
+#     }
+#   }
 
-  provisioner "local-exec" {
-    when = "destroy"
+#   spec {
+#     port {
+#       protocol = "UDP"
+#       port = 8125
+#       name = "statsd-sink"
+#     }
 
-    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete customresourcedefinition clusterissuers.certmanager.k8s.io --ignore-not-found"
-  }
-}
+#     port {
+#       protocol = "TCP"
+#       port = 9102
+#       name = "prometheus-metrics"
+#     }
 
-data "helm_repository" "jetstack" {
-  name = "jetstack"
-  url  = "https://charts.jetstack.io"
-}
+#     selector {
+#       "service" = "statsd-sink"
+#     }
+#   }
+# }
 
-# See: https://hub.helm.sh/charts/jetstack/cert-manager/v0.6.0
-resource "helm_release" "cert_manager" {
-  depends_on = [ "null_resource.create_cert_manager_crd" ]
+# # See: https://www.getambassador.io/user-guide/getting-started/#1-deploying-ambassador
+# resource "null_resource" "statsd_sink" {
+#   triggers = {
+#     manifest_sha1 = "${sha1("${file("files/statsd-sink.yaml")}")}"
+#     timestamp = "${timestamp()}"   # DELETE ME
+#   }
 
-  name       = "cert-manager"
-  namespace  = "${local.namespace}"
-  chart      = "cert-manager"
-  version    = "v0.6.0"
-  repository = "${data.helm_repository.jetstack.metadata.0.name}"
-  
-  set {
-    name  = "webhook.enabled"
-    value = "false"
-  }
+#   provisioner "local-exec" {
+#     command = "kubectl apply --kubeconfig=${local.config_path} -n monitoring -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
+#   }
+# }
 
-  set {
-    name  = "resources.requests.cpu"
-    value = "10m"
-  }
+# # See: https://www.getambassador.io/user-guide/getting-started/#1-deploying-ambassador
+# resource "null_resource" "service_monitor" {
+#   triggers = {
+#     manifest_sha1 = "${sha1("${file("files/statsd-sink.yaml")}")}"
+#     timestamp = "${timestamp()}"   # DELETE ME
+#   }
 
-  set {
-    name  = "resources.requests.memory"
-    value = "32Mi"
-  }
-}
-
-# # resource "kubernetes_deployment" "statsd_sink" {
-# #   metadata {
-# #     # creation_timestamp = null
-# #     name = "statsd-sink"
-# #     namespace = "${local.namespace}"
-# #   }
-
-# #   spec {
-# #     replicas = 1
-
-# #     selector {
-# #       match_labels {
-# #         service = "statsd-sink"
-# #       }
-# #     }
-
-# #     template {
-# #       metadata {
-# #         labels {
-# #           service = "statsd-sink"
-# #         }
-# #       }
-
-# #       spec {
-# #         container {
-# #           name = "statsd-sink"
-# #           image = "prom/statsd-exporter:v0.8.1"
-
-# #           resources{
-# #             requests{
-# #               cpu    = "100m"
-# #               memory = "25Mi"
-# #             }
-# #           }
-# #         }
-
-# #         restart_policy = "Always"
-# #       }
-# #     }
-# #   }
-# # }
-
-# # resource "kubernetes_service" "statsd-sink" {
-# #   metadata {
-# #     name = "statsd-sink"
-# #     namespace = "${local.namespace}"
-
-# #     labels {
-# #       "service" = "statsd-sink"
-# #     }
-
-# #     annotations {
-# #       # "prometheus.io/probe" = "true"
-# #       # "prometheus.io/scrape" = "true"
-# #       # "prometheus.io/scheme" = "http"
-# #       # "prometheus.io/path" = "/metrics"
-# #     }
-# #   }
-
-# #   spec {
-# #     port {
-# #       protocol = "UDP"
-# #       port = 8125
-# #       name = "statsd-sink"
-# #     }
-
-# #     port {
-# #       protocol = "TCP"
-# #       port = 9102
-# #       name = "prometheus-metrics"
-# #     }
-
-# #     selector {
-# #       "service" = "statsd-sink"
-# #     }
-# #   }
-# # }
-
-# # # See: https://www.getambassador.io/user-guide/getting-started/#1-deploying-ambassador
-# # resource "null_resource" "statsd_sink" {
-# #   triggers = {
-# #     manifest_sha1 = "${sha1("${file("files/statsd-sink.yaml")}")}"
-# #     timestamp = "${timestamp()}"   # DELETE ME
-# #   }
-
-# #   provisioner "local-exec" {
-# #     command = "kubectl apply --kubeconfig=${local.config_path} -n monitoring -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
-# #   }
-# # }
-
-# # # See: https://www.getambassador.io/user-guide/getting-started/#1-deploying-ambassador
-# # resource "null_resource" "service_monitor" {
-# #   triggers = {
-# #     manifest_sha1 = "${sha1("${file("files/statsd-sink.yaml")}")}"
-# #     timestamp = "${timestamp()}"   # DELETE ME
-# #   }
-
-# #   provisioner "local-exec" {
-# #     command = "kubectl apply --kubeconfig=${local.config_path} -n dev -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
-# #   }
-# # }
-
-# https://github.com/fbeltrao/aks-letsencrypt/blob/master/setup-wildcard-certificates-with-azure-dns.md
-resource "kubernetes_secret" "service_principal_password" {
-  metadata {
-    name = "service-principal-password"
-    namespace = "${local.namespace}"
-  }
-
-  data {
-    password = "${var.service_principal_password}"
-  }
-}
-
-# https://github.com/fbeltrao/aks-letsencrypt/blob/master/setup-wildcard-certificates-with-azure-dns.md
-data "template_file" "letsencrypt_cluster_issuer" {
-  template = "${file("templates/letsencrypt-cluster-issuer.yaml.tpl")}"
-
-  vars {
-    email = "${var.ambassador_letsencrypt_email}"
-    service_principal_client_id = "${var.service_principal_app_id}"
-    service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
-    dns_zone_name = "sandbox.sapience.net"
-    resource_group_name = "${var.resource_group_name}"
-    subscription_id = "${var.subscription_id}"
-    service_pricincipal_tenant_id = "${var.service_principal_tenant}"
-  }
-}
-
-resource "null_resource" "letsencrypt_cluster_issuer" {
-  depends_on = ["helm_release.cert_manager"]
-
-  triggers {
-    template_changed = "${data.template_file.letsencrypt_cluster_issuer.rendered}"
-    timestamp = "${timestamp()}"
-  }
-
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_cluster_issuer.rendered}\nEOF"
-  }
-}
+#   provisioner "local-exec" {
+#     command = "kubectl apply --kubeconfig=${local.config_path} -n dev -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
+#   }
+# }
 
 # https://github.com/fbeltrao/aks-letsencrypt/blob/master/setup-wildcard-certificates-with-azure-dns.md
 data "template_file" "letsencrypt_certificate" {
@@ -399,8 +287,6 @@ data "template_file" "letsencrypt_certificate" {
 }
 
 resource "null_resource" "letsencrypt_certificate" {
-  depends_on = ["helm_release.cert_manager"]
-
   triggers {
     template_changed = "${data.template_file.letsencrypt_certificate.rendered}"
     timestamp = "${timestamp()}"

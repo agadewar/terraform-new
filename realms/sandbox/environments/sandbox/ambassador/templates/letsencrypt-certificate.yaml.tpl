@@ -7,8 +7,8 @@ spec:
   secretName: ambassador-certs
   issuerRef:
     name: letsencrypt-prod
-    kind: ClusterIssuer
-  #commonName: '*.api.${namespace}.sapience.net'
+    kind: Issuer
+  # commonName: '*.api.${namespace}.sapience.net'
   commonName: 'api.${namespace}.sapience.net'
   dnsNames:
   - api.${namespace}.sapience.net
@@ -18,5 +18,5 @@ spec:
         provider: azure-dns
         ingressClass: nginx
       domains:
-      #- '*.api.${namespace}.sapience.net'
+      # - '*.api.${namespace}.sapience.net'
       - api.${namespace}.sapience.net
