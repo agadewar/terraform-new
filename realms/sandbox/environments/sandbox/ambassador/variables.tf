@@ -7,6 +7,8 @@ variable "environment" {}
 variable "subscription_id" {}
 variable "resource_group_name" {}
 
+variable "ambassador_rbac_replicas" {}
+
 variable "realm_common_tags" {
     type = "map"
 }
