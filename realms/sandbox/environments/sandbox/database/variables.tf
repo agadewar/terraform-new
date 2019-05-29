@@ -8,6 +8,7 @@ variable "subscription_id" {}
 variable "resource_group_name" {}
 variable "resource_group_location" {}
 
+
 variable "sql_server_administrator_login" {}
 variable "sql_server_administrator_password" {}
 

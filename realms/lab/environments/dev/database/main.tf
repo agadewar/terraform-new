@@ -132,21 +132,46 @@ resource "azurerm_sql_firewall_rule" "aks_egress" {
   end_ip_address      = "${data.terraform_remote_state.kubernetes_namespace.aks_egress_ip_address}"
 }
 
-resource "azurerm_sql_firewall_rule" "ardis_home" {
-  name                = "ardis-home"
+resource "azurerm_sql_firewall_rule" "ip_banyan_office" {
+  name                = "ip-banyan-office"
   resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
   server_name         = "${azurerm_sql_server.sapience.name}"
-  start_ip_address    = "24.99.117.169"
-  end_ip_address      = "24.99.117.169"
+  start_ip_address    = "${var.ip_banyan_office}"
+  end_ip_address      = "${var.ip_banyan_office}"
 }
 
-resource "azurerm_sql_firewall_rule" "banyan" {
-  name                = "banyan"
+resource "azurerm_sql_firewall_rule" "ip_benjamin_john_home" {
+  name                = "ip-benjamin-john-home"
   resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
   server_name         = "${azurerm_sql_server.sapience.name}"
-  start_ip_address    = "50.20.0.62"
-  end_ip_address      = "50.20.0.62"
+  start_ip_address    = "${var.ip_benjamin_john_home}"
+  end_ip_address      = "${var.ip_benjamin_john_home}"
 }
+
+resource "azurerm_sql_firewall_rule" "ip_sapience_office" {
+  name                = "ip-sapience-office"
+  resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
+  server_name         = "${azurerm_sql_server.sapience.name}"
+  start_ip_address    = "${var.ip_sapience_office}"
+  end_ip_address      = "${var.ip_sapience_office}"
+}
+
+resource "azurerm_sql_firewall_rule" "ip_sapience_office2" {
+  name                = "ip-sapience-office2"
+  resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
+  server_name         = "${azurerm_sql_server.sapience.name}"
+  start_ip_address    = "${var.ip_sapience_office2}"
+  end_ip_address      = "${var.ip_sapience_office2}"
+}
+
+resource "azurerm_sql_firewall_rule" "ip_steve_ardis_home" {
+  name                = "ip-steve-ardis-home"
+  resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
+  server_name         = "${azurerm_sql_server.sapience.name}"
+  start_ip_address    = "${var.ip_steve_ardis_home}"
+  end_ip_address      = "${var.ip_steve_ardis_home}"
+}
+
 
 resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
   name                = "sapience-canopy-hierarchy-${var.environment}"

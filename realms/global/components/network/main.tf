@@ -21,7 +21,7 @@ locals {
 resource "azurerm_virtual_network" "default" {
   name                 = "${var.resource_group_name}-vnet"
   location             = "${var.resource_group_location}"
-  address_space        = ["172.16.1.0/24"]
+  address_space        = "${var.virtual_network_address_space}"
   resource_group_name  = "${var.resource_group_name}"
 }
 
@@ -29,5 +29,6 @@ resource "azurerm_subnet" "default" {
   name                 = "default"
   resource_group_name  = "${var.resource_group_name}"
   virtual_network_name = "${azurerm_virtual_network.default.name}"
-  address_prefix       = "172.16.1.0/24"
+  address_prefix       = "${var.subnet_address_prefix}"
+  service_endpoints    = "${var.subnet_service_endpoints}"
 }
