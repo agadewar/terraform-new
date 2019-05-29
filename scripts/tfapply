@@ -41,7 +41,7 @@ then
 
 	before $config_location $realm $environment
 	
-	terraform apply -var-file $config_location/realm.$realm.tfvars -var-file $config_location/environment.$environment.tfvars
+	terraform apply -var-file $config_location/realm.$realm.tfvars -var-file $config_location/environment.$environment.tfvars $@
 else
 	regexp="terraform/realms/(.*)/components/.+"
 	
@@ -54,7 +54,7 @@ else
 
 		before $config_location $realm
 	
-		terraform apply -var-file $config_location/realm.$realm.tfvars
+		terraform apply -var-file $config_location/realm.$realm.tfvars $@
 	fi
 fi
 

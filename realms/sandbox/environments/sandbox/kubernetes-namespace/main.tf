@@ -14,6 +14,15 @@ provider "kubernetes" {
   config_path = "${local.config_path}"
 }
 
+provider "helm" {
+  kubernetes {
+    config_path = "${local.config_path}"
+  }
+
+  #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
+  service_account = "tiller"
+}
+
 data "terraform_remote_state" "kubernetes" {
   backend = "azurerm"
 
@@ -116,5 +125,108 @@ resource "kubernetes_service" "aks_egress" {
     port {
       port = "80"
     }
+  }
+}
+
+data "helm_repository" "jetstack" {
+  name = "jetstack"
+  url  = "https://charts.jetstack.io"
+}
+
+# See: https://hub.helm.sh/charts/jetstack/cert-manager/v0.6.0
+resource "helm_release" "cert_manager" {
+  depends_on = [ "kubernetes_namespace.namespace" ]
+
+  name       = "cert-manager"
+  namespace  = "${local.namespace}"
+  chart      = "cert-manager"
+  version    = "v0.6.0"
+  repository = "${data.helm_repository.jetstack.metadata.0.name}"
+  
+  set {
+    name  = "webhook.enabled"
+    value = "false"
+  }
+
+  set {
+    name  = "resources.requests.cpu"
+    value = "10m"
+  }
+
+  set {
+    name  = "resources.requests.memory"
+    value = "32Mi"
+  }
+}
+
+# https://github.com/fbeltrao/aks-letsencrypt/blob/master/setup-wildcard-certificates-with-azure-dns.md
+resource "kubernetes_secret" "service_principal_password" {
+  metadata {
+    name = "service-principal-password"
+    namespace = "${local.namespace}"
+  }
+
+  data {
+    password = "${var.service_principal_password}"
+  }
+}
+
+# https://github.com/fbeltrao/aks-letsencrypt/blob/master/setup-wildcard-certificates-with-azure-dns.md
+data "template_file" "letsencrypt_issuer_staging" {
+  template = "${file("templates/letsencrypt-issuer.yaml.tpl")}"
+
+  vars {
+    suffix = "-staging"
+    letsencrypt_server = "https://acme-staging-v02.api.letsencrypt.org/directory"
+    email = "${var.letsencrypt_cluster_issuer_email}"
+    service_principal_client_id = "${var.service_principal_app_id}"
+    service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
+    dns_zone_name = "${var.environment}.sapience.net"
+    resource_group_name = "${var.resource_group_name}"
+    subscription_id = "${var.subscription_id}"
+    service_pricincipal_tenant_id = "${var.service_principal_tenant}"
+  }
+}
+
+resource "null_resource" "letsencrypt_issuer_staging" {
+  depends_on = [ "helm_release.cert_manager" ]
+
+  triggers {
+    template_changed = "${data.template_file.letsencrypt_issuer_staging.rendered}"
+    timestamp = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_issuer_staging.rendered}\nEOF"
+  }
+}
+
+# https://github.com/fbeltrao/aks-letsencrypt/blob/master/setup-wildcard-certificates-with-azure-dns.md
+data "template_file" "letsencrypt_issuer_prod" {
+  template = "${file("templates/letsencrypt-issuer.yaml.tpl")}"
+
+  vars {
+    suffix = "-prod"
+    letsencrypt_server = "https://acme-v02.api.letsencrypt.org/directory"
+    email = "${var.letsencrypt_cluster_issuer_email}"
+    service_principal_client_id = "${var.service_principal_app_id}"
+    service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
+    dns_zone_name = "${var.environment}.sapience.net"
+    resource_group_name = "${var.resource_group_name}"
+    subscription_id = "${var.subscription_id}"
+    service_pricincipal_tenant_id = "${var.service_principal_tenant}"
+  }
+}
+
+resource "null_resource" "letsencrypt_issuer_prod" {
+  depends_on = [ "helm_release.cert_manager" ]
+
+  triggers {
+    template_changed = "${data.template_file.letsencrypt_issuer_prod.rendered}"
+    timestamp = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_issuer_prod.rendered}\nEOF"
   }
 }

@@ -1,4 +1,3 @@
----
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
@@ -8,12 +7,16 @@ spec:
   secretName: ambassador-certs
   issuerRef:
     name: letsencrypt-prod
-    kind: ClusterIssuer
+    kind: Issuer
+  # commonName: '*.api.${namespace}.sapience.net'
+  commonName: 'api.${namespace}.sapience.net'
   dnsNames:
   - api.${namespace}.sapience.net
   acme:
     config:
-    - http01:
+    - dns01:
+        provider: azure-dns
         ingressClass: nginx
       domains:
+      # - '*.api.${namespace}.sapience.net'
       - api.${namespace}.sapience.net
