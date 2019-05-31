@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.environment.dev.database.terraform.tfstate"
+    key = "database.tfstate"
   }
 }
 
@@ -56,7 +56,7 @@ resource "azurerm_sql_database" "sedw" {
   location                       = "${azurerm_sql_server.sapience.location}"
   server_name                    = "${azurerm_sql_server.sapience.name}"
   edition                        = "DataWarehouse"
-  requested_service_objective_name = "DW200c"
+  requested_service_objective_name = "DW500c"
 
   tags = "${merge(
     local.common_tags,

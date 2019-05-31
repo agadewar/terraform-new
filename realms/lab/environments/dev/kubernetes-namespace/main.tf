@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.environment.dev.kubernetes-namespace.terraform.tfstate"
+    key = "kubernetes-namespace.tfstate"
   }
 }
 
@@ -74,8 +74,8 @@ resource "null_resource" "default_token_secret_name" {
 # see: https://github.com/hashicorp/terraform/issues/11806
 data "null_data_source" "default_token_secret_name" {
   inputs = {
-    data = "${file(".local/default_token_secret_name.out")}"
     dummy = "${format(null_resource.default_token_secret_name.id)}"
+    data = "${file(".local/default_token_secret_name.out")}"
   }
 }
 
@@ -193,7 +193,7 @@ resource "null_resource" "letsencrypt_issuer_staging" {
 
   triggers {
     template_changed = "${data.template_file.letsencrypt_issuer_staging.rendered}"
-    timestamp = "${timestamp()}"
+    # timestamp = "${timestamp()}"
   }
 
   provisioner "local-exec" {
@@ -223,7 +223,7 @@ resource "null_resource" "letsencrypt_issuer_prod" {
 
   triggers {
     template_changed = "${data.template_file.letsencrypt_issuer_prod.rendered}"
-    timestamp = "${timestamp()}"
+    # timestamp = "${timestamp()}"
   }
 
   provisioner "local-exec" {

@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.environment.dev.cronjob.terraform.tfstate"
+    key = "cronjob.tfstate"
   }
 }
 

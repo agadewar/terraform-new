@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.environment.dev.service-bus.terraform.tfstate"
+    key = "service-bus.tfstate"
   }
 }
 

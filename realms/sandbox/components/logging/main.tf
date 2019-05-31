@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.realm.sandbox.logging.terraform.tfstate"
+    key = "logging.tfstate"
   }
 }
 

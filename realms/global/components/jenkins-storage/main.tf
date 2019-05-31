@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.realm.global.jenkins-storage.terraform.tfstate"
+    key = "jenkins-storage.tfstate"
   }
 }
 

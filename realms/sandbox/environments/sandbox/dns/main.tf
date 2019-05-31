@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.environment.sandbox.dns.terraform.tfstate"
+    key = "dns.tfstate"
   }
 }
 

@@ -2,7 +2,7 @@
 
 terraform {
   backend "azurerm" {
-    key = "sapience.realm.sandbox.jenkins.terraform.tfstate"
+    key = "jenkins.tfstate"
   }
 }
 

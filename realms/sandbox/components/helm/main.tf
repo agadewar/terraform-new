@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.realm.sandbox.helm.terraform.tfstate"
+    key = "helm.tfstate"
   }
 }
 

@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.environment.sandbox.canopy.terraform.tfstate"
+    key = "canopy.tfstate"
   }
 }
 

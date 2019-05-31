@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.realm.lab.resource-group.terraform.tfstate"
+    key = "resource-group.tfstate"
   }
 }
 

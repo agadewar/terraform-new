@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.environment.sandbox.databricks.terraform.tfstate"
+    key = "databricks.tfstate"
   }
 }
 

@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.realm.sandbox.kubernetes.terraform.tfstate"
+    key = "kubernetes.tfstate"
   }
 }
 

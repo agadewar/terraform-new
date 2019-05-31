@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.environment.sandbox.ambassador.terraform.tfstate"
+    key = "ambassador.tfstate"
   }
 }
 

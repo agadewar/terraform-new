@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience.environment.sandbox.openfaas.terraform.tfstate"
+    key = "openfaas.tfstate"
   }
 }
 
