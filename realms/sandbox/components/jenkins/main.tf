@@ -19,10 +19,10 @@ data "terraform_remote_state" "jenkins_storage" {
   backend = "azurerm"
 
   config {
-    access_key            = "${var.backend_access_key}"
-    storage_account_name  = "${var.backend_storage_account_name}"
-	  container_name        = "${var.backend_container_name}"
-    key                   = "sapience.realm.${var.realm}.jenkins-storage.terraform.tfstate"
+    access_key           = "${var.backend_access_key}"
+    storage_account_name = "${var.backend_storage_account_name}"
+	  container_name       = "realm-${var.realm}"
+    key                  = "jenkins-storage.tfstate"
   }
 }
 
@@ -32,8 +32,8 @@ data "terraform_remote_state" "kubernetes" {
   config {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "${var.backend_container_name}"
-    key                  = "sapience.realm.${var.realm}.kubernetes.terraform.tfstate"
+	  container_name       = "realm-${var.realm}"
+    key                  = "kubernetes.tfstate"
   }
 }
 
@@ -44,8 +44,8 @@ data "terraform_remote_state" "kubernetes" {
   config {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "${var.backend_container_name}"
-    key                  = "sapience.environment.${var.environment}.dns.terraform.tfstate"
+	  container_name       = "realm-${var.realm}"
+    key                  = "dns.tfstate"
   }
 } */
 
@@ -124,7 +124,7 @@ resource "kubernetes_deployment" "jenkins" {
         container {
           name = "jenkins"
           # image = "jenkins/jenkins:2.169"
-          image = "${var.sapience_container_registry_hostname}/jenkins:1.2"
+          image = "${var.sapience_container_registry_hostname}/jenkins:1.4"
           image_pull_policy = "Always"
 
           env {
@@ -189,7 +189,6 @@ resource "kubernetes_service" "jenkins" {
     }
 
     load_balancer_source_ranges = "${var.load_balancer_source_ranges_allowed}"
-
   }
 }
 

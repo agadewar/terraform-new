@@ -14,8 +14,8 @@ provider "azurerm" {
 #   config {
 #     access_key           = "${var.backend_access_key}"
 #     storage_account_name = "${var.backend_storage_account_name}"
-# 	  container_name       = "${var.backend_container_name}"
-#     key                  = "sapience.environment.sandbox.resource-group.terraform.tfstate"
+# 	  container_name       = "environment-${var.environment}"
+#     key                  = "resource-group.tfstate"
 #   }
 # }
 
