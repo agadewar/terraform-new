@@ -15,8 +15,8 @@ data "terraform_remote_state" "kubernetes_namespace" {
   config {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "${var.backend_container_name}"
-    key                  = "sapience.environment.${var.environment}.kubernetes-namespace.terraform.tfstate"
+	  container_name       = "environment-${var.environment}"
+    key                  = "kubernetes-namespace.tfstate"
   }
 }
 
@@ -56,7 +56,7 @@ resource "azurerm_sql_database" "sedw" {
   location                       = "${azurerm_sql_server.sapience.location}"
   server_name                    = "${azurerm_sql_server.sapience.name}"
   edition                        = "DataWarehouse"
-  requested_service_objective_name = "DW500c"
+  requested_service_objective_name = "DW100c"
 
   tags = "${merge(
     local.common_tags,

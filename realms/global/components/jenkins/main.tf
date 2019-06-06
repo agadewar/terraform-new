@@ -19,10 +19,10 @@ data "terraform_remote_state" "jenkins_storage" {
   backend = "azurerm"
 
   config {
-    access_key            = "${var.backend_access_key}"
-    storage_account_name  = "${var.backend_storage_account_name}"
-	  container_name        = "${var.backend_container_name}"
-    key                   = "sapience.realm.${var.realm}.jenkins-storage.terraform.tfstate"
+    access_key           = "${var.backend_access_key}"
+    storage_account_name = "${var.backend_storage_account_name}"
+	  container_name       = "realm-${var.realm}"
+    key                  = "jenkins-storage.tfstate"
   }
 }
 
@@ -32,8 +32,8 @@ data "terraform_remote_state" "kubernetes" {
   config {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "${var.backend_container_name}"
-    key                  = "sapience.realm.${var.realm}.kubernetes.terraform.tfstate"
+	  container_name       = "realm-${var.realm}"
+    key                  = "kubernetes.tfstate"
   }
 }
 
@@ -44,8 +44,8 @@ data "terraform_remote_state" "kubernetes" {
   config {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "${var.backend_container_name}"
-    key                  = "sapience.environment.${var.environment}.dns.terraform.tfstate"
+	  container_name       = "realm-${var.realm}"
+    key                  = "dns.tfstate"
   }
 } */
 
