@@ -21,6 +21,8 @@ provider "template" {
 }
 
 locals {
+  config_path = "./kubeconfig"
+
   cluster_name                 = "${var.realm}"
   agent_pool_profile_1_name    = "default"
   dns_prefix                   = "${var.realm}"
@@ -134,18 +136,46 @@ resource "null_resource" "kubernetes_config_autoscaler" {
   }
 }
 
-# az extension add --name aks-preview
-# az feature register --name VMSSPreview --namespace Microsoft.ContainerService
-# az feature list -o table --subscription=c57d6dfd-85ff-46a6-8038-1f6d97197cb6 --query "[?contains(name, 'Microsoft.ContainerService/VMSSPreview')].{Name:name,State:properties.state}"
-# az provider register --namespace Microsoft.ContainerService --subscription=c57d6dfd-85ff-46a6-8038-1f6d97197cb6
-# az aks update \
-#   --subscription=c57d6dfd-85ff-46a6-8038-1f6d97197cb6 \
-#   --resource-group Sandbox \
-#   --name sandbox \
-#   --enable-vmss \
-#   --enable-cluster-autoscaler \
-#   --min-count 2 \
-#   --max-count 8
-#
-#
-# az ad sp list --output json --all | less
+# See: https://www.getambassador.io/user-guide/cert-manager
+# See: https://raw.githubusercontent.com/jetstack/cert-manager/release-0.6/deploy/manifests/00-crds.yaml
+resource "null_resource" "create_cert_manager_crd" {
+  depends_on = ["null_resource.kubeconfig"]
+
+  triggers {
+    manifest_sha1 = "${sha1("${file("files/cert-manager-crds.yaml")}")}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -f -<<EOF\n${file("files/cert-manager-crds.yaml")}\nEOF"
+  }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition challenges.certmanager.k8s.io --ignore-not-found"
+  }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "kubectl --kubeconfig=${local.config_path} customresourcedefinition issuers.certmanager.k8s.io --ignore-not-found"
+  }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "kubectl --kubeconfig=${local.config_path} customresourcedefinition orders.certmanager.k8s.io --ignore-not-found"
+  }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "kubectl --kubeconfig=${local.config_path} customresourcedefinition certificates.certmanager.k8s.io --ignore-not-found"
+  }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "kubectl --kubeconfig=${local.config_path} customresourcedefinition clusterissuers.certmanager.k8s.io --ignore-not-found"
+  }
+}
