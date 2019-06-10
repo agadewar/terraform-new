@@ -11,7 +11,7 @@ variable "resource_group_location" {}
 
 variable "sql_server_administrator_login" {}
 variable "sql_server_administrator_password" {}
-
+variable "sedw_requested_service_objective_name" {}
 
 variable "realm_common_tags" {
     type = "map"
@@ -19,7 +19,6 @@ variable "realm_common_tags" {
 variable "environment_common_tags" {
     type = "map"
 }
-
 
 variable "ip_banyan_office"  {
   default = ""

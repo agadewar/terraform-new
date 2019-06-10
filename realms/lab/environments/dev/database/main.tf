@@ -21,11 +21,11 @@ data "terraform_remote_state" "kubernetes_namespace" {
 }
 
 locals {
-  sql_server_version                = "12.0"
-  sql_server_adminstrator_login     = "${var.sql_server_administrator_login}"
-  sql_server_administrator_password = "${var.sql_server_administrator_password}"
-
-  cosmos_failover_location = "eastus2"
+  sql_server_version                    = "12.0"
+  sql_server_administrator_login         = "${var.sql_server_administrator_login}"
+  sql_server_administrator_password     = "${var.sql_server_administrator_password}"
+  sedw_requested_service_objective_name = "${var.sedw_requested_service_objective_name}"
+  cosmos_failover_location              = "eastus2"
 
   common_tags = "${merge(
     var.realm_common_tags,
@@ -41,8 +41,8 @@ resource "azurerm_sql_server" "sapience" {
   resource_group_name          = "${var.resource_group_name}"
   location                     = "${var.resource_group_location}"
   version                      = "${local.sql_server_version}"
-  administrator_login          = "${var.sql_server_administrator_login}"
-  administrator_login_password = "${var.sql_server_administrator_password}"
+  administrator_login          = "${local.sql_server_administrator_login}"
+  administrator_login_password = "${local.sql_server_administrator_password}"
 
   tags = "${merge(
     local.common_tags,
@@ -51,12 +51,12 @@ resource "azurerm_sql_server" "sapience" {
 }
 
 resource "azurerm_sql_database" "sedw" {
-  name                           = "sedw"
-  resource_group_name            = "${azurerm_sql_server.sapience.resource_group_name}"
-  location                       = "${azurerm_sql_server.sapience.location}"
-  server_name                    = "${azurerm_sql_server.sapience.name}"
-  edition                        = "DataWarehouse"
-  requested_service_objective_name = "DW100c"
+  name                             = "sedw"
+  resource_group_name              = "${azurerm_sql_server.sapience.resource_group_name}"
+  location                         = "${azurerm_sql_server.sapience.location}"
+  server_name                      = "${azurerm_sql_server.sapience.name}"
+  edition                          = "DataWarehouse"
+  requested_service_objective_name = "${local.sedw_requested_service_objective_name}"
 
   tags = "${merge(
     local.common_tags,

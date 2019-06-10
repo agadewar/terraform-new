@@ -11,7 +11,7 @@ variable "resource_group_location" {}
 
 variable "sql_server_administrator_login" {}
 variable "sql_server_administrator_password" {}
-
+variable "sedw_requested_service_objective_name" {}
 
 variable "realm_common_tags" {
     type = "map"
@@ -20,7 +20,6 @@ variable "environment_common_tags" {
     type = "map"
 }
 
-
 variable "ip_banyan_office"  {
   default = ""
 }
@@ -28,6 +27,9 @@ variable "ip_benjamin_john_home" {
   default = ""
 }
 variable "ip_sapience_office" {
+  default = ""
+}
+variable "ip_sapience_office2" {
   default = ""
 }
 variable "ip_steve_ardis_home" {

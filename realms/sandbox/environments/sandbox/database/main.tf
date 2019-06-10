@@ -21,11 +21,11 @@ data "terraform_remote_state" "kubernetes_namespace" {
 }
 
 locals {
-  sql_server_version                = "12.0"
-  sql_server_adminstrator_login     = "${var.sql_server_administrator_login}"
-  sql_server_administrator_password = "${var.sql_server_administrator_password}"
-
-  cosmos_failover_location = "eastus2"
+  sql_server_version                    = "12.0"
+  sql_server_administrator_login         = "${var.sql_server_administrator_login}"
+  sql_server_administrator_password     = "${var.sql_server_administrator_password}"
+  sedw_requested_service_objective_name = "${var.sedw_requested_service_objective_name}"
+  cosmos_failover_location              = "eastus2"
 
   common_tags = "${merge(
     var.realm_common_tags,
@@ -41,8 +41,22 @@ resource "azurerm_sql_server" "sapience" {
   resource_group_name          = "${var.resource_group_name}"
   location                     = "${var.resource_group_location}"
   version                      = "${local.sql_server_version}"
-  administrator_login          = "${var.sql_server_administrator_login}"
-  administrator_login_password = "${var.sql_server_administrator_password}"
+  administrator_login          = "${local.sql_server_administrator_login}"
+  administrator_login_password = "${local.sql_server_administrator_password}"
+
+  tags = "${merge(
+    local.common_tags,
+    map()
+  )}"
+}
+
+resource "azurerm_sql_database" "sedw" {
+  name                             = "sedw"
+  resource_group_name              = "${azurerm_sql_server.sapience.resource_group_name}"
+  location                         = "${azurerm_sql_server.sapience.location}"
+  server_name                      = "${azurerm_sql_server.sapience.name}"
+  edition                          = "DataWarehouse"
+  requested_service_objective_name = "${local.sedw_requested_service_objective_name}"
 
   tags = "${merge(
     local.common_tags,
@@ -118,45 +132,46 @@ resource "azurerm_sql_firewall_rule" "aks_egress" {
   end_ip_address      = "${data.terraform_remote_state.kubernetes_namespace.aks_egress_ip_address}"
 }
 
-resource "azurerm_sql_firewall_rule" "sapience_office" {
-  count = "${var.ip_sapience_office != "" ? 1 : 0}"
-
-  name                = "sapience-office"
-  resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
-  server_name         = "${azurerm_sql_server.sapience.name}"
-  start_ip_address    = "${var.ip_sapience_office}"
-  end_ip_address      = "${var.ip_sapience_office}"
-}
-
-resource "azurerm_sql_firewall_rule" "banyan_office" {
-  count = "${var.ip_banyan_office != "" ? 1 : 0}"
-
-  name                = "banyan-office"
+resource "azurerm_sql_firewall_rule" "ip_banyan_office" {
+  name                = "ip-banyan-office"
   resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
   server_name         = "${azurerm_sql_server.sapience.name}"
   start_ip_address    = "${var.ip_banyan_office}"
   end_ip_address      = "${var.ip_banyan_office}"
 }
 
-resource "azurerm_sql_firewall_rule" "steve_ardis_home" {
-  count = "${var.ip_steve_ardis_home != "" ? 1 : 0}"
+resource "azurerm_sql_firewall_rule" "ip_benjamin_john_home" {
+  name                = "ip-benjamin-john-home"
+  resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
+  server_name         = "${azurerm_sql_server.sapience.name}"
+  start_ip_address    = "${var.ip_benjamin_john_home}"
+  end_ip_address      = "${var.ip_benjamin_john_home}"
+}
 
-  name                = "steve-ardis-home"
+resource "azurerm_sql_firewall_rule" "ip_sapience_office" {
+  name                = "ip-sapience-office"
+  resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
+  server_name         = "${azurerm_sql_server.sapience.name}"
+  start_ip_address    = "${var.ip_sapience_office}"
+  end_ip_address      = "${var.ip_sapience_office}"
+}
+
+resource "azurerm_sql_firewall_rule" "ip_sapience_office2" {
+  name                = "ip-sapience-office2"
+  resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
+  server_name         = "${azurerm_sql_server.sapience.name}"
+  start_ip_address    = "${var.ip_sapience_office2}"
+  end_ip_address      = "${var.ip_sapience_office2}"
+}
+
+resource "azurerm_sql_firewall_rule" "ip_steve_ardis_home" {
+  name                = "ip-steve-ardis-home"
   resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
   server_name         = "${azurerm_sql_server.sapience.name}"
   start_ip_address    = "${var.ip_steve_ardis_home}"
   end_ip_address      = "${var.ip_steve_ardis_home}"
 }
 
-resource "azurerm_sql_firewall_rule" "benjamin_john_home" {
-  count = "${var.ip_benjamin_john_home != "" ? 1 : 0}"
-
-  name                = "benjamin-john-home"
-  resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
-  server_name         = "${azurerm_sql_server.sapience.name}"
-  start_ip_address    = "${var.ip_benjamin_john_home}"
-  end_ip_address      = "${var.ip_benjamin_john_home}"
-}
 
 resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
   name                = "sapience-canopy-hierarchy-${var.environment}"
@@ -204,25 +219,24 @@ resource "azurerm_cosmosdb_account" "sapience_graph" {
   }
 }
 
-# resource "azurerm_cosmosdb_account" "sapience_mdm" {
-#   name                = "sapience-mdm-${local.environment}"
-#   resource_group_name = "${local.resource_group_name}"
-#   location            = "${local.resource_group_location}"
-#   offer_type          = "Standard"
-#   kind                = "GlobalDocumentDB"
+resource "azurerm_cosmosdb_account" "event_archive" {
+  name                = "sapience-event-archive-${var.environment}"
+  resource_group_name = "${var.resource_group_name}"
+  location            = "${var.resource_group_location}"
+  offer_type          = "Standard"
 
-# /*   capabilities = [
-#     {
-#       name = "MongoDBv3.4"
-#     }
-#   ] */
+  capabilities = [
+    {
+      name = "EnableCassandra"
+    }
+  ]
 
-#   consistency_policy {
-#     consistency_level = "Strong"
-#   }
+  consistency_policy {
+    consistency_level = "Eventual"
+  }
 
-#   geo_location {
-#     location          = "${local.cosmos_failover_location}"
-#     failover_priority = 0
-#   }
-# }
+  geo_location {
+    location          = "${local.cosmos_failover_location}"
+    failover_priority = 0
+  }
+}
