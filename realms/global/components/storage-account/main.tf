@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "spinnaker-storage.tfstate"
+    key = "storage-account.tfstate"
   }
 }
 
@@ -15,13 +15,13 @@ locals {
   common_tags = "${merge(
     var.realm_common_tags,
     map(
-      "Component", "Spinnaker Storage"
+      "Component", "Storage Account"
     )
   )}"
 }
 
-resource "azurerm_storage_account" "spinnaker_storage" {
-  name                      = "spinnakerstorage${var.realm}"
+resource "azurerm_storage_account" "storage_account" {
+  name                      = "sapiencerealm${var.realm}"
   resource_group_name       = "${var.resource_group_name}"
   location                  = "${var.resource_group_location}"
   account_tier              = "Standard"
@@ -32,6 +32,10 @@ resource "azurerm_storage_account" "spinnaker_storage" {
     local.common_tags,
     map()
   )}"
+
+  lifecycle {
+    prevent_destroy = "true"
+  }
 }
 
 # resource "azurerm_storage_share" "spinnaker_storage" {

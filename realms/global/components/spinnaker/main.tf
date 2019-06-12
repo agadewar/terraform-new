@@ -46,15 +46,15 @@ data "template_file" "custom_values" {
   template = "${file("templates/custom-values.yaml.tpl")}"
 
   vars {
-    realm                  = "${var.realm}"
-    storageAccountName     = "${data.terraform_remote_state.storage_account.storage_account_name}"
-    accessKey              = "${data.terraform_remote_state.storage_account.storage_account_access_key}"
-    whitelist-source-range = "${join(", ", var.spinnaker_source_ranges_allowed)}"
-    kubeconfig-contexts    = "${indent(2, join("\n", formatlist("- %s", var.spinnaker_kubeconfig_contexts)))}"
-    acr-address            = "${var.sapience_container_registry_hostname}"
-    acr-username           = "${var.sapience_container_registry_username}"
-    acr-password           = "${var.sapience_container_registry_password}"
-    acr-email              = "${var.devops_email}"
+    realm                          = "${var.realm}"
+    storageAccountName             = "${data.terraform_remote_state.storage_account.storage_account_name}"
+    accessKey                      = "${data.terraform_remote_state.storage_account.storage_account_access_key}"
+    whitelist-source-range         = "${join(", ", var.spinnaker_source_ranges_allowed)}"
+    additional-kubeconfig-contexts = "${indent(2, join("\n", formatlist("- %s", var.spinnaker_additional_kubeconfig_contexts)))}"
+    acr-address                    = "${var.sapience_container_registry_hostname}"
+    acr-username                   = "${var.sapience_container_registry_username}"
+    acr-password                   = "${var.sapience_container_registry_password}"
+    acr-email                      = "${var.devops_email}"
   }
 }
 
@@ -64,8 +64,29 @@ resource "kubernetes_namespace" "spinnaker" {
   }
 }
 
+resource "null_resource" "kubeconfig" {
+  provisioner "local-exec" {
+    # combine kubeconfigs
+    command = "mkdir -p .local && KUBECONFIG=${join(":", formatlist("../../../%s/components/kubernetes/kubeconfig", concat(var.spinnaker_additional_kubeconfig_contexts, list("global"))))} kubectl config view --merge --flatten > .local/kubeconfig"
+  }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "rm .local/kubeconfig"
+  }
+}
+
+data "local_file" "kubeconfig" {
+  depends_on = [ "null_resource.kubeconfig" ]
+
+  filename = ".local/kubeconfig"
+}
+
 resource "kubernetes_secret" "kubeconfig" {
-  metadata {
+  depends_on = [ "null_resource.kubeconfig" ]
+
+  metadata { 
     name      = "kubeconfig"
     namespace = "${local.namespace}"
   }
@@ -73,7 +94,9 @@ resource "kubernetes_secret" "kubeconfig" {
   data {
     # don't use "local.config_path" here, as it may need to be a kubeconfig file comprised of multiple environments; this secret
     # is used by the spinnaker helm chart to make Spinnaker aware of the K8S clusters it should be aware of
-    config = "${file("${var.kubeconfig}")}"
+    #config = "${file("${var.kubeconfig}")}"
+
+    config = "${data.local_file.kubeconfig.content}"
   }
 }
 
@@ -244,6 +267,8 @@ resource "helm_release" "nginx_ingress" {
     name  = "controller.service.externalTrafficPolicy"
     value = "Local"
   }
+
+  timeout = 600
 }
 
 resource "helm_release" "spinnaker" {
