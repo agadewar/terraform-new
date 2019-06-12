@@ -2,7 +2,7 @@ halyard:
   spinnakerVersion: 1.12.5
   image:
     repository: gcr.io/spinnaker-marketplace/halyard
-    tag: 1.16.0
+    tag: 1.20.2
   # Provide a config map with Hal commands that will be run the core config (storage)
   # The config map should contain a script in the config.sh key
   additionalScripts:
@@ -90,11 +90,15 @@ dockerRegistries:
     - library/ubuntu
     - library/centos
     - library/nginx
-# - name: gcr
-#   address: https://gcr.io
-#   username: _json_key
-#   password: '<INSERT YOUR SERVICE ACCOUNT JSON HERE>'
-#   email: 1234@5678.com
+- name: acr
+  # address: sapience.azurecr.io
+  # username: sapience  
+  # password: 'S=A8bcw7zeGezpzO4Mj9smthLgXy3pEU'
+  # email: devops@sapience.net
+  address: ${acr-address}
+  username: ${acr-username}
+  password: ${acr-password}
+  email: ${acr-email}
 
 # If you don't want to put your passwords into a values file
 # you can use a pre-created secret instead of putting passwords
@@ -107,35 +111,39 @@ dockerRegistries:
 kubeConfig:
   # Use this when you want to register arbitrary clusters with Spinnaker
   # Upload your ~/kube/.config to a secret
-  enabled: false
-  secretName: my-kubeconfig
+  enabled: true
+  secretName: kubeconfig
   secretKey: config
   # List of contexts from the kubeconfig to make available to Spinnaker
   contexts:
-  - default
-  deploymentContext: default
+  - ${realm}
+  ${additional-kubeconfig-contexts}
+  # This is the context from the list above that you would like
+  # to deploy Spinnaker itself to.
+  deploymentContext: ${realm}
   omittedNameSpaces:
   - kube-system
   - kube-public
 
 # Change this if youd like to expose Spinnaker outside the cluster
 ingress:
-  enabled: false
-  # host: spinnaker.example.org
-  # annotations:
-    # ingress.kubernetes.io/ssl-redirect: 'true'
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  # tls:
-  #  - secretName: -tls
-  #    hosts:
-  #      - domain.com
+  enabled: true
+  host: spinnaker.${realm}.sapience.net
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/whitelist-source-range: ${whitelist-source-range}
+  tls:
+  - secretName: spinnaker-certs
+    hosts:
+    - spinnaker.${realm}.sapience.net
 
 ingressGate:
   enabled: false
   # host: gate.spinnaker.example.org
   # annotations:
-    # ingress.kubernetes.io/ssl-redirect: 'true'
+    # ingress.kubernetes.io/ssl-redirect: "true"
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   # tls:
@@ -160,25 +168,25 @@ nodeSelector: {}
 # Redis password to use for the in-cluster redis service
 # Enable redis to use in-cluster redis
 redis:
-  enabled: false
-#  # External Redis option will be enabled if in-cluster redis is disabled
-#  external:
-#    host: "<EXTERNAL-REDIS-HOST-NAME>"
-#    port: 6379
-#    # password: ""
-#  password: password
-#  nodeSelector: {}
-#  cluster:
-#    enabled: false
-## Uncomment if you don't want to create a PVC for redis
-##  master:
-##    persistence:
-##      enabled: false
+  enabled: true
+  # External Redis option will be enabled if in-cluster redis is disabled
+  external:
+    host: "<EXTERNAL-REDIS-HOST-NAME>"
+    port: 6379
+    # password: ""
+  password: password
+  nodeSelector: {}
+  cluster:
+    enabled: false
+# Uncomment if you don't want to create a PVC for redis
+#  master:
+#    persistence:
+#      enabled: false
 
 # Minio access/secret keys for the in-cluster S3 usage
 # Minio is not exposed publically
 minio:
-  enabled: true
+  enabled: false
   imageTag: RELEASE.2018-06-09T02-18-09Z
   serviceType: ClusterIP
   accessKey: spinnakeradmin
@@ -214,7 +222,7 @@ s3:
 # Azure Storage Account
 azs:
   enabled: true
-  storageAccountName: "{storageAccountName}"
+  storageAccountName: "${storageAccountName}"
   accessKey: "${accessKey}"
   containerName: "spinnaker"
 
