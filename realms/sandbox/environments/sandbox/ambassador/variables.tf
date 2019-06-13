@@ -2,6 +2,7 @@ variable "backend_access_key" {}
 variable "backend_storage_account_name" {}
 variable "backend_container_name" {}
 
+variable "realm" {}
 variable "environment" {}
 
 variable "subscription_id" {}

@@ -42,6 +42,16 @@ data "terraform_remote_state" "storage_account" {
   }
 }
 
+data "terraform_remote_state" "dns" {
+  backend = "azurerm"
+  config {
+    access_key           = "${var.backend_access_key}"
+    storage_account_name = "${var.backend_storage_account_name}"
+	  container_name       = "realm-${var.realm}"
+    key                  = "dns.tfstate"
+  }
+}
+
 data "template_file" "custom_values" {
   template = "${file("templates/custom-values.yaml.tpl")}"
 
@@ -272,7 +282,7 @@ resource "helm_release" "nginx_ingress" {
 }
 
 resource "helm_release" "spinnaker" {
-  depends_on = [ "kubernetes_namespace.spinnaker", "helm_release.nginx_ingress" ]
+  depends_on = [ "kubernetes_namespace.spinnaker"] #, "helm_release.nginx_ingress" ]
 
   name       = "spinnaker"
   namespace  = "${local.namespace}"
@@ -282,29 +292,39 @@ resource "helm_release" "spinnaker" {
   ]
 
   timeout = 600
-
-  # set {
-  #   name  = "redis.enabled"
-  #   value = "false"
-  # }
-
-  # set {
-  #   name  = "azs.enabled"
-  #   value = "true"
-  # }
-
-  # set {
-  #   name  = "azs.storageAccountName"
-  #   value = ""
-  # }
-
-  # set {
-  #   name  = "azs.accessKey"
-  #   value = ""
-  # }
-
-  # set {
-  #   name  = "azs.containerName"
-  #   value = "spinnaker"
-  # }
 }
+
+resource "null_resource" "nginx_ingress_controller_ip" {
+  depends_on = [ "helm_release.nginx_ingress" ]
+  
+  triggers = {
+    timestamp = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "mkdir -p .local && kubectl --kubeconfig ${local.config_path} -n ${local.namespace} get services -o json | jq -j '.items[] | select(.metadata.name == \"nginx-ingress-controller\") | .status .loadBalancer .ingress [0] .ip' > .local/nginx-ingress-controller-ip"
+  }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "rm .local/nginx-ingress-controller-ip"
+  }
+}
+
+data "local_file" "nginx_ingress_controller_ip" {
+  depends_on = [ "null_resource.nginx_ingress_controller_ip" ]
+
+  filename = ".local/nginx-ingress-controller-ip"
+}
+
+resource "azurerm_dns_a_record" "spinnaker" {
+  depends_on = [ "null_resource.nginx_ingress_controller_ip" ]
+
+  name                = "spinnaker"
+  zone_name           = "${data.terraform_remote_state.dns.zone_name}"
+  resource_group_name = "${var.resource_group_name}"
+  ttl                 = 30
+  records             = [ "${data.local_file.nginx_ingress_controller_ip.content}" ]
+}
+

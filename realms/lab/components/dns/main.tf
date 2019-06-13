@@ -14,7 +14,6 @@ locals {
 
   common_tags = "${merge(
     var.realm_common_tags,
-    var.environment_common_tags,
     map(
       "Component", "DNS"
     )
@@ -22,7 +21,17 @@ locals {
 }
 
 resource "azurerm_dns_zone" "dns_public" {
-  name                = "${var.environment}.sapience.net"
+  name                = "${var.realm}.sapience.net"
   resource_group_name = "${var.resource_group_name}"
   zone_type           = "Public"
+}
+
+resource "azurerm_dns_cname_record" "api" {
+  count = "${var.create_cname_api >= 1 ? 1 : 0}"
+
+  name                = "api"
+  zone_name           = "${azurerm_dns_zone.dns_public.name}"
+  resource_group_name = "${var.resource_group_name}"
+  ttl                 = 300
+  record              = "api.${var.realm}.${azurerm_dns_zone.dns_public.name}"
 }

@@ -16,11 +16,13 @@ variable "sapience_container_registry_hostname" {}
 variable "sapience_container_registry_username" {}
 variable "sapience_container_registry_password" {}
 
-variable "spinnaker_kubeconfig_contexts" {
+variable "spinnaker_additional_kubeconfig_contexts" {
     type = "list"
 }
 
-variable "kubeconfig" {}
+variable "kubeconfig" {
+    default = "../kubernetes/kubeconfig"
+}
 
 variable "devops_email" {}
 

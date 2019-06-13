@@ -184,8 +184,8 @@ resource "kubernetes_service" "jenkins" {
 
     port {
       name = "jnlp"
-      port = 38339
-      target_port = 38339
+      port = 50000
+      target_port = 50000
     }
 
     load_balancer_source_ranges = "${var.load_balancer_source_ranges_allowed}"

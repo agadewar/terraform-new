@@ -20,7 +20,7 @@ data "terraform_remote_state" "dns" {
   config {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "environment-${var.environment}"
+	  container_name       = "realm-${var.realm}"
     key                  = "dns.tfstate"
   }
 }
@@ -168,7 +168,7 @@ EOF
 }
 
 resource "azurerm_dns_a_record" "api" {
-  name                = "api"
+  name                = "api.${var.environment}"
   zone_name           = "${data.terraform_remote_state.dns.zone_name}"
   resource_group_name = "${var.resource_group_name}"
   ttl                 = 30
@@ -282,7 +282,8 @@ data "template_file" "letsencrypt_certificate" {
   template = "${file("templates/letsencrypt-certificate.yaml.tpl")}"
 
   vars {
-     namespace = "${local.namespace}"
+     realm       = "${var.realm}"
+     environment = "${var.environment}"
   }
 }
 

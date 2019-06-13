@@ -6,7 +6,7 @@ metadata:
 spec:
   secretName: spinnaker-certs
   issuerRef:
-    name: letsencrypt-prod
+    name: letsencrypt-staging
     kind: Issuer
   # commonName: '*.spinnaker.${realm}.sapience.net'
   commonName: 'spinnaker.${realm}.sapience.net'

@@ -116,9 +116,11 @@ kubeConfig:
   secretKey: config
   # List of contexts from the kubeconfig to make available to Spinnaker
   contexts:
-  ${kubeconfig-contexts}
-  #- sandbox
-  deploymentContext: default
+  - ${realm}
+  ${additional-kubeconfig-contexts}
+  # This is the context from the list above that you would like
+  # to deploy Spinnaker itself to.
+  deploymentContext: ${realm}
   omittedNameSpaces:
   - kube-system
   - kube-public
