@@ -134,6 +134,9 @@ ingress:
     kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/whitelist-source-range: ${whitelist-source-range}
+    certmanager.k8s.io/acme-challenge-type: dns01
+    certmanager.k8s.io/acme-dns01-provider: azure-dns
+    certmanager.k8s.io/issuer: letsencrypt-prod
   tls:
   - secretName: spinnaker-certs
     hosts:

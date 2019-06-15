@@ -52,6 +52,17 @@ data "terraform_remote_state" "dns" {
   }
 }
 
+data "terraform_remote_state" "ingress-controller" {
+  backend = "azurerm"
+
+  config {
+    access_key           = "${var.backend_access_key}"
+    storage_account_name = "${var.backend_storage_account_name}"
+	  container_name       = "realm-${var.realm}"
+    key                  = "ingress-controller.tfstate"
+  }
+}
+
 data "template_file" "custom_values" {
   template = "${file("templates/custom-values.yaml.tpl")}"
 
@@ -230,56 +241,56 @@ resource "null_resource" "letsencrypt_issuer_prod" {
   }
 }
 
-data "template_file" "letsencrypt_certificate" {
-  template = "${file("templates/letsencrypt-certificate.yaml.tpl")}"
+# data "template_file" "letsencrypt_certificate" {
+#   template = "${file("templates/letsencrypt-certificate.yaml.tpl")}"
 
-  vars {
-     namespace = "${local.namespace}"
-     realm     = "${var.realm}"
-  }
-}
+#   vars {
+#      namespace = "${local.namespace}"
+#      realm     = "${var.realm}"
+#   }
+# }
 
-resource "null_resource" "letsencrypt_certificate" {
-  triggers {
-    template_changed = "${data.template_file.letsencrypt_certificate.rendered}"
-    # timestamp = "${timestamp()}"
-  }
+# resource "null_resource" "letsencrypt_certificate" {
+#   triggers {
+#     template_changed = "${data.template_file.letsencrypt_certificate.rendered}"
+#     # timestamp = "${timestamp()}"
+#   }
 
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_certificate.rendered}\nEOF"
-  }
-}
+#   provisioner "local-exec" {
+#     command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_certificate.rendered}\nEOF"
+#   }
+# }
 
-resource "helm_release" "nginx_ingress" {
-  depends_on = [ "kubernetes_namespace.spinnaker" ]
+# resource "helm_release" "nginx_ingress" {
+#   depends_on = [ "kubernetes_namespace.spinnaker" ]
 
-  name      = "nginx-ingress"
-  namespace = "${local.namespace}"
-  chart     = "stable/nginx-ingress"
+#   name      = "nginx-ingress"
+#   namespace = "${local.namespace}"
+#   chart     = "stable/nginx-ingress"
 
-  set {
-    name  = "controller.replicaCount"
-    value = "1"
-  }
+#   set {
+#     name  = "controller.replicaCount"
+#     value = "1"
+#   }
 
-  # See: https://docs.microsoft.com/en-us/azure/aks/ingress-tls
-  # set {
-  #   name  = "controller.nodeSelector.\"beta\\.kubernetes\\.io/os\""
-  #   value = "linux"
-  # }
+#   # See: https://docs.microsoft.com/en-us/azure/aks/ingress-tls
+#   # set {
+#   #   name  = "controller.nodeSelector.\"beta\\.kubernetes\\.io/os\""
+#   #   value = "linux"
+#   # }
 
-  # set {
-  #   name  = "defaultBackend.nodeSelector.\"beta\\.kubernetes\\.io/os\""
-  #   value = "linux"
-  # }
+#   # set {
+#   #   name  = "defaultBackend.nodeSelector.\"beta\\.kubernetes\\.io/os\""
+#   #   value = "linux"
+#   # }
 
-  set {
-    name  = "controller.service.externalTrafficPolicy"
-    value = "Local"
-  }
+#   set {
+#     name  = "controller.service.externalTrafficPolicy"
+#     value = "Local"
+#   }
 
-  timeout = 600
-}
+#   timeout = 600
+# }
 
 resource "helm_release" "spinnaker" {
   depends_on = [ "kubernetes_namespace.spinnaker"] #, "helm_release.nginx_ingress" ]
@@ -287,6 +298,7 @@ resource "helm_release" "spinnaker" {
   name       = "spinnaker"
   namespace  = "${local.namespace}"
   chart      = "stable/spinnaker"
+  
   values = [
     "${data.template_file.custom_values.rendered}"
   ]
@@ -294,37 +306,35 @@ resource "helm_release" "spinnaker" {
   timeout = 600
 }
 
-resource "null_resource" "nginx_ingress_controller_ip" {
-  depends_on = [ "helm_release.nginx_ingress" ]
+# resource "null_resource" "nginx_ingress_controller_ip" {
+#   depends_on = [ "helm_release.nginx_ingress" ]
   
-  triggers = {
-    timestamp = "${timestamp()}"
-  }
+#   # triggers = {
+#   #   timestamp = "${timestamp()}"
+#   # }
 
-  provisioner "local-exec" {
-    command = "mkdir -p .local && kubectl --kubeconfig ${local.config_path} -n ${local.namespace} get services -o json | jq -j '.items[] | select(.metadata.name == \"nginx-ingress-controller\") | .status .loadBalancer .ingress [0] .ip' > .local/nginx-ingress-controller-ip"
-  }
+#   provisioner "local-exec" {
+#     command = "mkdir -p .local && kubectl --kubeconfig ${local.config_path} -n ${local.namespace} get services -o json | jq -j '.items[] | select(.metadata.name == \"nginx-ingress-controller\") | .status .loadBalancer .ingress [0] .ip' > .local/nginx-ingress-controller-ip"
+#   }
 
-  provisioner "local-exec" {
-    when = "destroy"
+#   provisioner "local-exec" {
+#     when = "destroy"
 
-    command = "rm .local/nginx-ingress-controller-ip"
-  }
-}
+#     command = "rm -f .local/nginx-ingress-controller-ip"
+#   }
+# }
 
-data "local_file" "nginx_ingress_controller_ip" {
-  depends_on = [ "null_resource.nginx_ingress_controller_ip" ]
+# data "local_file" "nginx_ingress_controller_ip" {
+#   depends_on = [ "null_resource.nginx_ingress_controller_ip" ]
 
-  filename = ".local/nginx-ingress-controller-ip"
-}
+#   filename = ".local/nginx-ingress-controller-ip"
+# }
 
 resource "azurerm_dns_a_record" "spinnaker" {
-  depends_on = [ "null_resource.nginx_ingress_controller_ip" ]
-
   name                = "spinnaker"
   zone_name           = "${data.terraform_remote_state.dns.zone_name}"
   resource_group_name = "${var.resource_group_name}"
   ttl                 = 30
-  records             = [ "${data.local_file.nginx_ingress_controller_ip.content}" ]
+  records             = [ "${data.terraform_remote_state.ingress-controller.nginx_ingress_controller_ip}" ]
 }
 
