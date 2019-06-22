@@ -18,15 +18,15 @@ provider "helm" {
   service_account = "tiller"
 }
 
-data "terraform_remote_state" "dns" {
-  backend = "azurerm"
-  config {
-    access_key           = "${var.backend_access_key}"
-    storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "realm-${var.realm}"
-    key                  = "dns.tfstate"
-  }
-}
+# data "terraform_remote_state" "dns" {
+#   backend = "azurerm"
+#   config {
+#     access_key           = "${var.backend_access_key}"
+#     storage_account_name = "${var.backend_storage_account_name}"
+# 	  container_name       = "realm-${var.realm}"
+#     key                  = "dns.tfstate"
+#   }
+# }
 
 locals {
   resource_group_name = "${var.resource_group_name}"
@@ -83,9 +83,9 @@ resource "helm_release" "nginx_ingress" {
 resource "null_resource" "nginx_ingress_controller_ip" {
   depends_on = [ "helm_release.nginx_ingress" ]
   
-  triggers = {
-    timestamp = "${timestamp()}"
-  }
+  # triggers = {
+  #   timestamp = "${timestamp()}"
+  # }
 
   provisioner "local-exec" {
     command = "mkdir -p .local && kubectl --kubeconfig ${local.config_path} -n kube-system get services -o json | jq -j '.items[] | select(.metadata.name == \"nginx-ingress-controller\") | .status .loadBalancer .ingress [0] .ip' > .local/nginx-ingress-controller-ip"

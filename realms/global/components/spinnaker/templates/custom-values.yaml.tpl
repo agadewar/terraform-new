@@ -128,7 +128,7 @@ kubeConfig:
 # Change this if youd like to expose Spinnaker outside the cluster
 ingress:
   enabled: true
-  host: spinnaker.${realm}.sapience.net
+  host: spinnaker.${realm}.sapienceanalytics.com
   annotations:
     ingress.kubernetes.io/ssl-redirect: "true"
     kubernetes.io/ingress.class: nginx
@@ -140,7 +140,8 @@ ingress:
   tls:
   - secretName: spinnaker-certs
     hosts:
-    - spinnaker.${realm}.sapience.net
+    - spinnaker.${realm}.sapienceanalytics.com
+    - spinnaker.sapienceanalytics.com
 
 ingressGate:
   enabled: false

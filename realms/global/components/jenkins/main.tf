@@ -626,8 +626,8 @@ resource "azurerm_virtual_machine" "jenkins_windows_slave" {
 # }
 
 resource "azurerm_dns_a_record" "jenkins" {
-  name                = "jenkins"
-  zone_name           = "${data.terraform_remote_state.dns.zone_name}"
+  name                = "jenkins.${var.realm}"
+  zone_name           = "${data.terraform_remote_state.dns.sapienceanalytics_public_zone_name}"
   resource_group_name = "${var.resource_group_name}"
   ttl                 = 30
   records             = [ "${data.terraform_remote_state.ingress-controller.nginx_ingress_controller_ip}" ]
@@ -656,7 +656,7 @@ resource "kubernetes_ingress" "jenkins" {
     # }
 
     rule {
-      host = "jenkins.global.sapience.net"
+      host = "jenkins.${var.realm}.sapienceanalytics.com"
       http {
         path {
           backend {
@@ -666,21 +666,27 @@ resource "kubernetes_ingress" "jenkins" {
 
           path = "/"
         }
+      }
+    }
 
-        # path {
-        #   backend {
-        #     service_name = "MyApp2"
-        #     service_port = 8080
-        #   }
+    rule {
+      host = "jenkins.sapienceanalytics.com"
+      http {
+        path {
+          backend {
+            service_name = "jenkins"
+            service_port = 80
+          }
 
-        #   path = "/app2/*"
-        # }
+          path = "/"
+        }
       }
     }
 
     tls {
       hosts = [ 
-        "jenkins.global.sapience.net"
+        "jenkins.${var.realm}.sapienceanalytics.com",
+        "jenkins.sapienceanalytics.com"
       ]
       secret_name = "jenkins-certs"
     }
@@ -707,7 +713,7 @@ data "template_file" "letsencrypt_issuer_staging" {
     email = "devops@sapience.net"   # TODO !!! Normally, this would come from var.letsencrypt_cluster_issuer_email of the environment tfvars; but this is a realm component, so need to figure this out
     service_principal_client_id = "${var.service_principal_app_id}"
     service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
-    dns_zone_name = "${var.realm}.sapience.net"   #TODO !!! Normally, this would be var.environment (as the DNS zones are environment-specific); but, this is a realm component, so need to figure this out
+    dns_zone_name = "sapienceanalytics.com"
     resource_group_name = "${var.resource_group_name}"
     subscription_id = "${var.subscription_id}"
     service_pricincipal_tenant_id = "${var.service_principal_tenant}"
@@ -736,7 +742,7 @@ data "template_file" "letsencrypt_issuer_prod" {
     email = "devops@sapience.net"   # TODO !!! Normally, this would come from var.letsencrypt_cluster_issuer_email of the environment tfvars; but this is a realm component, so need to figure this out
     service_principal_client_id = "${var.service_principal_app_id}"
     service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
-    dns_zone_name = "${var.realm}.sapience.net"   #TODO !!! Normally, this would be var.environment (as the DNS zones are environment-specific); but, this is a realm component, so need to figure this out
+    dns_zone_name = "sapienceanalytics.com"
     resource_group_name = "${var.resource_group_name}"
     subscription_id = "${var.subscription_id}"
     service_pricincipal_tenant_id = "${var.service_principal_tenant}"
