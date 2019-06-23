@@ -103,15 +103,3 @@ data "local_file" "nginx_ingress_controller_ip" {
 
   filename = ".local/nginx-ingress-controller-ip"
 }
-
-# resource "azurerm_dns_a_record" "nginx_ingress_controller" {
-#   count = "${length(var.nginx_ingress_controller_dns_records)}"
-
-#   depends_on = [ "null_resource.nginx_ingress_controller_ip" ]
-
-#   name                = "${element(var.nginx_ingress_controller_dns_records, count.index)}.${var.environment}"
-#   zone_name           = "${data.terraform_remote_state.dns.zone_name}"
-#   resource_group_name = "${var.resource_group_name}"
-#   ttl                 = 30
-#   records             = [ "${data.local_file.nginx_ingress_controller_ip.content}" ]
-# }

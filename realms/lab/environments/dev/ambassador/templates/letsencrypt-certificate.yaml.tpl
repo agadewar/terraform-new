@@ -7,15 +7,15 @@ spec:
   secretName: ambassador-certs
   issuerRef:
     name: letsencrypt-prod
-    kind: Issuer
+    kind: ClusterIssuer
   dnsNames:
-  - api.${environment}.${realm}.sapience.net
-  - api.${environment}.sapience.net
+  - api.${environment}.${realm}.sapienceanalytics.com
+  - api.${environment}.sapienceanalytics.com
   acme:
     config:
     - dns01:
         provider: azure-dns
         ingressClass: nginx
       domains:
-      - api.${environment}.${realm}.sapience.net
-      - api.${environment}.sapience.net
+      - api.${environment}.${realm}.sapienceanalytics.com
+      - api.${environment}.sapienceanalytics.com

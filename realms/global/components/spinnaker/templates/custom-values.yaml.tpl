@@ -136,12 +136,14 @@ ingress:
     nginx.ingress.kubernetes.io/whitelist-source-range: ${whitelist-source-range}
     certmanager.k8s.io/acme-challenge-type: dns01
     certmanager.k8s.io/acme-dns01-provider: azure-dns
-    certmanager.k8s.io/issuer: letsencrypt-prod
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
   tls:
   - secretName: spinnaker-certs
     hosts:
     - spinnaker.${realm}.sapienceanalytics.com
     - spinnaker.sapienceanalytics.com
+    - deleteme.spinnaker.sapienceanalytics.com
+    # TODO - delete the "deleteme" record above after 2019-06-27
 
 ingressGate:
   enabled: false

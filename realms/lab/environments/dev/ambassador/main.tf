@@ -4,8 +4,6 @@ terraform {
   }
 }
 
-# See: https://github.com/Mimetis/ambassadorandtls
-
 provider "azurerm" {
   version = "1.20.0"
   subscription_id = "${var.subscription_id}"
@@ -13,16 +11,6 @@ provider "azurerm" {
 
 provider "kubernetes" {
     config_path = "${local.config_path}"
-}
-
-data "terraform_remote_state" "dns" {
-  backend = "azurerm"
-  config {
-    access_key           = "${var.backend_access_key}"
-    storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "realm-${var.realm}"
-    key                  = "dns.tfstate"
-  }
 }
 
 locals {
@@ -46,21 +34,16 @@ data "template_file" "ambassador-rbac" {
   }
 }
 
-# See: https://www.getambassador.io/user-guide/getting-started/#1-deploying-ambassador
 resource "null_resource" "ambassador_rbac" {
   triggers = {
-/*     manifest_sha1 = "${sha1("${file("files/ambassador-rbac.yaml")}")}"
-    timestamp = "${timestamp()}"   # DELETE ME */
     template_changed = "${data.template_file.ambassador-rbac.rendered}"
   }
 
   provisioner "local-exec" {
-/*     command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f -<<EOF\n${file("files/ambassador-rbac.yaml")}\nEOF" */
     command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.ambassador-rbac.rendered}\nEOF"
   }
 }
 
-# See: https://www.getambassador.io/user-guide/getting-started/#2-defining-the-ambassador-service
 resource "kubernetes_service" "ambassador" {
   metadata {
     name = "ambassador"
@@ -104,21 +87,15 @@ EOF
   }
 }
 
-# See: https://www.getambassador.io/user-guide/getting-started/#2-defining-the-ambassador-service
 # See: https://github.com/terraform-providers/terraform-provider-kubernetes/pull/59
 resource "null_resource" "patch_ambassador_service" {
   depends_on = [ "kubernetes_service.ambassador" ]
-
-  triggers {
-    timestamp = "${timestamp()}"
-  }
 
   provisioner "local-exec" {
     command = "kubectl patch --kubeconfig=${local.config_path} svc ambassador -n ${local.namespace} -p '{\"spec\":{\"externalTrafficPolicy\":\"Local\"}}'"
   }
 }
 
-# See: https://www.getambassador.io/user-guide/getting-started/#5-adding-a-service
 resource "kubernetes_service" "api" {
   metadata {
     name = "api"
@@ -168,9 +145,9 @@ EOF
 }
 
 resource "azurerm_dns_a_record" "api" {
-  name                = "api.${var.environment}"
-  zone_name           = "${data.terraform_remote_state.dns.zone_name}"
-  resource_group_name = "${var.resource_group_name}"
+  name                = "api.${var.environment}.${var.realm}"
+  zone_name           = "sapienceanalytics.com"
+  resource_group_name = "global"
   ttl                 = 30
   records             = [ "${kubernetes_service.ambassador.load_balancer_ingress.0.ip}" ]
 }
@@ -290,7 +267,6 @@ data "template_file" "letsencrypt_certificate" {
 resource "null_resource" "letsencrypt_certificate" {
   triggers {
     template_changed = "${data.template_file.letsencrypt_certificate.rendered}"
-    timestamp = "${timestamp()}"
   }
 
   provisioner "local-exec" {

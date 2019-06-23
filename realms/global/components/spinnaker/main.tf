@@ -177,74 +177,74 @@ resource "kubernetes_secret" "kubeconfig" {
 #   }
 # }
 
-resource "kubernetes_secret" "service_principal_password" {
-  metadata {
-    name = "service-principal-password"
-    namespace = "${local.namespace}"
-  }
+# resource "kubernetes_secret" "service_principal_password" {
+#   metadata {
+#     name = "service-principal-password"
+#     namespace = "${local.namespace}"
+#   }
 
-  data {
-    password = "${var.service_principal_password}"
-  }
-}
+#   data {
+#     password = "${var.service_principal_password}"
+#   }
+# }
 
-data "template_file" "letsencrypt_issuer_staging" {
-  template = "${file("templates/letsencrypt-issuer.yaml.tpl")}"
+# data "template_file" "letsencrypt_issuer_staging" {
+#   template = "${file("templates/letsencrypt-issuer.yaml.tpl")}"
 
-  vars {
-    suffix = "-staging"
-    letsencrypt_server = "https://acme-staging-v02.api.letsencrypt.org/directory"
-    email = "devops@sapience.net"   # TODO !!! Normally, this would come from var.letsencrypt_cluster_issuer_email of the environment tfvars; but this is a realm component, so need to figure this out
-    service_principal_client_id = "${var.service_principal_app_id}"
-    service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
-    dns_zone_name = "sapienceanalytics.com"
-    resource_group_name = "${var.resource_group_name}"
-    subscription_id = "${var.subscription_id}"
-    service_pricincipal_tenant_id = "${var.service_principal_tenant}"
-  }
-}
+#   vars {
+#     suffix = "-staging"
+#     letsencrypt_server = "https://acme-staging-v02.api.letsencrypt.org/directory"
+#     email = "devops@sapience.net"   # TODO !!! Normally, this would come from var.letsencrypt_cluster_issuer_email of the environment tfvars; but this is a realm component, so need to figure this out
+#     service_principal_client_id = "${var.service_principal_app_id}"
+#     service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
+#     dns_zone_name = "sapienceanalytics.com"
+#     resource_group_name = "${var.resource_group_name}"
+#     subscription_id = "${var.subscription_id}"
+#     service_pricincipal_tenant_id = "${var.service_principal_tenant}"
+#   }
+# }
 
-resource "null_resource" "letsencrypt_issuer_staging" {
-  # depends_on = [ "helm_release.cert_manager" ]
+# resource "null_resource" "letsencrypt_issuer_staging" {
+#   # depends_on = [ "helm_release.cert_manager" ]
 
-  triggers {
-    template_changed = "${data.template_file.letsencrypt_issuer_staging.rendered}"
-    # timestamp = "${timestamp()}"
-  }
+#   triggers {
+#     template_changed = "${data.template_file.letsencrypt_issuer_staging.rendered}"
+#     # timestamp = "${timestamp()}"
+#   }
 
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_issuer_staging.rendered}\nEOF"
-  }
-}
+#   provisioner "local-exec" {
+#     command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_issuer_staging.rendered}\nEOF"
+#   }
+# }
 
-data "template_file" "letsencrypt_issuer_prod" {
-  template = "${file("templates/letsencrypt-issuer.yaml.tpl")}"
+# data "template_file" "letsencrypt_issuer_prod" {
+#   template = "${file("templates/letsencrypt-issuer.yaml.tpl")}"
 
-  vars {
-    suffix = "-prod"
-    letsencrypt_server = "https://acme-v02.api.letsencrypt.org/directory"
-    email = "devops@sapience.net"   # TODO !!! Normally, this would come from var.letsencrypt_cluster_issuer_email of the environment tfvars; but this is a realm component, so need to figure this out
-    service_principal_client_id = "${var.service_principal_app_id}"
-    service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
-    dns_zone_name = "sapienceanalytics.com"
-    resource_group_name = "${var.resource_group_name}"
-    subscription_id = "${var.subscription_id}"
-    service_pricincipal_tenant_id = "${var.service_principal_tenant}"
-  }
-}
+#   vars {
+#     suffix = "-prod"
+#     letsencrypt_server = "https://acme-v02.api.letsencrypt.org/directory"
+#     email = "devops@sapience.net"   # TODO !!! Normally, this would come from var.letsencrypt_cluster_issuer_email of the environment tfvars; but this is a realm component, so need to figure this out
+#     service_principal_client_id = "${var.service_principal_app_id}"
+#     service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
+#     dns_zone_name = "sapienceanalytics.com"
+#     resource_group_name = "${var.resource_group_name}"
+#     subscription_id = "${var.subscription_id}"
+#     service_pricincipal_tenant_id = "${var.service_principal_tenant}"
+#   }
+# }
 
-resource "null_resource" "letsencrypt_issuer_prod" {
-  # depends_on = [ "helm_release.cert_manager" ]
+# resource "null_resource" "letsencrypt_issuer_prod" {
+#   # depends_on = [ "helm_release.cert_manager" ]
 
-  triggers {
-    template_changed = "${data.template_file.letsencrypt_issuer_prod.rendered}"
-    # timestamp = "${timestamp()}"
-  }
+#   triggers {
+#     template_changed = "${data.template_file.letsencrypt_issuer_prod.rendered}"
+#     # timestamp = "${timestamp()}"
+#   }
 
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_issuer_prod.rendered}\nEOF"
-  }
-}
+#   provisioner "local-exec" {
+#     command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_issuer_prod.rendered}\nEOF"
+#   }
+# }
 
 # data "template_file" "letsencrypt_certificate" {
 #   template = "${file("templates/letsencrypt-certificate.yaml.tpl")}"

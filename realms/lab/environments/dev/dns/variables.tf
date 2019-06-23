@@ -9,7 +9,7 @@ variable "resource_group_name" {}
 
 variable "create_cname_api" {}
 
-variable "portal_ip" {}
+# variable "portal_ip" {}
 
 variable "realm_common_tags" {
     type = "map"
