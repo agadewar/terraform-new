@@ -30,8 +30,8 @@ data "terraform_remote_state" "dns" {
 
 locals {
   resource_group_name = "${var.resource_group_name}"
-  config_path         = "../../../components/kubernetes/kubeconfig"
-  namespace           = "${var.environment}"
+  config_path         = "../kubernetes/kubeconfig"
+  namespace           = "kube-system"
 
   common_tags = "${merge(
     var.realm_common_tags,
@@ -43,7 +43,7 @@ locals {
 
 resource "helm_release" "nginx_ingress" {
   name      = "nginx-ingress"
-  namespace = "${local.namespace}"
+  namespace = "kube-system"
   chart     = "stable/nginx-ingress"
 
   set {
@@ -88,7 +88,7 @@ resource "null_resource" "nginx_ingress_controller_ip" {
   }
 
   provisioner "local-exec" {
-    command = "mkdir -p .local && kubectl --kubeconfig ${local.config_path} -n ${local.namespace} get services -o json | jq -j '.items[] | select(.metadata.name == \"nginx-ingress-controller\") | .status .loadBalancer .ingress [0] .ip' > .local/nginx-ingress-controller-ip"
+    command = "mkdir -p .local && kubectl --kubeconfig ${local.config_path} -n kube-system get services -o json | jq -j '.items[] | select(.metadata.name == \"nginx-ingress-controller\") | .status .loadBalancer .ingress [0] .ip' > .local/nginx-ingress-controller-ip"
   }
 
   provisioner "local-exec" {
@@ -104,14 +104,14 @@ data "local_file" "nginx_ingress_controller_ip" {
   filename = ".local/nginx-ingress-controller-ip"
 }
 
-resource "azurerm_dns_a_record" "nginx_ingress_controller" {
-  count = "${length(var.nginx_ingress_controller_dns_records)}"
+# resource "azurerm_dns_a_record" "nginx_ingress_controller" {
+#   count = "${length(var.nginx_ingress_controller_dns_records)}"
 
-  depends_on = [ "null_resource.nginx_ingress_controller_ip" ]
+#   depends_on = [ "null_resource.nginx_ingress_controller_ip" ]
 
-  name                = "${element(var.nginx_ingress_controller_dns_records, count.index)}.${var.environment}"
-  zone_name           = "${data.terraform_remote_state.dns.zone_name}"
-  resource_group_name = "${var.resource_group_name}"
-  ttl                 = 30
-  records             = [ "${data.local_file.nginx_ingress_controller_ip.content}" ]
-}
+#   name                = "${element(var.nginx_ingress_controller_dns_records, count.index)}.${var.environment}"
+#   zone_name           = "${data.terraform_remote_state.dns.zone_name}"
+#   resource_group_name = "${var.resource_group_name}"
+#   ttl                 = 30
+#   records             = [ "${data.local_file.nginx_ingress_controller_ip.content}" ]
+# }
