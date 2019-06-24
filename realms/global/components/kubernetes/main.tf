@@ -295,7 +295,7 @@ data "template_file" "letsencrypt_cluster_issuer_staging" {
     service_principal_client_id = "${var.service_principal_app_id}"
     service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
     dns_zone_name = "sapienceanalytics.com"
-    resource_group_name = "${var.resource_group_name}"
+    resource_group_name = "Global"
     subscription_id = "${var.subscription_id}"
     service_pricincipal_tenant_id = "${var.service_principal_tenant}"
   }
@@ -323,7 +323,7 @@ data "template_file" "letsencrypt_cluster_issuer_prod" {
     service_principal_client_id = "${var.service_principal_app_id}"
     service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
     dns_zone_name = "sapienceanalytics.com"
-    resource_group_name = "${var.resource_group_name}"
+    resource_group_name = "Global"
     subscription_id = "${var.subscription_id}"
     service_pricincipal_tenant_id = "${var.service_principal_tenant}"
   }
