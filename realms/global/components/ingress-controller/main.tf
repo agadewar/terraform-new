@@ -18,6 +18,10 @@ provider "helm" {
   service_account = "tiller"
 }
 
+provider "kubernetes" {
+  config_path = "${local.config_path}"
+}
+
 # data "terraform_remote_state" "dns" {
 #   backend = "azurerm"
 #   config {
@@ -41,7 +45,20 @@ locals {
   )}"
 }
 
+# resource "kubernetes_config_map" "tcp_services" {
+#   metadata {
+#     name = "tcp-services"
+#     namespace = "kube-system"
+#   }
+
+#   data {
+#     "50000" = "cicd/jenkins:50000"
+#   }
+# }
+
 resource "helm_release" "nginx_ingress" {
+  # depends_on = [ "kubernetes_config_map.tcp_services" ]
+
   name      = "nginx-ingress"
   namespace = "kube-system"
   chart     = "stable/nginx-ingress"
@@ -75,6 +92,16 @@ resource "helm_release" "nginx_ingress" {
   set {
     name = "controller.resources.requests.memory"
     value = "100Mi"
+  }
+
+  # set {
+  #   name = "controller.extraArgs.tcp-services-configmap"
+  #   value = "kube-system/tcp-services"
+  # }
+
+  set {
+    name = "tcp.50000"
+    value = "cicd/jenkins:50000"
   }
 
   timeout = 600

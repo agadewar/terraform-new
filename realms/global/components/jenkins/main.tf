@@ -488,9 +488,9 @@ resource "kubernetes_ingress" "jenkins" {
       "certmanager.k8s.io/acme-challenge-type"             = "dns01"
       "certmanager.k8s.io/acme-dns01-provider"             = "azure-dns"
       "certmanager.k8s.io/cluster-issuer"                  = "letsencrypt-prod"
-      "ingress.kubernetes.io/ssl-redirect"                 = "true"
       "kubernetes.io/ingress.class"                        = "nginx"
       "kubernetes.io/tls-acme"                             = "true"
+      "nginx.ingress.kubernetes.io/ssl-redirect"           = "true"
       "nginx.ingress.kubernetes.io/whitelist-source-range" = "${join(", ", var.jenkins_source_ranges_allowed)}"
     }
   }
@@ -533,3 +533,37 @@ resource "kubernetes_ingress" "jenkins" {
     }
   }
 }
+
+# ### TODO - remove this... once the Kubernetes cluster supports both Linux and Windows agent pools, this can go away.  Because the ingress only supports 80 and 443, JNLP from the windows
+# ###        is not able to get to the master.
+# resource "kubernetes_service" "jenkins_jnlp" {
+#   metadata {
+#     annotations = "${merge(
+#       local.common_tags,
+#       map()
+#     )}"
+    
+#     name = "jenkins"
+#     namespace = "${local.namespace}"
+#   }
+
+#   spec {
+#     type = "LoadBalancer"
+#     selector {
+#       app = "jenkins"
+#     }
+#     port {
+#       name = "http"
+#       port = 80
+#       target_port = 8080
+#     }
+
+#     port {
+#       name = "jnlp"
+#       port = 50000
+#       target_port = 50000
+#     }
+
+#     load_balancer_source_ranges = "${var.load_balancer_source_ranges_allowed}"
+#   }
+# }
