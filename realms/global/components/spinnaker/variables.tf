@@ -4,13 +4,13 @@ variable "backend_storage_account_name" {}
 
 variable "realm" {}
 
-variable "service_principal_app_id" {}
-variable "service_principal_tenant" {}
-variable "service_principal_password" {}
+# variable "service_principal_app_id" {}
+# variable "service_principal_tenant" {}
+# variable "service_principal_password" {}
 
 variable "subscription_id" {}
 variable "resource_group_name" {}
-variable "resource_group_location" {}
+# variable "resource_group_location" {}
 
 variable "sapience_container_registry_hostname" {}
 variable "sapience_container_registry_username" {}
@@ -20,9 +20,9 @@ variable "spinnaker_additional_kubeconfig_contexts" {
     type = "list"
 }
 
-variable "kubeconfig" {
-    default = "../kubernetes/kubeconfig"
-}
+# variable "kubeconfig" {
+#     default = "../kubernetes/kubeconfig"
+# }
 
 variable "devops_email" {}
 

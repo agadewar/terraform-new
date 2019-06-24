@@ -4,12 +4,21 @@ terraform {
   }
 }
 
-# See: https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/azure
-# See: https://docs.microsoft.com/en-us/azure/aks/cluster-autoscaler
-
 provider "azurerm" {
   version = "1.20.0"
   subscription_id = "${var.subscription_id}"
+}
+
+provider "helm" {
+  kubernetes {
+    config_path = "${local.config_path}"
+  }
+
+  service_account = "${kubernetes_service_account.tiller.metadata.0.name}"
+}
+
+provider "kubernetes" {
+    config_path = "${local.config_path}"
 }
 
 provider "null" {
@@ -36,9 +45,14 @@ locals {
   )}"
 }
 
-#See: https://docs.microsoft.com/en-us/azure/terraform/terraform-create-k8s-cluster-with-tf-and-aks
-#See: https://www.terraform.io/docs/providers/azurerm/r/kubernetes_cluster.html
+### Kubernetes (incl. autoscaler)
+
 resource "azurerm_kubernetes_cluster" "kubernetes" {
+  lifecycle {
+    ignore_changes = [ "agent_pool_profile.0.count" ]
+    prevent_destroy = "true"
+  }
+
   name                = "${local.cluster_name}"
   location            = "${var.resource_group_location}"
   resource_group_name = "${var.resource_group_name}"
@@ -71,14 +85,24 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     local.common_tags,
     map()
   )}"
+}
 
-  lifecycle{
-    prevent_destroy = "true"
+resource "null_resource" "kubeconfig" {
+  depends_on = ["azurerm_kubernetes_cluster.kubernetes"]
+
+  # triggers = {
+  #   timestamp = "${timestamp()}"
+  # }
+
+  provisioner "local-exec" {
+    command = "rm -f kubeconfig"
+  }
+
+  provisioner "local-exec" {
+    command = "az aks get-credentials --subscription ${var.subscription_id} --resource-group ${azurerm_kubernetes_cluster.kubernetes.resource_group_name} --name ${azurerm_kubernetes_cluster.kubernetes.name} -f kubeconfig"
   }
 }
 
-#See: https://docs.microsoft.com/en-us/azure/aks/autoscaler
-#See: https://github.com/underguiz/terraform-aks-autoscaler
 data "template_file" "node_resource_group" {
   template = "${file("autoscaler/node_resource_group.tpl")}"
 
@@ -107,28 +131,11 @@ data "template_file" "autoscaler_config" {
   }
 }
 
-resource "null_resource" "kubeconfig" {
-  depends_on = ["azurerm_kubernetes_cluster.kubernetes"]
-
-  triggers = {
-    timestamp = "${timestamp()}"
-  }
-
-  provisioner "local-exec" {
-    command = "rm -f kubeconfig"
-  }
-
-  provisioner "local-exec" {
-    command = "az aks get-credentials --subscription ${var.subscription_id} --resource-group ${azurerm_kubernetes_cluster.kubernetes.resource_group_name} --name ${azurerm_kubernetes_cluster.kubernetes.name} -f kubeconfig"
-  }
-}
-
 resource "null_resource" "kubernetes_config_autoscaler" {
   depends_on = ["null_resource.kubeconfig"]
 
   triggers {
     autoscaler_config_changed = "${data.template_file.autoscaler_config.rendered}"
-    timestamp = "${timestamp()}"
   }
 
   provisioner "local-exec" {
@@ -136,8 +143,55 @@ resource "null_resource" "kubernetes_config_autoscaler" {
   }
 }
 
-# See: https://www.getambassador.io/user-guide/cert-manager
-# See: https://raw.githubusercontent.com/jetstack/cert-manager/release-0.6/deploy/manifests/00-crds.yaml
+### Helm
+
+resource "kubernetes_service_account" "tiller" {
+  depends_on = [ "azurerm_kubernetes_cluster.kubernetes" ]
+  metadata {
+    annotations = "${merge(
+      local.common_tags,
+      map()
+    )}"
+
+    name = "tiller"
+    namespace = "kube-system"
+  }
+}
+
+resource "kubernetes_cluster_role_binding" "tiller_cluster_rule" {
+  depends_on = [ "kubernetes_service_account.tiller" ]
+
+  metadata {
+    annotations = "${merge(
+      local.common_tags,
+      map()
+    )}"
+    
+    name = "tiller-cluster-rule"
+  }
+  role_ref {
+      api_group = "rbac.authorization.k8s.io"
+      kind = "ClusterRole"
+      name = "cluster-admin"
+  }
+  subject {
+      kind = "ServiceAccount"
+      name = "tiller"
+      namespace = "kube-system"
+      api_group = ""
+  }
+}
+
+resource "null_resource" "helm_init" {
+  depends_on = [ "kubernetes_cluster_role_binding.tiller_cluster_rule", "null_resource.kubeconfig" ]
+  
+  provisioner "local-exec" {
+    command = "helm --kubeconfig ${local.config_path} init --service-account tiller --automount-service-account-token --upgrade"
+  }
+}
+
+### TLS (cert-manager + Let's Encrypt)
+
 resource "null_resource" "create_cert_manager_crd" {
   depends_on = ["null_resource.kubeconfig"]
 
@@ -177,5 +231,112 @@ resource "null_resource" "create_cert_manager_crd" {
     when = "destroy"
 
     command = "kubectl --kubeconfig=${local.config_path} customresourcedefinition clusterissuers.certmanager.k8s.io --ignore-not-found"
+  }
+}
+
+resource "kubernetes_secret" "service_principal_password" {
+  depends_on = [ "null_resource.kubeconfig" ]
+
+  metadata {
+    name = "service-principal-password"
+    namespace = "cert-manager"
+  }
+
+  data {
+    password = "${var.service_principal_password}"
+  }
+}
+
+resource "kubernetes_namespace" "cert_manager" {
+  depends_on = [ "null_resource.kubeconfig" ]
+
+  metadata {
+    name = "cert-manager"
+  }
+}
+
+data "helm_repository" "jetstack" {
+  name = "jetstack"
+  url  = "https://charts.jetstack.io"
+}
+
+resource "helm_release" "cert_manager" {
+  depends_on = [ "null_resource.helm_init" ]
+
+  name       = "cert-manager"
+  namespace  = "${kubernetes_namespace.cert_manager.metadata.0.name}"
+  chart      = "cert-manager"
+  version    = "v0.6.0"
+  repository = "${data.helm_repository.jetstack.metadata.0.name}"
+  
+  set {
+    name  = "webhook.enabled"
+    value = "false"
+  }
+
+  set {
+    name  = "resources.requests.cpu"
+    value = "10m"
+  }
+
+  set {
+    name  = "resources.requests.memory"
+    value = "32Mi"
+  }
+}
+
+data "template_file" "letsencrypt_cluster_issuer_staging" {
+  template = "${file("templates/letsencrypt-cluster-issuer.yaml.tpl")}"
+
+  vars {
+    suffix = "-staging"
+    letsencrypt_server = "https://acme-staging-v02.api.letsencrypt.org/directory"
+    email = "devops@sapience.net"
+    service_principal_client_id = "${var.service_principal_app_id}"
+    service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
+    dns_zone_name = "sapienceanalytics.com"
+    resource_group_name = "Global"
+    subscription_id = "${var.subscription_id}"
+    service_pricincipal_tenant_id = "${var.service_principal_tenant}"
+  }
+}
+
+resource "null_resource" "letsencrypt_cluster_issuer_staging" {
+  depends_on = [ "null_resource.kubeconfig", "kubernetes_secret.service_principal_password" ]
+
+  triggers {
+    template_changed = "${data.template_file.letsencrypt_cluster_issuer_staging.rendered}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.letsencrypt_cluster_issuer_staging.rendered}\nEOF"
+  }
+}
+
+data "template_file" "letsencrypt_cluster_issuer_prod" {
+  template = "${file("templates/letsencrypt-cluster-issuer.yaml.tpl")}"
+
+  vars {
+    suffix = "-prod"
+    letsencrypt_server = "https://acme-v02.api.letsencrypt.org/directory"
+    email = "devops@sapience.net"
+    service_principal_client_id = "${var.service_principal_app_id}"
+    service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
+    dns_zone_name = "sapienceanalytics.com"
+    resource_group_name = "Global"
+    subscription_id = "${var.subscription_id}"
+    service_pricincipal_tenant_id = "${var.service_principal_tenant}"
+  }
+}
+
+resource "null_resource" "letsencrypt_cluster_issuer_prod" {
+  depends_on = [ "null_resource.kubeconfig", "kubernetes_secret.service_principal_password" ]
+
+  triggers {
+    template_changed = "${data.template_file.letsencrypt_cluster_issuer_prod.rendered}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.letsencrypt_cluster_issuer_prod.rendered}\nEOF"
   }
 }

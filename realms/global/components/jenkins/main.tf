@@ -58,18 +58,6 @@ data "terraform_remote_state" "kubernetes" {
   }
 }
 
-
-
-/* data "terraform_remote_state" "dns" {
-  backend = "azurerm"
-  config {
-    access_key           = "${var.backend_access_key}"
-    storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "realm-${var.realm}"
-    key                  = "dns.tfstate"
-  }
-} */
-
 locals {
   config_path = "../kubernetes/kubeconfig"
   namespace = "cicd"
@@ -208,8 +196,6 @@ resource "kubernetes_service" "jenkins" {
       port = 50000
       target_port = 50000
     }
-
-    # load_balancer_source_ranges = "${var.load_balancer_source_ranges_allowed}"
   }
 }
 
@@ -296,36 +282,7 @@ resource "kubernetes_secret" "maven_repo_azure_file" {
     azurestorageaccountname = "${data.terraform_remote_state.jenkins_storage.maven_repo_storage_account_name}"
     azurestorageaccountkey  = "${data.terraform_remote_state.jenkins_storage.maven_repo_storage_account_access_key}"
   }
-
-  # type = "Opaque"
 }
-
-                # data "template_file" "maven_repo_azure_file_secret" {
-                #   template = "${file("templates/maven-repo-azure-file-secret.yaml.tpl")}"
-
-                #   vars {
-                #     azurestorageaccountname = "${data.terraform_remote_state.jenkins_storage.maven_repo_storage_account_name}"
-                #     azurestorageaccountkey  = "${data.terraform_remote_state.jenkins_storage.maven_repo_storage_account_access_key}"
-                #   }
-                # }
-
-                # resource "null_resource" "maven_repo_azure_file_secret" {
-                #   triggers {
-                #     template_changed = "${data.template_file.maven_repo_azure_file_secret.rendered}"
-                #   }
-
-                #   provisioner "local-exec" {
-                #     command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.maven_repo_azure_file_secret.rendered}\nEOF"
-                #   }
-
-                #   provisioner "local-exec" {
-                #     when = "destroy"
-
-                #     command = "kubectl delete --kubeconfig=${local.config_path} persistentvolume maven-repo-${var.realm}"
-                #   }  
-                # }
-
-
 
 resource "kubernetes_persistent_volume_claim" "maven_repo" {
   depends_on = [ "null_resource.maven_repo_storage_class", "null_resource.maven_repo_pv" ]
@@ -392,30 +349,7 @@ resource "null_resource" "maven_repo_storage_class" {
   provisioner "local-exec" {
     command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.maven_repo_storage_class.rendered}\nEOF"
   }
-
-  # provisioner "local-exec" {
-  #   when = "destroy"
-
-  #   command = "kubectl delete --kubeconfig=${local.config_path} persistentvolume maven-repo-${var.realm}"
-  # }  
 }
-
-                      # resource "kubernetes_storage_class" "maven_repo" {
-                      #   metadata {
-                      #     annotations = "${merge(
-                      #       local.common_tags,
-                      #       map()
-                      #     )}"
-                          
-                      #     name = "maven-repo"
-                      #   }
-                        
-                      #   storage_provisioner = "kubernetes.io/azure-file"
-                      # //  reclaim_policy = "Retain"
-                      #   parameters {
-                      #     storageaccounttype = "Standard_LRS"
-                      #   }
-                      # }
 
 resource "kubernetes_service_account" "jenkins" {
   metadata {
@@ -427,10 +361,6 @@ resource "kubernetes_service_account" "jenkins" {
     name = "jenkins"
     namespace = "${local.namespace}"
   }
-
-  # secret {
-  #   name = "${kubernetes_secret.example.metadata.0.name}"
-  # }
 }
 
 resource "kubernetes_cluster_role_binding" "jenkins" {
@@ -454,36 +384,7 @@ resource "kubernetes_cluster_role_binding" "jenkins" {
         namespace = "management"
         api_group = ""
     }
-    # subject {
-    #     kind = "Group"
-    #     name = "system:masters"
-    #     api_group = "rbac.authorization.k8s.io"
-    # }
 }
-
-/* resource "aws_route53_record" "jenkins" {
-  provider = "aws.banyan"   # we are going to create this in the "banyan" account, since that is where the banyanhills.com hosted zone is
-
-  zone_id = "Z1X9O792DMWEV4"
-  name    = "jenkins-lab"
-  type    = "CNAME"
-  ttl     = "1"
-
-  # weighted_routing_policy {
-  #   weight = 10
-  # }
-
-  # set_identifier = "dev"
-  records        = [ "${kubernetes_service.jenkins.load_balancer_ingress.0.hostname}" ]
-} */
-
-/* resource "azurerm_dns_cname_record" "jenkins" {
-  name                = "jenkins"
-  zone_name           = "${data.terraform_remote_state.dns.zone_name}"
-  resource_group_name = "${var.resource_group_name}"
-  ttl                 = 1
-  record              = [ "${kubernetes_service.jenkins.load_balancer_ingress.0.hostname}" ]
-} */
 
 data "azurerm_subnet" "default" {
   name                 = "default"
@@ -543,7 +444,7 @@ resource "azurerm_virtual_machine" "jenkins_windows_slave" {
   # NOTE: This may not be optimal in all cases.
   delete_os_disk_on_termination = true
 
-  # This means the Data Disk Disk will be deleted when Terraform destroys the Virtual Machine
+  # This means the Data Disk will be deleted when Terraform destroys the Virtual Machine
   # NOTE: This may not be optimal in all cases.
   delete_data_disks_on_termination = true
 
@@ -570,64 +471,9 @@ resource "azurerm_virtual_machine" "jenkins_windows_slave" {
   os_profile_windows_config {}
 }
 
-# resource "helm_release" "nginx_ingress" {
-#   depends_on = [ "kubernetes_namespace.namespace" ]
-
-#   name      = "nginx-ingress"
-#   namespace = "${local.namespace}"
-#   chart     = "stable/nginx-ingress"
-
-#   set {
-#     name  = "controller.replicaCount"
-#     value = "1"
-#   }
-
-#   # See: https://docs.microsoft.com/en-us/azure/aks/ingress-tls
-#   # set {
-#   #   name  = "controller.nodeSelector.\"beta\\.kubernetes\\.io/os\""
-#   #   value = "linux"
-#   # }
-
-#   # set {
-#   #   name  = "defaultBackend.nodeSelector.\"beta\\.kubernetes\\.io/os\""
-#   #   value = "linux"
-#   # }
-
-#   set {
-#     name  = "controller.service.externalTrafficPolicy"
-#     value = "Local"
-#   }
-
-#   timeout = 600
-# }
-
-# resource "null_resource" "nginx_ingress_controller_ip" {
-#   depends_on = [ "helm_release.nginx_ingress" ]
-  
-#   # triggers = {
-#   #   timestamp = "${timestamp()}"
-#   # }
-
-#   provisioner "local-exec" {
-#     command = "mkdir -p .local && kubectl --kubeconfig ${local.config_path} -n ${local.namespace} get services -o json | jq -j '.items[] | select(.metadata.name == \"nginx-ingress-controller\") | .status .loadBalancer .ingress [0] .ip' > .local/nginx-ingress-controller-ip"
-#   }
-
-#   provisioner "local-exec" {
-#     when = "destroy"
-
-#     command = "rm -f .local/nginx-ingress-controller-ip"
-#   }
-# }
-
-# data "local_file" "nginx_ingress_controller_ip" {
-#   depends_on = [ "null_resource.nginx_ingress_controller_ip" ]
-
-#   filename = ".local/nginx-ingress-controller-ip"
-# }
-
 resource "azurerm_dns_a_record" "jenkins" {
-  name                = "jenkins"
-  zone_name           = "${data.terraform_remote_state.dns.zone_name}"
+  name                = "jenkins.${var.realm}"
+  zone_name           = "${data.terraform_remote_state.dns.sapienceanalytics_public_zone_name}"
   resource_group_name = "${var.resource_group_name}"
   ttl                 = 30
   records             = [ "${data.terraform_remote_state.ingress-controller.nginx_ingress_controller_ip}" ]
@@ -641,7 +487,7 @@ resource "kubernetes_ingress" "jenkins" {
     annotations = {
       "certmanager.k8s.io/acme-challenge-type"             = "dns01"
       "certmanager.k8s.io/acme-dns01-provider"             = "azure-dns"
-      "certmanager.k8s.io/issuer"                          = "letsencrypt-prod"
+      "certmanager.k8s.io/cluster-issuer"                  = "letsencrypt-prod"
       "ingress.kubernetes.io/ssl-redirect"                 = "true"
       "kubernetes.io/ingress.class"                        = "nginx"
       "kubernetes.io/tls-acme"                             = "true"
@@ -650,13 +496,8 @@ resource "kubernetes_ingress" "jenkins" {
   }
 
   spec {
-    # backend {
-    #   service_name = "MyApp1"
-    #   service_port = 8080
-    # }
-
     rule {
-      host = "jenkins.global.sapience.net"
+      host = "jenkins.${var.realm}.sapienceanalytics.com"
       http {
         path {
           backend {
@@ -666,92 +507,29 @@ resource "kubernetes_ingress" "jenkins" {
 
           path = "/"
         }
+      }
+    }
 
-        # path {
-        #   backend {
-        #     service_name = "MyApp2"
-        #     service_port = 8080
-        #   }
+    rule {
+      host = "jenkins.sapienceanalytics.com"
+      http {
+        path {
+          backend {
+            service_name = "jenkins"
+            service_port = 80
+          }
 
-        #   path = "/app2/*"
-        # }
+          path = "/"
+        }
       }
     }
 
     tls {
       hosts = [ 
-        "jenkins.global.sapience.net"
+        "jenkins.${var.realm}.sapienceanalytics.com",
+        "jenkins.sapienceanalytics.com"
       ]
       secret_name = "jenkins-certs"
     }
-  }
-}
-
-resource "kubernetes_secret" "service_principal_password" {
-  metadata {
-    name = "service-principal-password"
-    namespace = "${local.namespace}"
-  }
-
-  data {
-    password = "${var.service_principal_password}"
-  }
-}
-
-data "template_file" "letsencrypt_issuer_staging" {
-  template = "${file("templates/letsencrypt-issuer.yaml.tpl")}"
-
-  vars {
-    suffix = "-staging"
-    letsencrypt_server = "https://acme-staging-v02.api.letsencrypt.org/directory"
-    email = "devops@sapience.net"   # TODO !!! Normally, this would come from var.letsencrypt_cluster_issuer_email of the environment tfvars; but this is a realm component, so need to figure this out
-    service_principal_client_id = "${var.service_principal_app_id}"
-    service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
-    dns_zone_name = "${var.realm}.sapience.net"   #TODO !!! Normally, this would be var.environment (as the DNS zones are environment-specific); but, this is a realm component, so need to figure this out
-    resource_group_name = "${var.resource_group_name}"
-    subscription_id = "${var.subscription_id}"
-    service_pricincipal_tenant_id = "${var.service_principal_tenant}"
-  }
-}
-
-resource "null_resource" "letsencrypt_issuer_staging" {
-  # depends_on = [ "helm_release.cert_manager" ]
-
-  triggers {
-    template_changed = "${data.template_file.letsencrypt_issuer_staging.rendered}"
-    # timestamp = "${timestamp()}"
-  }
-
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_issuer_staging.rendered}\nEOF"
-  }
-}
-
-data "template_file" "letsencrypt_issuer_prod" {
-  template = "${file("templates/letsencrypt-issuer.yaml.tpl")}"
-
-  vars {
-    suffix = "-prod"
-    letsencrypt_server = "https://acme-v02.api.letsencrypt.org/directory"
-    email = "devops@sapience.net"   # TODO !!! Normally, this would come from var.letsencrypt_cluster_issuer_email of the environment tfvars; but this is a realm component, so need to figure this out
-    service_principal_client_id = "${var.service_principal_app_id}"
-    service_principal_password_secret_ref = "${kubernetes_secret.service_principal_password.metadata.0.name}"
-    dns_zone_name = "${var.realm}.sapience.net"   #TODO !!! Normally, this would be var.environment (as the DNS zones are environment-specific); but, this is a realm component, so need to figure this out
-    resource_group_name = "${var.resource_group_name}"
-    subscription_id = "${var.subscription_id}"
-    service_pricincipal_tenant_id = "${var.service_principal_tenant}"
-  }
-}
-
-resource "null_resource" "letsencrypt_issuer_prod" {
-  # depends_on = [ "helm_release.cert_manager" ]
-
-  triggers {
-    template_changed = "${data.template_file.letsencrypt_issuer_prod.rendered}"
-    # timestamp = "${timestamp()}"
-  }
-
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_issuer_prod.rendered}\nEOF"
   }
 }
