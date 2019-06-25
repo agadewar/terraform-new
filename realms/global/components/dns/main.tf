@@ -22,8 +22,33 @@ locals {
 
 resource "azurerm_dns_zone" "sapienceanalytics_public" {
   name                = "sapienceanalytics.com"
-  resource_group_name = "${var.resource_group_name}"
+  resource_group_name = "${var.resource_group_name}" 
   zone_type           = "Public"
+}
+
+resource "azurerm_dns_zone" "sapienceinsider_public" {
+  name                = "sapienceinsider.com"
+  resource_group_name = "${var.resource_group_name}"  
+  zone_type           = "Public"
+}
+
+resource "azurerm_dns_a_record" "sapienceanalytics_public" {
+  name                = "@"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"  # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  records             = ["40.79.154.192"]
+}
+
+resource "azurerm_dns_txt_record" "sapienceanalytics_public" {
+  name                = "@"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"  # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+
+  record {
+    value = "sapienceanalytics.azurewebsites.net"
+  }
 }
 
 resource "azurerm_dns_cname_record" "api_dev" {
