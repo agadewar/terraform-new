@@ -29,7 +29,7 @@ resource "azurerm_dns_zone" "sapienceanalytics_public" {
 resource "azurerm_dns_cname_record" "api_dev" {
   name                = "api.dev"
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
-  resource_group_name = "${azurerm_dns_zone.sapienceanalytics_public.resource_group_name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
   record              = "api.dev.lab.sapienceanalytics.com"
 }
@@ -37,7 +37,7 @@ resource "azurerm_dns_cname_record" "api_dev" {
 resource "azurerm_dns_cname_record" "jenkins" {
   name                = "jenkins"
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
-  resource_group_name = "${azurerm_dns_zone.sapienceanalytics_public.resource_group_name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
   record              = "jenkins.global.sapienceanalytics.com"
 }
@@ -45,7 +45,7 @@ resource "azurerm_dns_cname_record" "jenkins" {
 resource "azurerm_dns_cname_record" "portal_dev" {
   name                = "portal.dev"
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
-  resource_group_name = "${azurerm_dns_zone.sapienceanalytics_public.resource_group_name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
   record              = "portal.dev.lab.sapienceanalytics.com"
 }
@@ -53,7 +53,7 @@ resource "azurerm_dns_cname_record" "portal_dev" {
 resource "azurerm_dns_cname_record" "spinnaker" {
   name                = "spinnaker"
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
-  resource_group_name = "${azurerm_dns_zone.sapienceanalytics_public.resource_group_name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
   record              = "spinnaker.global.sapienceanalytics.com"
 }
