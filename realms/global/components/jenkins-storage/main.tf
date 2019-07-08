@@ -5,7 +5,7 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "1.20.0"
+  version = "1.31.0"
   subscription_id = "${var.subscription_id}"
 }
 
@@ -29,8 +29,7 @@ resource "azurerm_managed_disk" "jenkins_home" {
   disk_size_gb         = "10"
 
   tags = "${merge(
-    local.common_tags,
-    map()
+    local.common_tags
   )}"
   
   lifecycle{
@@ -50,8 +49,7 @@ resource "azurerm_storage_account" "maven_repo" {
   account_kind              = "StorageV2"
 
   tags = "${merge(
-    local.common_tags,
-    map()
+    local.common_tags
   )}"
 }
 

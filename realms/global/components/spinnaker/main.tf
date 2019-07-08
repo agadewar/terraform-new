@@ -7,7 +7,7 @@ terraform {
 # See: https://akomljen.com/get-kubernetes-cluster-metrics-with-prometheus-in-5-minutes/
 
 provider "azurerm" {
-  version = "1.20.0"
+  version = "1.31.0"
   subscription_id = "${var.subscription_id}"
 }
 
@@ -39,7 +39,7 @@ locals {
 data "terraform_remote_state" "storage_account" {
   backend = "azurerm"
 
-  config {
+  config = {
     access_key            = "${var.backend_access_key}"
     storage_account_name  = "${var.backend_storage_account_name}"
 	  container_name        = "realm-${var.realm}"
@@ -49,7 +49,7 @@ data "terraform_remote_state" "storage_account" {
 
 data "terraform_remote_state" "dns" {
   backend = "azurerm"
-  config {
+  config = {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
 	  container_name       = "realm-${var.realm}"
@@ -60,7 +60,7 @@ data "terraform_remote_state" "dns" {
 data "terraform_remote_state" "ingress-controller" {
   backend = "azurerm"
 
-  config {
+  config = {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
 	  container_name       = "realm-${var.realm}"
@@ -71,10 +71,10 @@ data "terraform_remote_state" "ingress-controller" {
 data "template_file" "custom_values" {
   template = "${file("templates/custom-values.yaml.tpl")}"
 
-  vars {
+  vars = {
     realm                          = "${var.realm}"
-    storageAccountName             = "${data.terraform_remote_state.storage_account.storage_account_name}"
-    accessKey                      = "${data.terraform_remote_state.storage_account.storage_account_access_key}"
+    storageAccountName             = "${data.terraform_remote_state.storage_account.outputs.storage_account_name}"
+    accessKey                      = "${data.terraform_remote_state.storage_account.outputs.storage_account_access_key}"
     whitelist-source-range         = "${join(", ", var.spinnaker_source_ranges_allowed)}"
     additional-kubeconfig-contexts = "${indent(2, join("\n", formatlist("- %s", var.spinnaker_additional_kubeconfig_contexts)))}"
     acr-address                    = "${var.sapience_container_registry_hostname}"
@@ -117,7 +117,7 @@ resource "kubernetes_secret" "kubeconfig" {
     namespace = "${local.namespace}"
   }
 
-  data {
+  data = {
     # don't use "local.config_path" here, as it may need to be a kubeconfig file comprised of multiple environments; this secret
     # is used by the spinnaker helm chart to make Spinnaker aware of the K8S clusters it should be aware of
     #config = "${file("${var.kubeconfig}")}"
@@ -337,8 +337,8 @@ resource "helm_release" "spinnaker" {
 
 resource "azurerm_dns_a_record" "spinnaker" {
   name                = "spinnaker.${var.realm}"
-  zone_name           = "${data.terraform_remote_state.dns.sapienceanalytics_public_zone_name}"
+  zone_name           = "${data.terraform_remote_state.dns.outputs.sapienceanalytics_public_zone_name}"
   resource_group_name = "${var.resource_group_name}"
   ttl                 = 30
-  records             = [ "${data.terraform_remote_state.ingress-controller.nginx_ingress_controller_ip}" ]
+  records             = [ "${data.terraform_remote_state.ingress-controller.outputs.nginx_ingress_controller_ip}" ]
 }
