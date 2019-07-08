@@ -29,7 +29,7 @@
 
 	**SECRET** :b:
 
-	az role assignment create --assignee 0f5157af-f89e-49ff-8337-e9c53f4ee731 --role Contributor
+	az role assignment create --assignee <sp object id> --role Contributor
 
 ### Create Realm and Environment Infrastructure
 ----
