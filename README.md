@@ -29,6 +29,8 @@
 
 	**SECRET** :b:
 
+	az role assignment create --assignee 0f5157af-f89e-49ff-8337-e9c53f4ee731 --role Contributor
+
 ### Create Realm and Environment Infrastructure
 ----
 ##### 1. Create "Lab" Realm Infrastructure
