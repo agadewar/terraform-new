@@ -7,7 +7,7 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "1.20.0"
+  version = "1.31.0"
   subscription_id = "${var.subscription_id}"
 }
 
@@ -17,10 +17,10 @@ provider "kubernetes" {
 
 data "terraform_remote_state" "dns" {
   backend = "azurerm"
-  config {
+  config = {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "realm-${var.realm}"
+    container_name       = "realm-${var.realm}"
     key                  = "dns.tfstate"
   }
 }
@@ -28,10 +28,10 @@ data "terraform_remote_state" "dns" {
 data "terraform_remote_state" "jenkins_storage" {
   backend = "azurerm"
 
-  config {
+  config = {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "realm-${var.realm}"
+    container_name       = "realm-${var.realm}"
     key                  = "jenkins-storage.tfstate"
   }
 }
@@ -39,10 +39,10 @@ data "terraform_remote_state" "jenkins_storage" {
 data "terraform_remote_state" "ingress-controller" {
   backend = "azurerm"
 
-  config {
+  config = {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "realm-${var.realm}"
+    container_name       = "realm-${var.realm}"
     key                  = "ingress-controller.tfstate"
   }
 }
@@ -50,10 +50,10 @@ data "terraform_remote_state" "ingress-controller" {
 data "terraform_remote_state" "kubernetes" {
   backend = "azurerm"
 
-  config {
+  config = {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "realm-${var.realm}"
+    container_name       = "realm-${var.realm}"
     key                  = "kubernetes.tfstate"
   }
 }
@@ -74,7 +74,7 @@ locals {
 data "template_file" "sapience_container_registry_credential" {
   template = "${file("templates/dockerconfigjson.tpl")}"
 
-  vars {
+  vars = {
      server   = "${var.sapience_container_registry_hostname}"
      username = "${var.sapience_container_registry_username}"
      password = "${var.sapience_container_registry_password}"
@@ -87,7 +87,7 @@ resource "kubernetes_secret" "sapience_container_registry_credential" {
     namespace = "${local.namespace}"
   }
 
-  data {
+  data = {
     ".dockerconfigjson" = "${data.template_file.sapience_container_registry_credential.rendered}"
   }
 
@@ -105,8 +105,7 @@ resource "kubernetes_deployment" "jenkins" {
 
   metadata {
     annotations = "${merge(
-      local.common_tags,
-      map()
+      local.common_tags
     )}"
 
     name = "jenkins"
@@ -115,13 +114,13 @@ resource "kubernetes_deployment" "jenkins" {
   spec {
     replicas = 1
     selector {
-      match_labels {
+      match_labels = {
         app = "jenkins"
       }
     }
     template {
       metadata {
-        labels {
+        labels = {
           app = "jenkins"
         }
       }
@@ -172,8 +171,7 @@ resource "kubernetes_deployment" "jenkins" {
 resource "kubernetes_service" "jenkins" {
   metadata {
     annotations = "${merge(
-      local.common_tags,
-      map()
+      local.common_tags
     )}"
     
     name = "jenkins"
@@ -182,7 +180,7 @@ resource "kubernetes_service" "jenkins" {
 
   spec {
     type = "ClusterIP"
-    selector {
+    selector = {
       app = "jenkins"
     }
     port {
@@ -204,8 +202,7 @@ resource "kubernetes_persistent_volume_claim" "jenkins_home" {
   
   metadata {
     annotations = "${merge(
-      local.common_tags,
-      map()
+      local.common_tags
     )}"
     
     name = "jenkins"
@@ -215,7 +212,7 @@ resource "kubernetes_persistent_volume_claim" "jenkins_home" {
   spec {
     access_modes = ["ReadWriteMany"]
     resources {
-      requests {
+      requests = {
         storage = "10G"
       }
     }
@@ -227,7 +224,7 @@ resource "kubernetes_persistent_volume_claim" "jenkins_home" {
 data "template_file" "jenkins_home_pv" {
   template = "${file("templates/jenkins-home-pv.yaml.tpl")}"
 
-  vars {
+  vars = {
     realm = "${var.realm}"
     subscription_id = "${var.subscription_id}"
     resource_group_name = "${var.resource_group_name}"
@@ -235,7 +232,7 @@ data "template_file" "jenkins_home_pv" {
 }
 
 resource "null_resource" "jenkins_home_pv" {
-  triggers {
+  triggers = {
     template_changed = "${data.template_file.jenkins_home_pv.rendered}"
   }
 
@@ -253,8 +250,7 @@ resource "null_resource" "jenkins_home_pv" {
 resource "kubernetes_storage_class" "jenkins_home" {
   metadata {
     annotations = "${merge(
-      local.common_tags,
-      map()
+      local.common_tags
     )}"
     
     name = "jenkins"
@@ -262,7 +258,7 @@ resource "kubernetes_storage_class" "jenkins_home" {
 
   storage_provisioner = "kubernetes.io/azure-disk"
   reclaim_policy = "Retain"
-  parameters {
+  parameters = {
     storageaccounttype = "Standard_LRS"
   }
 }
@@ -270,17 +266,16 @@ resource "kubernetes_storage_class" "jenkins_home" {
 resource "kubernetes_secret" "maven_repo_azure_file" {
   metadata {
     annotations = "${merge(
-      local.common_tags,
-      map()
+      local.common_tags
     )}"
     
     name = "maven-repo-azure-file"
     namespace = "${local.namespace}"
   }
 
-  data {
-    azurestorageaccountname = "${data.terraform_remote_state.jenkins_storage.maven_repo_storage_account_name}"
-    azurestorageaccountkey  = "${data.terraform_remote_state.jenkins_storage.maven_repo_storage_account_access_key}"
+  data = {
+    azurestorageaccountname = "${data.terraform_remote_state.jenkins_storage.outputs.maven_repo_storage_account_name}"
+    azurestorageaccountkey  = "${data.terraform_remote_state.jenkins_storage.outputs.maven_repo_storage_account_access_key}"
   }
 }
 
@@ -289,8 +284,7 @@ resource "kubernetes_persistent_volume_claim" "maven_repo" {
   
   metadata {
     annotations = "${merge(
-      local.common_tags,
-      map()
+      local.common_tags
     )}"
     
     name = "maven-repo"
@@ -300,7 +294,7 @@ resource "kubernetes_persistent_volume_claim" "maven_repo" {
   spec {
     access_modes = ["ReadWriteMany"]
     resources {
-      requests {
+      requests = {
         storage = "20G"
       }
     }
@@ -312,18 +306,18 @@ resource "kubernetes_persistent_volume_claim" "maven_repo" {
 data "template_file" "maven_repo_pv" {
   template = "${file("templates/maven-repo-pv.yaml.tpl")}"
 
-  vars {
+  vars = {
     realm = "${var.realm}"
     subscription_id = "${var.subscription_id}"
     resource_group_name = "${var.resource_group_name}"
     secret_name = "${kubernetes_secret.maven_repo_azure_file.metadata.0.name}"
-    share_name = "${data.terraform_remote_state.jenkins_storage.maven_repo_storage_account_name}"
+    share_name = "${data.terraform_remote_state.jenkins_storage.outputs.maven_repo_storage_account_name}"
   }
 }
 
 resource "null_resource" "maven_repo_pv" {
   depends_on = [ "null_resource.maven_repo_storage_class" ]
-  triggers {
+  triggers = {
     template_changed = "${data.template_file.maven_repo_pv.rendered}"
   }
 
@@ -342,7 +336,7 @@ data "template_file" "maven_repo_storage_class" {
 }
 
 resource "null_resource" "maven_repo_storage_class" {
-  triggers {
+  triggers = {
     template_changed = "${data.template_file.maven_repo_storage_class.rendered}"
   }
 
@@ -354,8 +348,7 @@ resource "null_resource" "maven_repo_storage_class" {
 resource "kubernetes_service_account" "jenkins" {
   metadata {
     annotations = "${merge(
-      local.common_tags,
-      map()
+      local.common_tags
     )}"
     
     name = "jenkins"
@@ -366,8 +359,7 @@ resource "kubernetes_service_account" "jenkins" {
 resource "kubernetes_cluster_role_binding" "jenkins" {
   metadata {
     annotations = "${merge(
-      local.common_tags,
-      map()
+      local.common_tags
     )}"
     
     name = "jenkins"
@@ -473,10 +465,10 @@ resource "azurerm_virtual_machine" "jenkins_windows_slave" {
 
 resource "azurerm_dns_a_record" "jenkins" {
   name                = "jenkins.${var.realm}"
-  zone_name           = "${data.terraform_remote_state.dns.sapienceanalytics_public_zone_name}"
+  zone_name           = "${data.terraform_remote_state.dns.outputs.sapienceanalytics_public_zone_name}"
   resource_group_name = "${var.resource_group_name}"
   ttl                 = 30
-  records             = [ "${data.terraform_remote_state.ingress-controller.nginx_ingress_controller_ip}" ]
+  records             = [ "${data.terraform_remote_state.ingress-controller.outputs.nginx_ingress_controller_ip}" ]
 }
 
 resource "kubernetes_ingress" "jenkins" {

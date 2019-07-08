@@ -5,7 +5,7 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "1.20.0"
+  version = "1.31.0"
   subscription_id = "${var.subscription_id}"
 }
 
@@ -18,6 +18,14 @@ locals {
       "Component", "DNS"
     )
   )}"
+}
+
+resource "azurerm_role_assignment" "dns_zone_contributor_terraform_sandbox" {
+  count = length(var.dns_contributor_role_assignment_ids)
+
+  scope                = "${azurerm_dns_zone.sapienceanalytics_public.id}"
+  role_definition_name = "DNS Zone Contributor"
+  principal_id         = "${var.dns_contributor_role_assignment_ids[count.index]}"
 }
 
 resource "azurerm_dns_zone" "sapienceanalytics_public" {
