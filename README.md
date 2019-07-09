@@ -29,6 +29,8 @@
 
 	**SECRET** :b:
 
+	az role assignment create --assignee <sp object id> --role Contributor
+
 ### Create Realm and Environment Infrastructure
 ----
 ##### 1. Create "Lab" Realm Infrastructure
