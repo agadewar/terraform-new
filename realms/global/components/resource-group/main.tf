@@ -5,8 +5,12 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "1.20.0"
+  version = "1.31.0"
+  
   subscription_id = "${var.subscription_id}"
+  client_id       = "${var.service_principal_app_id}"
+  client_secret   = "${var.service_principal_password}"
+  tenant_id       = "${var.service_principal_tenant}"
 }
 
 locals {
@@ -23,7 +27,6 @@ resource "azurerm_resource_group" "sapience" {
   location = "${var.resource_group_location}"
 
   tags = "${merge(
-    local.common_tags,
-    map()
+    local.common_tags
   )}"
 }
