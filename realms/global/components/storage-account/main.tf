@@ -5,8 +5,12 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "1.20.0"
+  version = "1.31.0"
+  
   subscription_id = "${var.subscription_id}"
+  client_id       = "${var.service_principal_app_id}"
+  client_secret   = "${var.service_principal_password}"
+  tenant_id       = "${var.service_principal_tenant}"
 }
 
 locals {
@@ -27,10 +31,10 @@ resource "azurerm_storage_account" "storage_account" {
   account_tier              = "Standard"
   account_replication_type  = "LRS"
   account_kind              = "StorageV2"
+  enable_https_traffic_only = "true"
 
   tags = "${merge(
-    local.common_tags,
-    map()
+    local.common_tags
   )}"
 
   lifecycle {

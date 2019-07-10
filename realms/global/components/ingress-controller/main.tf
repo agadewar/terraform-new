@@ -5,8 +5,12 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "1.20.0"
+  version = "1.31.0"
+
   subscription_id = "${var.subscription_id}"
+  client_id       = "${var.service_principal_app_id}"
+  client_secret   = "${var.service_principal_password}"
+  tenant_id       = "${var.service_principal_tenant}"  
 }
 
 provider "helm" {
@@ -110,9 +114,9 @@ resource "helm_release" "nginx_ingress" {
 resource "null_resource" "nginx_ingress_controller_ip" {
   depends_on = [ "helm_release.nginx_ingress" ]
   
-  # triggers = {
-  #   timestamp = "${timestamp()}"
-  # }
+  // triggers = {
+  //   timestamp = "${timestamp()}"
+  // }
 
   provisioner "local-exec" {
     command = "mkdir -p .local && kubectl --kubeconfig ${local.config_path} -n kube-system get services -o json | jq -j '.items[] | select(.metadata.name == \"nginx-ingress-controller\") | .status .loadBalancer .ingress [0] .ip' > .local/nginx-ingress-controller-ip"
@@ -121,7 +125,7 @@ resource "null_resource" "nginx_ingress_controller_ip" {
   provisioner "local-exec" {
     when = "destroy"
 
-    command = "rm .local/nginx-ingress-controller-ip"
+    command = "rm -f .local/nginx-ingress-controller-ip"
   }
 }
 
