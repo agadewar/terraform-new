@@ -139,6 +139,13 @@ resource "kubernetes_deployment" "jenkins" {
           image = "${var.sapience_container_registry_hostname}/jenkins:1.4"
           image_pull_policy = "Always"
 
+          resources {
+            requests {
+              cpu    = "250m"
+              memory = "1000Mi"
+            }
+          }
+
           env {
             name = "JAVA_OPTS"
             value = "-Djenkins.install.runSetupWizard=false"

@@ -63,10 +63,10 @@ halyard:
 
   ## Uncomment the following resources definitions to control the cpu and memory
   # resources allocated for the halyard pod
-  resources: {}
-    # requests:
-    #   memory: "1Gi"
-    #   cpu: "100m"
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "100m"
     # limits:
     #   memory: "2Gi"
     #   cpu: "200m"
