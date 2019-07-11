@@ -49,6 +49,7 @@ locals {
 
   cluster_name                 = var.realm
   agent_pool_profile_1_name    = "pool01"
+  agent_pool_profile_2_name    = "pool02"
   dns_prefix                   = var.realm
   linux_profile_admin_username = "sapience"
 
@@ -64,8 +65,15 @@ resource "azurerm_subnet" "agent_pool_profile_1" {
   name                 = "aks-${local.agent_pool_profile_1_name}"
   resource_group_name  = var.resource_group_name
   virtual_network_name = data.terraform_remote_state.network.outputs.realm_network_name
-  address_prefix       = var.subnet_address_prefix_kubernetes_agent_pool_profile_1
+  address_prefix       = var.subnet_address_prefix_kubernetes_pool01
 }
+
+// resource "azurerm_subnet" "agent_pool_profile_2" {
+//   name                 = "aks-${local.agent_pool_profile_2_name}"
+//   resource_group_name  = var.resource_group_name
+//   virtual_network_name = data.terraform_remote_state.network.outputs.realm_network_name
+//   address_prefix       = var.subnet_address_prefix_kubernetes_pool02
+// }
 
 ### Kubernetes (incl. autoscaler)
 
@@ -90,13 +98,27 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     }
   }
 
+  network_profile {
+    network_plugin = "azure"
+  }
+
   agent_pool_profile {
     name            = local.agent_pool_profile_1_name
-    count           = var.kubernetes_min_count
-    vm_size         = var.kubernetes_agent_pool_profile_1_vm_size
-    os_type         = "Linux"
+    count           = var.kubernetes_pool01_min_count
+    vm_size         = var.kubernetes_pool01_vm_size
+    vnet_subnet_id  = azurerm_subnet.agent_pool_profile_1.id
+    os_type         = var.kubernetes_pool01_os_type
     os_disk_size_gb = 30
   }
+
+  // agent_pool_profile {
+  //   name            = local.agent_pool_profile_2_name
+  //   count           = var.kubernetes_pool02_min_count
+  //   vm_size         = var.kubernetes_pool02_vm_size
+  //   vnet_subnet_id  = azurerm_subnet.agent_pool_profile_2.id
+  //   os_type         = var.kubernetes_pool02_os_type
+  //   os_disk_size_gb = 30
+  // }
 
   service_principal {
     client_id     = var.service_principal_app_id
@@ -109,9 +131,9 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
 resource "null_resource" "kubeconfig" {
   depends_on = [azurerm_kubernetes_cluster.kubernetes]
 
-  # triggers = {
-  #   timestamp = "${timestamp()}"
-  # }
+ triggers = {
+   timestamp = timestamp()
+ }
 
   provisioner "local-exec" {
     command = "rm -f kubeconfig"
@@ -132,7 +154,7 @@ data "template_file" "node_resource_group" {
   }
 }
 
-data "template_file" "autoscaler_config" {
+data "template_file" "autoscaler_config_pool01" {
   template = file("autoscaler/cluster-autoscaler-containerservice.yaml.tpl")
 
   vars = {
@@ -143,29 +165,59 @@ data "template_file" "autoscaler_config" {
     autoscaler_tenant_id           = base64encode(var.service_principal_tenant)
     autoscaler_cluster_name        = base64encode(azurerm_kubernetes_cluster.kubernetes.name)
     autoscaler_node_resource_group = base64encode(data.template_file.node_resource_group.rendered)
-    autoscaler_minimum             = var.kubernetes_min_count
-    autoscaler_maximum             = var.kubernetes_max_count
+    autoscaler_minimum             = var.kubernetes_pool01_min_count
+    autoscaler_maximum             = var.kubernetes_pool01_max_count
     autoscaler_agentpool           = local.agent_pool_profile_1_name
-    autoscaler_version             = "v1.13.0"
+    autoscaler_version             = "v1.15.0"
   }
 }
 
-resource "null_resource" "kubernetes_config_autoscaler" {
+// data "template_file" "autoscaler_config_pool02" {
+//   template = file("autoscaler/cluster-autoscaler-containerservice.yaml.tpl")
+
+//   vars = {
+//     autoscaler_client_id           = base64encode(var.service_principal_app_id)
+//     autoscaler_client_secret       = base64encode(var.service_principal_password)
+//     autoscaler_resource_group      = base64encode(azurerm_kubernetes_cluster.kubernetes.resource_group_name)
+//     autoscaler_subscription_id     = base64encode(var.subscription_id)
+//     autoscaler_tenant_id           = base64encode(var.service_principal_tenant)
+//     autoscaler_cluster_name        = base64encode(azurerm_kubernetes_cluster.kubernetes.name)
+//     autoscaler_node_resource_group = base64encode(data.template_file.node_resource_group.rendered)
+//     autoscaler_minimum             = var.kubernetes_pool02_min_count
+//     autoscaler_maximum             = var.kubernetes_pool02_max_count
+//     autoscaler_agentpool           = local.agent_pool_profile_2_name
+//     autoscaler_version             = "v1.15.0"
+//   }
+// }
+
+resource "null_resource" "kubernetes_autoscaler_config_pool01" {
   depends_on = [null_resource.kubeconfig]
 
   triggers = {
-    autoscaler_config_changed = data.template_file.autoscaler_config.rendered
+    autoscaler_config_changed = data.template_file.autoscaler_config_pool01.rendered
   }
 
   provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=kubeconfig -f - <<EOF\n${data.template_file.autoscaler_config.rendered}\nEOF"
+    command = "kubectl apply --kubeconfig=kubeconfig -f - <<EOF\n${data.template_file.autoscaler_config_pool01.rendered}\nEOF"
   }
 }
+
+// resource "null_resource" "kubernetes_autoscaler_config_pool02" {
+//   depends_on = [null_resource.kubeconfig]
+
+//   triggers = {
+//     autoscaler_config_changed = data.template_file.autoscaler_config_pool02.rendered
+//   }
+
+//   provisioner "local-exec" {
+//     command = "kubectl apply --kubeconfig=kubeconfig -f - <<EOF\n${data.template_file.autoscaler_config_pool02.rendered}\nEOF"
+//   }
+// }
 
 ### Helm
 
 resource "kubernetes_service_account" "tiller" {
-  depends_on = [azurerm_kubernetes_cluster.kubernetes]
+  depends_on = [null_resource.kubeconfig]
   metadata {
     annotations = merge(local.common_tags, {})
 

@@ -5,18 +5,28 @@ variable "realm" {}
 variable "subscription_id" {}
 variable "resource_group_name" {}
 variable "resource_group_location" {}
+
 variable "service_principal_app_id" {}
 variable "service_principal_tenant" {}
 variable "service_principal_password" {}
 
 variable "kubernetes_version" {}
-variable "kubernetes_agent_pool_profile_1_vm_size" {}
-variable "kubernetes_min_count" {}
-variable "kubernetes_max_count" {}
-variable "subnet_address_prefix_kubernetes_agent_pool_profile_1" {}
+
+variable "kubernetes_pool01_vm_size" {}
+variable "kubernetes_pool01_os_type" {}
+variable "kubernetes_pool01_min_count" {}
+variable "kubernetes_pool01_max_count" {}
+
+variable "kubernetes_pool02_vm_size" {}
+variable "kubernetes_pool02_os_type" {}
+variable "kubernetes_pool02_min_count" {}
+variable "kubernetes_pool02_max_count" {}
+
+variable "subnet_address_prefix_kubernetes_pool01" {}
+variable "subnet_address_prefix_kubernetes_pool02" {}
+
 variable "kubernetes_linux_profile_ssh_key_loc" {}
 
 variable "realm_common_tags" {
   type = map(string)
 }
-

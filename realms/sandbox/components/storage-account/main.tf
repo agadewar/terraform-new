@@ -24,12 +24,13 @@ locals {
 }
 
 resource "azurerm_storage_account" "storage_account" {
-  name                     = "sapiencerealm${var.realm}"
-  resource_group_name      = var.resource_group_name
-  location                 = var.resource_group_location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  account_kind             = "StorageV2"
+  name                      = "sapiencerealm${var.realm}"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  account_tier              = "Standard"
+  account_replication_type  = "LRS"
+  account_kind              = "StorageV2"
+  enable_https_traffic_only = "true"
 
   tags = merge(local.common_tags)
 

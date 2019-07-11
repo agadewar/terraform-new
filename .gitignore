@@ -32,6 +32,7 @@ override.tf.json
 
 /config/*
 !/config/*.vault
+!/config/id_rsa.pub
 
 
 **/*_original
@@ -43,3 +44,5 @@ todo.txt
 
 **/.local/
 *~
+
+config/id_rsa
