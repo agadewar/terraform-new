@@ -1,5 +1,7 @@
 variable "realm_common_tags" {
-    type = "map"
+  type = map(string)
 }
 
-variable "monitoring_grafana_admin_password" {}
+variable "monitoring_grafana_admin_password" {
+}
+

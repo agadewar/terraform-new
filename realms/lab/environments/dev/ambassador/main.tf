@@ -5,49 +5,53 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "1.20.0"
-  subscription_id = "${var.subscription_id}"
+  version = "1.31.0"
+
+  subscription_id = var.subscription_id
+  client_id       = var.service_principal_app_id
+  client_secret   = var.service_principal_password
+  tenant_id       = var.service_principal_tenant
 }
 
 provider "kubernetes" {
-    config_path = "${local.config_path}"
+  config_path = local.config_path
 }
 
 locals {
   config_path = "../../../components/kubernetes/kubeconfig"
-  namespace = "${var.environment}"
-  
-  common_tags = "${merge(
+  namespace   = var.environment
+
+  common_tags = merge(
     var.realm_common_tags,
     var.environment_common_tags,
-    map(
-      "Component", "Ambassador"
-    )
-  )}"
+    {
+      "Component" = "Ambassador"
+    },
+  )
 }
 
 data "terraform_remote_state" "ingress_controller" {
   backend = "azurerm"
-  config {
-    access_key           = "${var.backend_access_key}"
-    storage_account_name = "${var.backend_storage_account_name}"
-	  container_name       = "realm-${var.realm}"
+  config = {
+    access_key           = var.backend_access_key
+    storage_account_name = var.backend_storage_account_name
+    container_name       = "realm-${var.realm}"
     key                  = "ingress-controller.tfstate"
   }
 }
 
 resource "kubernetes_ingress" "api" {
   metadata {
-    name = "api"
-    namespace = "${local.namespace}"
+    name      = "api"
+    namespace = local.namespace
 
     annotations = {
-      "certmanager.k8s.io/acme-challenge-type"             = "dns01"  
-      "certmanager.k8s.io/acme-dns01-provider"             = "azure-dns"
-      "certmanager.k8s.io/cluster-issuer"                  = "letsencrypt-prod"
-      "ingress.kubernetes.io/ssl-redirect"                 = "true"
-      "kubernetes.io/ingress.class"                        = "nginx"
-      "kubernetes.io/tls-acme"                             = "true"
+      "certmanager.k8s.io/acme-challenge-type" = "dns01"
+      "certmanager.k8s.io/acme-dns01-provider" = "azure-dns"
+      "certmanager.k8s.io/cluster-issuer"      = "letsencrypt-prod"
+      "ingress.kubernetes.io/ssl-redirect"     = "true"
+      "kubernetes.io/ingress.class"            = "nginx"
+      "kubernetes.io/tls-acme"                 = "true"
     }
   }
 
@@ -81,9 +85,9 @@ resource "kubernetes_ingress" "api" {
     }
 
     tls {
-      hosts = [ 
+      hosts = [
         "api.${var.environment}.${var.realm}.sapienceanalytics.com",
-        "api.${var.environment}.sapienceanalytics.com"
+        "api.${var.environment}.sapienceanalytics.com",
       ]
       secret_name = "ambassador-certs"
     }
@@ -91,16 +95,16 @@ resource "kubernetes_ingress" "api" {
 }
 
 data "template_file" "ambassador-rbac" {
-  template = "${file("templates/ambassador-rbac.yaml.tpl")}"
+  template = file("templates/ambassador-rbac.yaml.tpl")
 
-  vars {
-     replicas = "${var.ambassador_rbac_replicas}"
+  vars = {
+    replicas = var.ambassador_rbac_replicas
   }
 }
 
 resource "null_resource" "ambassador_rbac" {
   triggers = {
-    template_changed = "${data.template_file.ambassador-rbac.rendered}"
+    template_changed = data.template_file.ambassador-rbac.rendered
   }
 
   provisioner "local-exec" {
@@ -108,34 +112,33 @@ resource "null_resource" "ambassador_rbac" {
   }
 
   provisioner "local-exec" {
-    when = "destroy"
+    when = destroy
 
     command = "kubectl delete --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.ambassador-rbac.rendered}\nEOF"
-  }  
+  }
 }
 
 resource "kubernetes_service" "ambassador" {
   metadata {
-    name = "ambassador"
-    namespace = "${local.namespace}"
-
-#     annotations {
-#       "getambassador.io/config" = <<EOF
-# ---
-# apiVersion: ambassador/v1
-# kind: Module
-# name: tls
-# config:
-#   server:
-#     enabled: True
-#     redirect_cleartext_from: 80
-#     secret: ambassador-certs
-# EOF
-#     }
+    name      = "ambassador"
+    namespace = local.namespace
+    #     annotations {
+    #       "getambassador.io/config" = <<EOF
+    # ---
+    # apiVersion: ambassador/v1
+    # kind: Module
+    # name: tls
+    # config:
+    #   server:
+    #     enabled: True
+    #     redirect_cleartext_from: 80
+    #     secret: ambassador-certs
+    # EOF
+    #     }
   }
 
   spec {
-    selector {
+    selector = {
       service = "ambassador"
     }
 
@@ -153,7 +156,7 @@ resource "kubernetes_service" "ambassador" {
     # See: https://github.com/terraform-providers/terraform-provider-kubernetes/pull/59
     # Note: Due to issue above, use "null_resource.patch_ambassador_service" to patch the "externalTrafficPolicy" property
     # external_traffic_policy = "Local"
-    
+
     type = "ClusterIP"
   }
 }
@@ -169,9 +172,9 @@ resource "kubernetes_service" "ambassador" {
 
 resource "kubernetes_service" "api" {
   metadata {
-    name = "api"
-    namespace = "${local.namespace}"
-    annotations {
+    name      = "api"
+    namespace = local.namespace
+    annotations = {
       "getambassador.io/config" = <<EOF
 ---
 apiVersion: ambassador/v1
@@ -204,6 +207,7 @@ name:  eventpipeline_service_mapping
 prefix: /eventpipeline/
 service: eventpipeline-service
 EOF
+
     }
   }
 
@@ -216,11 +220,19 @@ EOF
 }
 
 resource "azurerm_dns_a_record" "api" {
-  name                = "api.${var.environment}.${var.realm}"
-  zone_name           = "sapienceanalytics.com"
+  name = "api.${var.environment}.${var.realm}"
+  zone_name = "sapienceanalytics.com"
   resource_group_name = "global"
-  ttl                 = 30
-  records             = [ "${data.terraform_remote_state.ingress_controller.nginx_ingress_controller_ip}" ]
+  ttl = 30
+  # TF-UPGRADE-TODO: In Terraform v0.10 and earlier, it was sometimes necessary to
+  # force an interpolation expression to be interpreted as a list by wrapping it
+  # in an extra set of list brackets. That form was supported for compatibilty in
+  # v0.11, but is no longer supported in Terraform v0.12.
+  #
+  # If the expression in the following list itself returns a list, remove the
+  # brackets to avoid interpretation as a list of lists. If the expression
+  # returns a single list item then leave it as-is and remove this TODO comment.
+  records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
 }
 
 # resource "kubernetes_deployment" "statsd_sink" {
@@ -229,28 +241,23 @@ resource "azurerm_dns_a_record" "api" {
 #     name = "statsd-sink"
 #     namespace = "${local.namespace}"
 #   }
-
 #   spec {
 #     replicas = 1
-
 #     selector {
 #       match_labels {
 #         service = "statsd-sink"
 #       }
 #     }
-
 #     template {
 #       metadata {
 #         labels {
 #           service = "statsd-sink"
 #         }
 #       }
-
 #       spec {
 #         container {
 #           name = "statsd-sink"
 #           image = "prom/statsd-exporter:v0.8.1"
-
 #           resources{
 #             requests{
 #               cpu    = "100m"
@@ -258,22 +265,18 @@ resource "azurerm_dns_a_record" "api" {
 #             }
 #           }
 #         }
-
 #         restart_policy = "Always"
 #       }
 #     }
 #   }
 # }
-
 # resource "kubernetes_service" "statsd-sink" {
 #   metadata {
 #     name = "statsd-sink"
 #     namespace = "${local.namespace}"
-
 #     labels {
 #       "service" = "statsd-sink"
 #     }
-
 #     annotations {
 #       # "prometheus.io/probe" = "true"
 #       # "prometheus.io/scrape" = "true"
@@ -281,65 +284,54 @@ resource "azurerm_dns_a_record" "api" {
 #       # "prometheus.io/path" = "/metrics"
 #     }
 #   }
-
 #   spec {
 #     port {
 #       protocol = "UDP"
 #       port = 8125
 #       name = "statsd-sink"
 #     }
-
 #     port {
 #       protocol = "TCP"
 #       port = 9102
 #       name = "prometheus-metrics"
 #     }
-
 #     selector {
 #       "service" = "statsd-sink"
 #     }
 #   }
 # }
-
 # # See: https://www.getambassador.io/user-guide/getting-started/#1-deploying-ambassador
 # resource "null_resource" "statsd_sink" {
 #   triggers = {
 #     manifest_sha1 = "${sha1("${file("files/statsd-sink.yaml")}")}"
 #     timestamp = "${timestamp()}"   # DELETE ME
 #   }
-
 #   provisioner "local-exec" {
 #     command = "kubectl apply --kubeconfig=${local.config_path} -n monitoring -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
 #   }
 # }
-
 # # See: https://www.getambassador.io/user-guide/getting-started/#1-deploying-ambassador
 # resource "null_resource" "service_monitor" {
 #   triggers = {
 #     manifest_sha1 = "${sha1("${file("files/statsd-sink.yaml")}")}"
 #     timestamp = "${timestamp()}"   # DELETE ME
 #   }
-
 #   provisioner "local-exec" {
 #     command = "kubectl apply --kubeconfig=${local.config_path} -n dev -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
 #   }
 # }
-
 # # https://github.com/fbeltrao/aks-letsencrypt/blob/master/setup-wildcard-certificates-with-azure-dns.md
 # data "template_file" "letsencrypt_certificate" {
 #   template = "${file("templates/letsencrypt-certificate.yaml.tpl")}"
-
 #   vars {
 #      realm       = "${var.realm}"
 #      environment = "${var.environment}"
 #   }
 # }
-
 # resource "null_resource" "letsencrypt_certificate" {
 #   triggers {
 #     template_changed = "${data.template_file.letsencrypt_certificate.rendered}"
 #   }
-
 #   provisioner "local-exec" {
 #     command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_certificate.rendered}\nEOF"
 #   }

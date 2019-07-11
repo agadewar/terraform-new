@@ -6,13 +6,19 @@ variable "realm" {}
 variable "environment" {}
 
 variable "subscription_id" {}
-variable "resource_group_name" {}
 
+variable "service_principal_app_id" {}
+variable "service_principal_tenant" {}
+variable "service_principal_password" {}
+
+variable "resource_group_name" {}
 variable "ambassador_rbac_replicas" {}
 
 variable "realm_common_tags" {
-    type = "map"
+  type = map(string)
 }
+
 variable "environment_common_tags" {
-    type = "map"
+  type = map(string)
 }
+

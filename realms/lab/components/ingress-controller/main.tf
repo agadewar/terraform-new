@@ -5,13 +5,17 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "1.20.0"
-  subscription_id = "${var.subscription_id}"
+  version = "1.31.0"
+
+  subscription_id = var.subscription_id
+  client_id       = var.service_principal_app_id
+  client_secret   = var.service_principal_password
+  tenant_id       = var.service_principal_tenant
 }
 
 provider "helm" {
   kubernetes {
-    config_path = "${local.config_path}"
+    config_path = local.config_path
   }
 
   #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
@@ -29,16 +33,16 @@ provider "helm" {
 # }
 
 locals {
-  resource_group_name = "${var.resource_group_name}"
+  resource_group_name = var.resource_group_name
   config_path         = "../kubernetes/kubeconfig"
   namespace           = "kube-system"
 
-  common_tags = "${merge(
+  common_tags = merge(
     var.realm_common_tags,
-    map(
-      "Component", "Ingress Controller"
-    )
-  )}"
+    {
+      "Component" = "Ingress Controller"
+    },
+  )
 }
 
 resource "helm_release" "nginx_ingress" {
@@ -48,7 +52,7 @@ resource "helm_release" "nginx_ingress" {
 
   set {
     name  = "controller.replicaCount"
-    value = "${var.nginx_ingress_replica_count}"
+    value = var.nginx_ingress_replica_count
   }
 
   # See: https://docs.microsoft.com/en-us/azure/aks/ingress-tls
@@ -68,12 +72,12 @@ resource "helm_release" "nginx_ingress" {
   }
 
   set {
-    name = "controller.resources.requests.cpu"
+    name  = "controller.resources.requests.cpu"
     value = "100m"
   }
 
   set {
-    name = "controller.resources.requests.memory"
+    name  = "controller.resources.requests.memory"
     value = "100Mi"
   }
 
@@ -81,25 +85,26 @@ resource "helm_release" "nginx_ingress" {
 }
 
 resource "null_resource" "nginx_ingress_controller_ip" {
-  depends_on = [ "helm_release.nginx_ingress" ]
-  
-  # triggers = {
-  #   timestamp = "${timestamp()}"
-  # }
+  depends_on = [helm_release.nginx_ingress]
+
+  triggers = {
+    timestamp = "${timestamp()}"
+  }
 
   provisioner "local-exec" {
     command = "mkdir -p .local && kubectl --kubeconfig ${local.config_path} -n kube-system get services -o json | jq -j '.items[] | select(.metadata.name == \"nginx-ingress-controller\") | .status .loadBalancer .ingress [0] .ip' > .local/nginx-ingress-controller-ip"
   }
 
   provisioner "local-exec" {
-    when = "destroy"
+    when = destroy
 
     command = "rm -f .local/nginx-ingress-controller-ip"
   }
 }
 
 data "local_file" "nginx_ingress_controller_ip" {
-  depends_on = [ "null_resource.nginx_ingress_controller_ip" ]
+  depends_on = [null_resource.nginx_ingress_controller_ip]
 
   filename = ".local/nginx-ingress-controller-ip"
 }
+
