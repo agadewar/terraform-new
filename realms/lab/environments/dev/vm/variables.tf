@@ -50,10 +50,6 @@ variable "ip_steve_ardis_home" {
   default = ""
 }
 
-variable "ip_benji_dallas" {
-  default = ""
-}
-
 variable "environment_common_tags" {
   type = map(string)
 }
