@@ -23,7 +23,7 @@ locals {
 }
 
 
-# OLD NETWORK
+# OLD NETWORK.  DELETE AFTER SAPIENCE REMOVES THE SISENSE VM.
 resource "azurerm_virtual_network" "default" {
   name                = "${var.resource_group_name}-vnet"
   location            = var.resource_group_location
