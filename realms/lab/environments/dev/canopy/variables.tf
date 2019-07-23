@@ -1,35 +1,23 @@
-variable "backend_access_key" {
-}
+variable "backend_access_key" {}
+variable "backend_storage_account_name" {}
+variable "backend_container_name" {}
 
-variable "backend_storage_account_name" {
-}
+variable "realm" {}
 
-variable "backend_container_name" {
-}
+variable "environment" {}
 
-variable "realm" {
-}
+variable "kafka_bootstrap_servers" {}
+variable "kafka_username" {}
+variable "kafka_password" {}
 
-variable "environment" {
-}
+variable "canopy_container_registry_hostname" {}
 
-variable "canopy_container_registry_hostname" {
-}
+variable "sapience_container_registry_hostname" {}
+variable "sapience_container_registry_username" {}
+variable "sapience_container_registry_password" {}
 
-variable "sapience_container_registry_hostname" {
-}
-
-variable "sapience_container_registry_username" {
-}
-
-variable "sapience_container_registry_password" {
-}
-
-variable "sql_server_administrator_login" {
-}
-
-variable "sql_server_administrator_password" {
-}
+variable "sql_server_administrator_login" {}
+variable "sql_server_administrator_password" {}
 
 variable "google_api_key" {
   default = ""
