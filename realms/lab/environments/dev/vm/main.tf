@@ -33,6 +33,7 @@ locals {
   )
 }
 
+# SECURITY GROUPS
 
 resource "azurerm_network_security_group" "sisense_appquery" {
   name                = "sisense-appquery-${var.environment}"
@@ -88,186 +89,6 @@ resource "azurerm_network_security_group" "sisense_appquery" {
   }
 }
 
-# Sisense App/Query Server 01
-
-resource "azurerm_virtual_machine" "sisense_appquery_01" {
-  depends_on            = [azurerm_network_interface.sisense_appquery_01]
-  name                  = "sisense-appquery-vm-01-${var.environment}"
-  resource_group_name   = var.resource_group_name
-  location              = var.resource_group_location
-  network_interface_ids = [azurerm_network_interface.sisense_appquery_01.id]
-  vm_size               = "Standard_A8_v2"
-
-  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
-  # NOTE: This may not be optimal in all cases.
-  delete_os_disk_on_termination = true
-
-  # This means the Data Disk will be deleted when Terraform destroys the Virtual Machine
-  # NOTE: This may not be optimal in all cases.
-  delete_data_disks_on_termination = true
-
-  storage_image_reference {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2016-Datacenter"
-    version   = "latest"
-  }
-
-  storage_os_disk {
-    name              = "sisense-appquery-01-os-${var.environment}"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-  }
-
-  os_profile {
-    computer_name  = "sisense-appq01"
-    admin_username = var.sisense_appquery_01_admin_username
-    admin_password = var.sisense_appquery_01_admin_password
-  }
-
-  os_profile_windows_config {}
-
-  storage_data_disk {
-    name            = "sisense-appquery-01-data-${var.environment}"
-    managed_disk_id = azurerm_managed_disk.sisense_appquery_01_data.id
-    create_option   = "Attach"
-    disk_size_gb    = "100"
-    lun             = "1"
-  }
-}
-
-resource "azurerm_managed_disk" "sisense_appquery_01_data" {
-  name                 = "sisense-appquery-01-data-${var.environment}"
-  location             = "${var.resource_group_location}"
-  resource_group_name  = "${var.resource_group_name}"
-  storage_account_type = "Standard_LRS"
-  create_option        = "Empty"
-  disk_size_gb         = "100"
-
-  tags = "${merge(
-    local.common_tags
-  )}"
-  
-  lifecycle{
-    prevent_destroy = "true"
-  }
-}
-
-resource "azurerm_public_ip" "sisense_appquery_01" {
-  name                         = "sisense-appquery-01-${var.environment}"
-  location                     = "East US"
-  resource_group_name          = var.resource_group_name
-  public_ip_address_allocation = "Static"
-}
-
-resource "azurerm_network_interface" "sisense_appquery_01" {
-  depends_on                = [azurerm_public_ip.sisense_appquery_01, azurerm_network_security_group.sisense_appquery]
-  name                      = "sisense-appquery-01-${var.environment}"
-  resource_group_name       = var.resource_group_name
-  location                  = var.resource_group_location
-  network_security_group_id = azurerm_network_security_group.sisense_appquery.id
-
-  ip_configuration {
-    name                          = "sisense-appquery-01-${var.environment}"
-    subnet_id                     = data.terraform_remote_state.network.outputs.default_subnet_id
-    public_ip_address_id          = azurerm_public_ip.sisense_appquery_01.id
-    private_ip_address_allocation = "Dynamic"
-  }
-}
-
-
-# Sisense App/Query Server 02
-
-resource "azurerm_virtual_machine" "sisense_appquery_02" {
-  depends_on            = [azurerm_network_interface.sisense_appquery_02]
-  name                  = "sisense-appquery-vm-02-${var.environment}"
-  resource_group_name   = var.resource_group_name
-  location              = var.resource_group_location
-  network_interface_ids = [azurerm_network_interface.sisense_appquery_02.id]
-  vm_size               = "Standard_A8_v2"
-
-  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
-  # NOTE: This may not be optimal in all cases.
-  delete_os_disk_on_termination = true
-
-  # This means the Data Disk will be deleted when Terraform destroys the Virtual Machine
-  # NOTE: This may not be optimal in all cases.
-  delete_data_disks_on_termination = true
-
-  storage_image_reference {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2016-Datacenter"
-    version   = "latest"
-  }
-
-  storage_os_disk {
-    name              = "sisense-appquery-02-os-${var.environment}"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-  }
-
-  os_profile {
-    computer_name  = "sisense-appq02"
-    admin_username = var.sisense_appquery_02_admin_username
-    admin_password = var.sisense_appquery_02_admin_password
-  }
-
-  os_profile_windows_config {}
-
-  storage_data_disk {
-    name            = "sisense-appquery-02-data-${var.environment}"
-    managed_disk_id = azurerm_managed_disk.sisense_appquery_02_data.id
-    create_option   = "Attach"
-    disk_size_gb    = "100"
-    lun             = "1"
-  }
-}
-
-resource "azurerm_managed_disk" "sisense_appquery_02_data" {
-  name                 = "sisense-appquery-02-data-${var.environment}"
-  location             = "${var.resource_group_location}"
-  resource_group_name  = "${var.resource_group_name}"
-  storage_account_type = "Standard_LRS"
-  create_option        = "Empty"
-  disk_size_gb         = "100"
-
-  tags = "${merge(
-    local.common_tags
-  )}"
-  
-  lifecycle{
-    prevent_destroy = "true"
-  }
-}
-
-resource "azurerm_public_ip" "sisense_appquery_02" {
-  name                         = "sisense-appquery-02-${var.environment}"
-  location                     = "East US"
-  resource_group_name          = var.resource_group_name
-  public_ip_address_allocation = "Static"
-}
-
-resource "azurerm_network_interface" "sisense_appquery_02" {
-  depends_on                = [azurerm_public_ip.sisense_appquery_02, azurerm_network_security_group.sisense_appquery]
-  name                      = "sisense-appquery-02-${var.environment}"
-  resource_group_name       = var.resource_group_name
-  location                  = var.resource_group_location
-  network_security_group_id = azurerm_network_security_group.sisense_appquery.id
-
-  ip_configuration {
-    name                          = "sisense-appquery-02-${var.environment}"
-    subnet_id                     = data.terraform_remote_state.network.outputs.default_subnet_id
-    public_ip_address_id          = azurerm_public_ip.sisense_appquery_02.id
-    private_ip_address_allocation = "Dynamic"
-  }
-}
-
-
-# Sisense Build Server
-
 resource "azurerm_network_security_group" "sisense_build" {
   name                = "sisense-build-${var.environment}"
   location            = var.resource_group_location
@@ -322,12 +143,15 @@ resource "azurerm_network_security_group" "sisense_build" {
   }
 }
 
-resource "azurerm_virtual_machine" "sisense_build" {
-  depends_on            = [azurerm_network_interface.sisense_build]
-  name                  = "sisense-build-vm-${var.environment}"
+
+# VIRTUAL MACHINES
+
+resource "azurerm_virtual_machine" "sisense_appquery_001" {
+  depends_on            = [azurerm_network_interface.sisense_appquery_001]
+  name                  = "sisense-appquery-001-${var.environment}"
   resource_group_name   = var.resource_group_name
   location              = var.resource_group_location
-  network_interface_ids = [azurerm_network_interface.sisense_build.id]
+  network_interface_ids = [azurerm_network_interface.sisense_appquery_001.id]
   vm_size               = "Standard_A8_v2"
 
   # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
@@ -346,31 +170,31 @@ resource "azurerm_virtual_machine" "sisense_build" {
   }
 
   storage_os_disk {
-    name              = "sisense-build-os-${var.environment}"
+    name              = "sisense-appquery-os-001-${var.environment}"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
 
   os_profile {
-    computer_name  = "sisense-build"
-    admin_username = var.sisense_build_admin_username
-    admin_password = var.sisense_build_admin_password
+    computer_name  = "sisense-appq001"
+    admin_username = var.sisense_appquery_001_admin_username
+    admin_password = var.sisense_appquery_001_admin_password
   }
 
   os_profile_windows_config {}
 
   storage_data_disk {
-    name            = "sisense-build-data-${var.environment}"
-    managed_disk_id = azurerm_managed_disk.sisense_build_data.id
+    name            = "sisense-appquery-data-001-${var.environment}"
+    managed_disk_id = azurerm_managed_disk.sisense_appquery_data_001.id
     create_option   = "Attach"
     disk_size_gb    = "100"
     lun             = "1"
   }
 }
 
-resource "azurerm_managed_disk" "sisense_build_data" {
-  name                 = "sisense-build-data-${var.environment}"
+resource "azurerm_managed_disk" "sisense_appquery_data_001" {
+  name                 = "sisense-appquery-data-001-${var.environment}"
   location             = "${var.resource_group_location}"
   resource_group_name  = "${var.resource_group_name}"
   storage_account_type = "Standard_LRS"
@@ -386,24 +210,196 @@ resource "azurerm_managed_disk" "sisense_build_data" {
   }
 }
 
-resource "azurerm_public_ip" "sisense_build" {
-  name                         = "sisense-build-${var.environment}"
+resource "azurerm_public_ip" "sisense_appquery_001" {
+  name                         = "sisense-appquery-001-${var.environment}"
   location                     = "East US"
   resource_group_name          = var.resource_group_name
   public_ip_address_allocation = "Static"
 }
 
-resource "azurerm_network_interface" "sisense_build" {
-  depends_on                = [azurerm_public_ip.sisense_build, azurerm_network_security_group.sisense_build]
-  name                      = "sisense-build-${var.environment}"
+resource "azurerm_network_interface" "sisense_appquery_001" {
+  depends_on                = [azurerm_public_ip.sisense_appquery_001, azurerm_network_security_group.sisense_appquery]
+  name                      = "sisense-appquery-001-${var.environment}"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  network_security_group_id = azurerm_network_security_group.sisense_appquery.id
+
+  ip_configuration {
+    name                          = "sisense-appquery-001-${var.environment}"
+    subnet_id                     = data.terraform_remote_state.network.outputs.dev-application_subnet_id
+    public_ip_address_id          = azurerm_public_ip.sisense_appquery_001.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_virtual_machine" "sisense_appquery_002" {
+  depends_on            = [azurerm_network_interface.sisense_appquery_002]
+  name                  = "sisense-appquery-002-${var.environment}"
+  resource_group_name   = var.resource_group_name
+  location              = var.resource_group_location
+  network_interface_ids = [azurerm_network_interface.sisense_appquery_002.id]
+  vm_size               = "Standard_A8_v2"
+
+  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  delete_os_disk_on_termination = true
+
+  # This means the Data Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  delete_data_disks_on_termination = true
+
+  storage_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2016-Datacenter"
+    version   = "latest"
+  }
+
+  storage_os_disk {
+    name              = "sisense-appquery-os-002-${var.environment}"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  os_profile {
+    computer_name  = "sisense-appq002"
+    admin_username = var.sisense_appquery_002_admin_username
+    admin_password = var.sisense_appquery_002_admin_password
+  }
+
+  os_profile_windows_config {}
+
+  storage_data_disk {
+    name            = "sisense-appquery-data-002-${var.environment}"
+    managed_disk_id = azurerm_managed_disk.sisense_appquery_data_002.id
+    create_option   = "Attach"
+    disk_size_gb    = "100"
+    lun             = "1"
+  }
+}
+
+resource "azurerm_managed_disk" "sisense_appquery_data_002" {
+  name                 = "sisense-appquery-data-002-${var.environment}"
+  location             = "${var.resource_group_location}"
+  resource_group_name  = "${var.resource_group_name}"
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = "100"
+
+  tags = "${merge(
+    local.common_tags
+  )}"
+  
+  lifecycle{
+    prevent_destroy = "true"
+  }
+}
+
+resource "azurerm_public_ip" "sisense_appquery_002" {
+  name                         = "sisense-appquery-002-${var.environment}"
+  location                     = "East US"
+  resource_group_name          = var.resource_group_name
+  public_ip_address_allocation = "Static"
+}
+
+resource "azurerm_network_interface" "sisense_appquery_002" {
+  depends_on                = [azurerm_public_ip.sisense_appquery_002, azurerm_network_security_group.sisense_appquery]
+  name                      = "sisense-appquery-002-${var.environment}"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  network_security_group_id = azurerm_network_security_group.sisense_appquery.id
+
+  ip_configuration {
+    name                          = "sisense-appquery-002-${var.environment}"
+    subnet_id                     = data.terraform_remote_state.network.outputs.dev-application_subnet_id
+    public_ip_address_id          = azurerm_public_ip.sisense_appquery_002.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_virtual_machine" "sisense_build_001" {
+  depends_on            = [azurerm_network_interface.sisense_build_001]
+  name                  = "sisense-build-001-${var.environment}"
+  resource_group_name   = var.resource_group_name
+  location              = var.resource_group_location
+  network_interface_ids = [azurerm_network_interface.sisense_build_001.id]
+  vm_size               = "Standard_A8_v2"
+
+  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  delete_os_disk_on_termination = true
+
+  # This means the Data Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  delete_data_disks_on_termination = true
+
+  storage_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2016-Datacenter"
+    version   = "latest"
+  }
+
+  storage_os_disk {
+    name              = "sisense-build-os-001-${var.environment}"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  os_profile {
+    computer_name  = "sisense-bld001"
+    admin_username = var.sisense_build_001_admin_username
+    admin_password = var.sisense_build_001_admin_password
+  }
+
+  os_profile_windows_config {}
+
+  storage_data_disk {
+    name            = "sisense-build-data-001-${var.environment}"
+    managed_disk_id = azurerm_managed_disk.sisense_build_data_001.id
+    create_option   = "Attach"
+    disk_size_gb    = "100"
+    lun             = "1"
+  }
+}
+
+resource "azurerm_managed_disk" "sisense_build_data_001" {
+  name                 = "sisense-build-data-001-${var.environment}"
+  location             = "${var.resource_group_location}"
+  resource_group_name  = "${var.resource_group_name}"
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = "100"
+
+  tags = "${merge(
+    local.common_tags
+  )}"
+  
+  lifecycle{
+    prevent_destroy = "true"
+  }
+}
+
+resource "azurerm_public_ip" "sisense_build_001" {
+  name                         = "sisense-build-001-${var.environment}"
+  location                     = "East US"
+  resource_group_name          = var.resource_group_name
+  public_ip_address_allocation = "Static"
+}
+
+resource "azurerm_network_interface" "sisense_build_001" {
+  depends_on                = [azurerm_public_ip.sisense_build_001, azurerm_network_security_group.sisense_build]
+  name                      = "sisense-build-001-${var.environment}"
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
   network_security_group_id = azurerm_network_security_group.sisense_build.id
 
   ip_configuration {
-    name                          = "sisense-build-${var.environment}"
-    subnet_id                     = data.terraform_remote_state.network.outputs.default_subnet_id
-    public_ip_address_id          = azurerm_public_ip.sisense_build.id
+    name                          = "sisense-build-001-${var.environment}"
+    subnet_id                     = data.terraform_remote_state.network.outputs.dev-application_subnet_id
+    public_ip_address_id          = azurerm_public_ip.sisense_build_001.id
     private_ip_address_allocation = "Dynamic"
   }
 }
