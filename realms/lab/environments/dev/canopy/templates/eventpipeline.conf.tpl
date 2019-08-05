@@ -1,9 +1,9 @@
 eventpipeline.sources = eventpipeline
-eventpipeline.channels = logger eventarchive eventprocessing
-eventpipeline.sinks = logger eventarchive eventprocessing
+eventpipeline.channels = logger eventarchive
+eventpipeline.sinks = logger eventarchive
 
 eventpipeline.sources.eventpipeline.type = com.banyanhills.eventpipeline.flume.source.KafkaSource
-eventpipeline.sources.eventpipeline.channels = logger eventarchive eventprocessing deviceregistration
+eventpipeline.sources.eventpipeline.channels = logger eventarchive deviceregistration
 eventpipeline.sources.eventpipeline.batchSize = 1000
 eventpipeline.sources.eventpipeline.kafka.bootstrap.servers = ${kafka_bootstrap_servers}
 eventpipeline.sources.eventpipeline.kafka.consumer.sasl.jaas.config = org.apache.kafka.common.security.plain.PlainLoginModule required username="$${KAFKA_USERNAME}" password="$${KAFKA_PASSWORD}";
@@ -56,29 +56,3 @@ eventpipeline.sinks.eventarchive.hdfs.rollSize = 0
 eventpipeline.sinks.eventarchive.hdfs.rollCount = 0
 eventpipeline.sinks.eventarchive.serializer = avro_event
 eventpipeline.sinks.eventarchive.serializer.compressionCodec = snappy
-
-eventpipeline.channels.eventprocessing.type = org.apache.flume.channel.kafka.KafkaChannel
-eventpipeline.channels.eventprocessing.kafka.bootstrap.servers = ${kafka_bootstrap_servers}
-eventpipeline.channels.eventprocessing.kafka.consumer.sasl.jaas.config = org.apache.kafka.common.security.plain.PlainLoginModule required username="$${KAFKA_USERNAME}" password="$${KAFKA_PASSWORD}";
-eventpipeline.channels.eventprocessing.kafka.consumer.sasl.mechanism = PLAIN
-eventpipeline.channels.eventprocessing.kafka.consumer.ssl.endpoint.identification.algorithm = https
-eventpipeline.channels.eventprocessing.kafka.consumer.security.protocol = SASL_SSL
-eventpipeline.channels.eventprocessing.kafka.producer.sasl.jaas.config = org.apache.kafka.common.security.plain.PlainLoginModule required username="$${KAFKA_USERNAME}" password="$${KAFKA_PASSWORD}";
-eventpipeline.channels.eventprocessing.kafka.producer.sasl.mechanism = PLAIN
-eventpipeline.channels.eventprocessing.kafka.producer.ssl.endpoint.identification.algorithm = https
-eventpipeline.channels.eventprocessing.kafka.producer.security.protocol = SASL_SSL
-eventpipeline.channels.eventprocessing.kafka.topic = eventprocessing-channel
-
-eventpipeline.sinks.eventprocessing.type = org.apache.flume.sink.kafka.KafkaSink
-eventpipeline.sinks.eventprocessing.channel = eventprocessing
-eventpipeline.sinks.eventprocessing.kafka.bootstrap.servers = ${kafka_bootstrap_servers}
-eventpipeline.sinks.eventprocessing.kafka.consumer.sasl.jaas.config = org.apache.kafka.common.security.plain.PlainLoginModule required username="$${KAFKA_USERNAME}" password="$${KAFKA_PASSWORD}";
-eventpipeline.sinks.eventprocessing.kafka.consumer.sasl.mechanism = PLAIN
-eventpipeline.sinks.eventprocessing.kafka.consumer.ssl.endpoint.identification.algorithm = https
-eventpipeline.sinks.eventprocessing.kafka.consumer.security.protocol = SASL_SSL
-eventpipeline.sinks.eventprocessing.kafka.producer.sasl.jaas.config = org.apache.kafka.common.security.plain.PlainLoginModule required username="$${KAFKA_USERNAME}" password="$${KAFKA_PASSWORD}";
-eventpipeline.sinks.eventprocessing.kafka.producer.sasl.mechanism = PLAIN
-eventpipeline.sinks.eventprocessing.kafka.producer.ssl.endpoint.identification.algorithm = https
-eventpipeline.sinks.eventprocessing.kafka.producer.security.protocol = SASL_SSL
-eventpipeline.sinks.eventprocessing.allowTopicOverride = false
-eventpipeline.sinks.eventprocessing.kafka.topic = eventprocessing
