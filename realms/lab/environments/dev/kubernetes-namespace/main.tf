@@ -5,12 +5,16 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "1.20.0"
-  subscription_id = "${var.subscription_id}"
+  version = "1.31.0"
+  
+  subscription_id = var.subscription_id
+  client_id       = var.service_principal_app_id
+  client_secret   = var.service_principal_password
+  tenant_id       = var.service_principal_tenant
 }
 
 provider "kubernetes" {
-  version = "1.5.0"
+  version = "1.7.0"
   config_path = "${local.config_path}"
 }
 
@@ -26,7 +30,7 @@ provider "helm" {
 data "terraform_remote_state" "kubernetes" {
   backend = "azurerm"
 
-  config {
+  config = {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
 	  container_name       = "realm-${var.realm}"
@@ -86,24 +90,24 @@ resource "kubernetes_resource_quota" "resource_quota" {
   }
 
   spec {
-    hard {
-      requests.memory = "7Gi"
-      requests.cpu = "2"
+    hard = {
+      "requests.memory" = "10Gi"
+      "requests.cpu" = "4"
     }
   }
 }
 
 resource "azurerm_public_ip" "aks_egress" {
   name                = "aks-egress-${local.namespace}"
-  location            = "${var.resource_group_location}"
-  location            = "${data.terraform_remote_state.kubernetes.kubernetes_location}"
-  resource_group_name = "${data.terraform_remote_state.kubernetes.kubernetes_node_resource_group_name}"
+  # location            = "${var.resource_group_location}"
+  location            = "${data.terraform_remote_state.kubernetes.outputs.kubernetes_location}"
+  resource_group_name = "${data.terraform_remote_state.kubernetes.outputs.kubernetes_node_resource_group_name}"
   
   public_ip_address_allocation = "Static"
 
   tags = "${merge(
     local.common_tags,
-    map()
+    {}
   )}"
 }
 
@@ -111,7 +115,7 @@ resource "kubernetes_service" "aks_egress" {
   // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
   //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
   metadata {
-    labels {
+    labels = {
       "sapienceanalytics.com/name" = "azure-egress"
     }
 
