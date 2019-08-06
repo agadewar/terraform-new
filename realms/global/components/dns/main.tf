@@ -52,17 +52,6 @@ resource "azurerm_dns_a_record" "sapienceanalytics_public" {
   records             = ["52.168.125.188"]
 }
 
-resource "azurerm_dns_txt_record" "sapience" {
-  name                = "@"
-  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
-  resource_group_name = "${var.resource_group_name}" 
-  ttl                 = 300
-
-  record {
-    value = "sapienceanalytics.azurewebsites.net"
-  }
-}
-
 resource "azurerm_dns_mx_record" "sapienceanalytics_public" {
   name                = "@"
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
@@ -78,14 +67,21 @@ resource "azurerm_dns_mx_record" "sapienceanalytics_public" {
   }
 }
 
-resource "azurerm_dns_txt_record" "sapienceanalytics_spf" {
+resource "azurerm_dns_txt_record" "sapienceanalytics_txt" {
   name                = "@"
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
   resource_group_name = "${var.resource_group_name}" 
   ttl                 = 3600
 
   record {
+    value = "ZOOM_verify_dfZ_gWR7RH6qeRrXntvOpA"
+             
+  }
+  record {
     value = "v=spf1 include:spf.protection.outlook.com -all"
+  }
+  record {
+    value = "sapienceanalytics.azurewebsites.net"
   }
 }
 
