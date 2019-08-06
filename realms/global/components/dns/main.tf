@@ -121,6 +121,22 @@ resource "azurerm_dns_srv_record" "_sipfederationtls" {
   }
 }
 
+resource "azurerm_dns_cname_record" "selector1" {
+  name                = "selector1._domainkey"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 3600
+  record              = "selector1-sapienceanalytics-com._domainkey.sapienceana.onmicrosoft.com"
+}
+
+resource "azurerm_dns_cname_record" "selector2" {
+  name                = "selector2._domainkey"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 3600
+  record              = "selector2-sapienceanalytics-com._domainkey.sapienceana.onmicrosoft.com"
+}
+
 resource "azurerm_dns_cname_record" "autodiscover" {
   name                = "autodiscover"
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
