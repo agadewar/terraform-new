@@ -5,7 +5,7 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "1.20.0"
+  version = "1.31.0"
   subscription_id = "${var.subscription_id}"
 }
 
@@ -18,11 +18,6 @@ locals {
     )
   )}"
 }
-
-
-
-
-
 
 # resource "azurerm_data_lake_store" "sapience" {
 #   name                = "sapience${var.environment}"
@@ -78,6 +73,42 @@ resource "null_resource" "azure_data_lake_storage_gen2" {
 
     command = "az storage account delete --name sapiencedatalake${var.environment} --subscription ${var.subscription_id} --resource-group ${var.resource_group_name} --yes"
   }
+}
+
+resource "null_resource" "azure_data_lake_storage_gen2_key_1" {
+  depends_on = [ null_resource.azure_data_lake_storage_gen2 ]
+
+  triggers = {
+    timestamp = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = "mkdir -p .local && az storage account keys list --account-name sapiencedatalake${var.environment} --subscription ${var.subscription_id} --resource-group ${var.resource_group_name} | jq -r .[0].value > .local/azure_data_lake_storage_gen2.key1"
+  }
+}
+
+data "local_file" "azure_data_lake_storage_gen2_key_1" {
+  depends_on = [ "null_resource.azure_data_lake_storage_gen2_key_1" ]
+
+  filename = ".local/azure_data_lake_storage_gen2.key1"
+}
+
+resource "null_resource" "azure_data_lake_storage_gen2_key_2" {
+  depends_on = [ null_resource.azure_data_lake_storage_gen2 ]
+
+  triggers = {
+    timestamp = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = "mkdir -p .local && az storage account keys list --account-name sapiencedatalake${var.environment} --subscription ${var.subscription_id} --resource-group ${var.resource_group_name} | jq -r .[1].value > .local/azure_data_lake_storage_gen2.key2"
+  }
+}
+
+data "local_file" "azure_data_lake_storage_gen2_key_2" {
+  depends_on = [ "null_resource.azure_data_lake_storage_gen2_key_2" ]
+
+  filename = ".local/azure_data_lake_storage_gen2.key2"
 }
 
 # resource "azurerm_storage_container" "raw-data" {

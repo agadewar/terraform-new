@@ -12,6 +12,9 @@ provider "azurerm" {
   tenant_id       = var.service_principal_tenant
 }
 
+provider "kubernetes" {
+  config_path = local.config_path
+}
 
 provider "helm" {
   kubernetes {
@@ -43,6 +46,20 @@ locals {
       "Component" = "Ingress Controller"
     },
   )
+}
+
+resource "kubernetes_config_map" "tcp_services" {
+  metadata {
+    name = "tcp-services"
+    namespace = "kube-system"
+  }
+
+  data = {
+    9092  = "sandbox/kafka:9092"
+    31090 = "sandbox/kafka-0-external:31090"
+    31091 = "sandbox/kafka-1-external:31091"
+    31092 = "sandbox/kafka-2-external:31092"
+  }
 }
 
 resource "helm_release" "nginx_ingress" {
@@ -79,6 +96,23 @@ resource "helm_release" "nginx_ingress" {
   set {
     name  = "controller.resources.requests.memory"
     value = "100Mi"
+  }
+
+  set {
+    name  = "controller.extraArgs.tcp-services-configmap"
+    value = "kube-system/tcp-services"
+  }
+
+  set {
+    name  = "tcp"
+    value = "{ 9092 = 9092 }"
+#     value = <<EOT
+# |-
+#   9092: 9092
+#   31090: 31090
+#   31091: 31091
+#   31092: 31092
+# EOT
   }
 
   timeout = 600

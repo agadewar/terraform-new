@@ -12,18 +12,9 @@ provider "azurerm" {
   tenant_id       = var.service_principal_tenant
 }
 
-
-provider "helm" {
-  kubernetes {
-    config_path = local.config_path
-  }
-
-  service_account = kubernetes_service_account.tiller.metadata[0].name
-}
-
-provider "kubernetes" {
-  config_path = local.config_path
-}
+# provider "kubernetes" {
+#   config_path = local.config_path
+# }
 
 provider "null" {
   version = "2.1.2"
@@ -214,204 +205,204 @@ resource "null_resource" "kubernetes_autoscaler_config_pool01" {
 //   }
 // }
 
-### Helm
+# ### Helm
 
-resource "kubernetes_service_account" "tiller" {
-  depends_on = [null_resource.kubeconfig]
-  metadata {
-    annotations = merge(local.common_tags, {})
+# resource "kubernetes_service_account" "tiller" {
+#   depends_on = [null_resource.kubeconfig]
+#   metadata {
+#     annotations = merge(local.common_tags, {})
 
-    name      = "tiller"
-    namespace = "kube-system"
-  }
-}
+#     name      = "tiller"
+#     namespace = "kube-system"
+#   }
+# }
 
-resource "kubernetes_cluster_role_binding" "tiller_cluster_rule" {
-  depends_on = [kubernetes_service_account.tiller]
+# resource "kubernetes_cluster_role_binding" "tiller_cluster_rule" {
+#   depends_on = [kubernetes_service_account.tiller]
 
-  metadata {
-    annotations = merge(local.common_tags, {})
+#   metadata {
+#     annotations = merge(local.common_tags, {})
 
-    name = "tiller-cluster-rule"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "cluster-admin"
-  }
-  subject {
-    kind      = "ServiceAccount"
-    name      = "tiller"
-    namespace = "kube-system"
-    api_group = ""
-  }
-}
+#     name = "tiller-cluster-rule"
+#   }
+#   role_ref {
+#     api_group = "rbac.authorization.k8s.io"
+#     kind      = "ClusterRole"
+#     name      = "cluster-admin"
+#   }
+#   subject {
+#     kind      = "ServiceAccount"
+#     name      = "tiller"
+#     namespace = "kube-system"
+#     api_group = ""
+#   }
+# }
 
-resource "null_resource" "helm_init" {
-  depends_on = [
-    kubernetes_cluster_role_binding.tiller_cluster_rule,
-    null_resource.kubeconfig,
-  ]
+# resource "null_resource" "helm_init" {
+#   depends_on = [
+#     kubernetes_cluster_role_binding.tiller_cluster_rule,
+#     null_resource.kubeconfig,
+#   ]
 
-  provisioner "local-exec" {
-    command = "helm --kubeconfig ${local.config_path} init --service-account tiller --automount-service-account-token --upgrade"
-  }
-}
+#   provisioner "local-exec" {
+#     command = "helm --kubeconfig ${local.config_path} init --service-account tiller --automount-service-account-token --upgrade"
+#   }
+# }
 
-### TLS (cert-manager + Let's Encrypt)
+# ### TLS (cert-manager + Let's Encrypt)
 
-resource "null_resource" "create_cert_manager_crd" {
-  depends_on = [null_resource.kubeconfig]
+# resource "null_resource" "create_cert_manager_crd" {
+#   depends_on = [null_resource.kubeconfig]
 
-  triggers = {
-    manifest_sha1 = sha1(file("files/cert-manager-crds.yaml"))
-  }
+#   triggers = {
+#     manifest_sha1 = sha1(file("files/cert-manager-crds.yaml"))
+#   }
 
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -f -<<EOF\n${file("files/cert-manager-crds.yaml")}\nEOF"
-  }
+#   provisioner "local-exec" {
+#     command = "kubectl apply --kubeconfig=${local.config_path} -f -<<EOF\n${file("files/cert-manager-crds.yaml")}\nEOF"
+#   }
 
-  provisioner "local-exec" {
-    when = destroy
+#   provisioner "local-exec" {
+#     when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition challenges.certmanager.k8s.io --ignore-not-found"
-  }
+#     command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition challenges.certmanager.k8s.io --ignore-not-found"
+#   }
 
-  provisioner "local-exec" {
-    when = destroy
+#   provisioner "local-exec" {
+#     when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition issuers.certmanager.k8s.io --ignore-not-found"
-  }
+#     command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition issuers.certmanager.k8s.io --ignore-not-found"
+#   }
 
-  provisioner "local-exec" {
-    when = destroy
+#   provisioner "local-exec" {
+#     when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition orders.certmanager.k8s.io --ignore-not-found"
-  }
+#     command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition orders.certmanager.k8s.io --ignore-not-found"
+#   }
 
-  provisioner "local-exec" {
-    when = destroy
+#   provisioner "local-exec" {
+#     when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition certificates.certmanager.k8s.io --ignore-not-found"
-  }
+#     command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition certificates.certmanager.k8s.io --ignore-not-found"
+#   }
 
-  provisioner "local-exec" {
-    when = destroy
+#   provisioner "local-exec" {
+#     when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition clusterissuers.certmanager.k8s.io --ignore-not-found"
-  }
-}
+#     command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition clusterissuers.certmanager.k8s.io --ignore-not-found"
+#   }
+# }
 
-resource "kubernetes_secret" "service_principal_password" {
-  depends_on = [null_resource.kubeconfig]
+# resource "kubernetes_secret" "service_principal_password" {
+#   depends_on = [null_resource.kubeconfig]
 
-  metadata {
-    name      = "service-principal-password"
-    namespace = "cert-manager"
-  }
+#   metadata {
+#     name      = "service-principal-password"
+#     namespace = "cert-manager"
+#   }
 
-  data = {
-    password = var.service_principal_password
-  }
-}
+#   data = {
+#     password = var.service_principal_password
+#   }
+# }
 
-resource "kubernetes_namespace" "cert_manager" {
-  depends_on = [null_resource.kubeconfig]
+# resource "kubernetes_namespace" "cert_manager" {
+#   depends_on = [null_resource.kubeconfig]
 
-  metadata {
-    name = "cert-manager"
-  }
-}
+#   metadata {
+#     name = "cert-manager"
+#   }
+# }
 
-data "helm_repository" "jetstack" {
-  name = "jetstack"
-  url  = "https://charts.jetstack.io"
-}
+# data "helm_repository" "jetstack" {
+#   name = "jetstack"
+#   url  = "https://charts.jetstack.io"
+# }
 
-resource "helm_release" "cert_manager" {
-  depends_on = [null_resource.helm_init]
+# resource "helm_release" "cert_manager" {
+#   depends_on = [null_resource.helm_init]
 
-  name       = "cert-manager"
-  namespace  = kubernetes_namespace.cert_manager.metadata[0].name
-  chart      = "cert-manager"
-  version    = "v0.6.0"
-  repository = data.helm_repository.jetstack.metadata[0].name
+#   name       = "cert-manager"
+#   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
+#   chart      = "cert-manager"
+#   version    = "v0.6.0"
+#   repository = data.helm_repository.jetstack.metadata[0].name
 
-  set {
-    name  = "webhook.enabled"
-    value = "false"
-  }
+#   set {
+#     name  = "webhook.enabled"
+#     value = "false"
+#   }
 
-  set {
-    name  = "resources.requests.cpu"
-    value = "10m"
-  }
+#   set {
+#     name  = "resources.requests.cpu"
+#     value = "10m"
+#   }
 
-  set {
-    name  = "resources.requests.memory"
-    value = "32Mi"
-  }
-}
+#   set {
+#     name  = "resources.requests.memory"
+#     value = "32Mi"
+#   }
+# }
 
-data "template_file" "letsencrypt_cluster_issuer_staging" {
-  template = file("templates/letsencrypt-cluster-issuer.yaml.tpl")
+# data "template_file" "letsencrypt_cluster_issuer_staging" {
+#   template = file("templates/letsencrypt-cluster-issuer.yaml.tpl")
 
-  vars = {
-    suffix                                = "-staging"
-    letsencrypt_server                    = "https://acme-staging-v02.api.letsencrypt.org/directory"
-    email                                 = "devops@sapience.net"
-    service_principal_client_id           = var.service_principal_app_id
-    service_principal_password_secret_ref = kubernetes_secret.service_principal_password.metadata[0].name
-    dns_zone_name                         = "sapienceanalytics.com"
-    resource_group_name                   = "Global"
-    subscription_id                       = var.subscription_id
-    service_pricincipal_tenant_id         = var.service_principal_tenant
-  }
-}
+#   vars = {
+#     suffix                                = "-staging"
+#     letsencrypt_server                    = "https://acme-staging-v02.api.letsencrypt.org/directory"
+#     email                                 = "devops@sapience.net"
+#     service_principal_client_id           = var.service_principal_app_id
+#     service_principal_password_secret_ref = kubernetes_secret.service_principal_password.metadata[0].name
+#     dns_zone_name                         = "sapienceanalytics.com"
+#     resource_group_name                   = "Global"
+#     subscription_id                       = var.subscription_id
+#     service_pricincipal_tenant_id         = var.service_principal_tenant
+#   }
+# }
 
-resource "null_resource" "letsencrypt_cluster_issuer_staging" {
-  depends_on = [
-    null_resource.kubeconfig,
-    kubernetes_secret.service_principal_password,
-  ]
+# resource "null_resource" "letsencrypt_cluster_issuer_staging" {
+#   depends_on = [
+#     null_resource.kubeconfig,
+#     kubernetes_secret.service_principal_password,
+#   ]
 
-  triggers = {
-    template_changed = data.template_file.letsencrypt_cluster_issuer_staging.rendered
-  }
+#   triggers = {
+#     template_changed = data.template_file.letsencrypt_cluster_issuer_staging.rendered
+#   }
 
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.letsencrypt_cluster_issuer_staging.rendered}\nEOF"
-  }
-}
+#   provisioner "local-exec" {
+#     command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.letsencrypt_cluster_issuer_staging.rendered}\nEOF"
+#   }
+# }
 
-data "template_file" "letsencrypt_cluster_issuer_prod" {
-  template = file("templates/letsencrypt-cluster-issuer.yaml.tpl")
+# data "template_file" "letsencrypt_cluster_issuer_prod" {
+#   template = file("templates/letsencrypt-cluster-issuer.yaml.tpl")
 
-  vars = {
-    suffix                                = "-prod"
-    letsencrypt_server                    = "https://acme-v02.api.letsencrypt.org/directory"
-    email                                 = "devops@sapience.net"
-    service_principal_client_id           = var.service_principal_app_id
-    service_principal_password_secret_ref = kubernetes_secret.service_principal_password.metadata[0].name
-    dns_zone_name                         = "sapienceanalytics.com"
-    resource_group_name                   = "Global"
-    subscription_id                       = var.subscription_id
-    service_pricincipal_tenant_id         = var.service_principal_tenant
-  }
-}
+#   vars = {
+#     suffix                                = "-prod"
+#     letsencrypt_server                    = "https://acme-v02.api.letsencrypt.org/directory"
+#     email                                 = "devops@sapience.net"
+#     service_principal_client_id           = var.service_principal_app_id
+#     service_principal_password_secret_ref = kubernetes_secret.service_principal_password.metadata[0].name
+#     dns_zone_name                         = "sapienceanalytics.com"
+#     resource_group_name                   = "Global"
+#     subscription_id                       = var.subscription_id
+#     service_pricincipal_tenant_id         = var.service_principal_tenant
+#   }
+# }
 
-resource "null_resource" "letsencrypt_cluster_issuer_prod" {
-  depends_on = [
-    null_resource.kubeconfig,
-    kubernetes_secret.service_principal_password,
-  ]
+# resource "null_resource" "letsencrypt_cluster_issuer_prod" {
+#   depends_on = [
+#     null_resource.kubeconfig,
+#     kubernetes_secret.service_principal_password,
+#   ]
 
-  triggers = {
-    template_changed = data.template_file.letsencrypt_cluster_issuer_prod.rendered
-  }
+#   triggers = {
+#     template_changed = data.template_file.letsencrypt_cluster_issuer_prod.rendered
+#   }
 
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.letsencrypt_cluster_issuer_prod.rendered}\nEOF"
-  }
-}
+#   provisioner "local-exec" {
+#     command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.letsencrypt_cluster_issuer_prod.rendered}\nEOF"
+#   }
+# }
 

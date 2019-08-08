@@ -29,6 +29,14 @@ amqp.url=amqps://sapience-$${environment}.servicebus.windows.net?amqp.idleTimeou
 amqp.username=RootManageSharedAccessKey
 amqp.password=$${CANOPY_AMQP_PASSWORD}
 
+kafka.ssl.endpoint.identification.algorithm=https
+kafka.sasl.mechanism=PLAIN
+kafka.request.timeout.ms=20000
+kafka.bootstrap.servers=${kafka_bootstrap_servers}
+kafka.retry.backoff.ms=500
+kafka.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="$${KAFKA_USERNAME}" password="$${KAFKA_PASSWORD}";
+kafka.security.protocol=SASL_SSL
+
 canopy.security.service.auhtenticationTokenName=canopySecurityToken
 canopy.security.service.auhtenticationUser=canopySecurityUser
 
