@@ -65,7 +65,7 @@ halyard:
   # resources allocated for the halyard pod
   resources:
     requests:
-      memory: "1Gi"
+      memory: "4Gi"
       cpu: "100m"
     # limits:
     #   memory: "2Gi"

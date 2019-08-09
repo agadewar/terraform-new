@@ -142,7 +142,7 @@ resource "kubernetes_deployment" "jenkins" {
           resources {
             requests {
               cpu    = "250m"
-              memory = "1000Mi"
+              memory = "2000Mi"
             }
           }
 
