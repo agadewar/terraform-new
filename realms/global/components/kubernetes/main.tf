@@ -211,25 +211,25 @@ resource "null_resource" "create_cert_manager_crd" {
   provisioner "local-exec" {
     when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} customresourcedefinition issuers.certmanager.k8s.io --ignore-not-found"
+    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition issuers.certmanager.k8s.io --ignore-not-found"
   }
 
   provisioner "local-exec" {
     when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} customresourcedefinition orders.certmanager.k8s.io --ignore-not-found"
+    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition orders.certmanager.k8s.io --ignore-not-found"
   }
 
   provisioner "local-exec" {
     when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} customresourcedefinition certificates.certmanager.k8s.io --ignore-not-found"
+    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition certificates.certmanager.k8s.io --ignore-not-found"
   }
 
   provisioner "local-exec" {
     when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} customresourcedefinition clusterissuers.certmanager.k8s.io --ignore-not-found"
+    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition clusterissuers.certmanager.k8s.io --ignore-not-found"
   }
 }
 
