@@ -2,6 +2,8 @@ eventpipeline.sources = eventpipeline
 eventpipeline.channels = logger eventarchive
 eventpipeline.sinks = logger eventarchive
 
+eventpipeline.channel.type=memory
+
 eventpipeline.sources.eventpipeline.type = com.banyanhills.eventpipeline.flume.source.KafkaSource
 eventpipeline.sources.eventpipeline.channels = logger eventarchive deviceregistration
 eventpipeline.sources.eventpipeline.batchSize = 1000
