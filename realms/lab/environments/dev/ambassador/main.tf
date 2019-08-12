@@ -206,6 +206,12 @@ kind:  Mapping
 name:  eventpipeline_service_mapping
 prefix: /eventpipeline/
 service: eventpipeline-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_app_api_mapping
+prefix: /
+service: sapience-app-api
 EOF
 
     }
