@@ -45,4 +45,3 @@ resource "azurerm_dns_a_record" "portal" {
   # returns a single list item then leave it as-is and remove this TODO comment.
   records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
 }
-

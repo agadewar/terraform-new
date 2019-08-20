@@ -95,9 +95,14 @@ resource "kubernetes_namespace" "spinnaker" {
 }
 
 resource "null_resource" "kubeconfig" {
+  triggers = {
+    spinnaker_additional_kubeconfig_contexts_changed = "${join(":", formatlist("../../../%s/components/kubernetes/.local/kubeconfig", concat(var.spinnaker_additional_kubeconfig_contexts, list("global"))))}"
+    timestamp = timestamp()
+  }
+  
   provisioner "local-exec" {
     # combine kubeconfigs
-    command = "mkdir -p .local && KUBECONFIG=${join(":", formatlist("../../../%s/components/kubernetes/kubeconfig", concat(var.spinnaker_additional_kubeconfig_contexts, list("global"))))} kubectl config view --merge --flatten > .local/kubeconfig"
+    command = "mkdir -p .local && KUBECONFIG=${join(":", formatlist("../../../%s/components/kubernetes/.local/kubeconfig", concat(var.spinnaker_additional_kubeconfig_contexts, list("global"))))} kubectl config view --merge --flatten > .local/kubeconfig"
   }
 
   provisioner "local-exec" {
@@ -302,7 +307,7 @@ resource "kubernetes_secret" "kubeconfig" {
 # }
 
 resource "helm_release" "spinnaker" {
-  depends_on = [ "kubernetes_namespace.spinnaker"] #, "helm_release.nginx_ingress" ]
+  depends_on = [ "kubernetes_namespace.spinnaker", "kubernetes_secret.kubeconfig" ]
 
   name       = "spinnaker"
   namespace  = "${local.namespace}"

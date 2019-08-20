@@ -122,19 +122,6 @@ resource "kubernetes_service" "ambassador" {
   metadata {
     name      = "ambassador"
     namespace = local.namespace
-    #     annotations {
-    #       "getambassador.io/config" = <<EOF
-    # ---
-    # apiVersion: ambassador/v1
-    # kind: Module
-    # name: tls
-    # config:
-    #   server:
-    #     enabled: True
-    #     redirect_cleartext_from: 80
-    #     secret: ambassador-certs
-    # EOF
-    #     }
   }
 
   spec {
@@ -145,30 +132,12 @@ resource "kubernetes_service" "ambassador" {
     port {
       name = "http"
       port = 80
-      # target_port = 80
+      target_port = 8080
     }
-
-    # port {
-    #   name = "https"
-    #   port = 443
-    # }
-
-    # See: https://github.com/terraform-providers/terraform-provider-kubernetes/pull/59
-    # Note: Due to issue above, use "null_resource.patch_ambassador_service" to patch the "externalTrafficPolicy" property
-    # external_traffic_policy = "Local"
 
     type = "ClusterIP"
   }
 }
-
-# # See: https://github.com/terraform-providers/terraform-provider-kubernetes/pull/59
-# resource "null_resource" "patch_ambassador_service" {
-#   depends_on = [ "kubernetes_service.ambassador" ]
-
-#   provisioner "local-exec" {
-#     command = "kubectl patch --kubeconfig=${local.config_path} svc ambassador -n ${local.namespace} -p '{\"spec\":{\"externalTrafficPolicy\":\"Local\"}}'"
-#   }
-# }
 
 resource "kubernetes_service" "api" {
   metadata {
@@ -206,6 +175,17 @@ kind:  Mapping
 name:  eventpipeline_service_mapping
 prefix: /eventpipeline/
 service: eventpipeline-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_app_api_mapping
+prefix: /
+service: sapience-app-api
+timeout_ms: 30000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization
 EOF
 
     }
@@ -318,21 +298,5 @@ resource "azurerm_dns_a_record" "api" {
 #   }
 #   provisioner "local-exec" {
 #     command = "kubectl apply --kubeconfig=${local.config_path} -n dev -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
-#   }
-# }
-# # https://github.com/fbeltrao/aks-letsencrypt/blob/master/setup-wildcard-certificates-with-azure-dns.md
-# data "template_file" "letsencrypt_certificate" {
-#   template = "${file("templates/letsencrypt-certificate.yaml.tpl")}"
-#   vars {
-#      realm       = "${var.realm}"
-#      environment = "${var.environment}"
-#   }
-# }
-# resource "null_resource" "letsencrypt_certificate" {
-#   triggers {
-#     template_changed = "${data.template_file.letsencrypt_certificate.rendered}"
-#   }
-#   provisioner "local-exec" {
-#     command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.letsencrypt_certificate.rendered}\nEOF"
 #   }
 # }
