@@ -210,6 +210,39 @@ resource "azurerm_dns_cname_record" "portal_dev" {
   record              = "portal.dev.lab.sapienceanalytics.com"
 }
 
+resource "azurerm_dns_cname_record" "portal_demo" {
+  name                = "portal.demo"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "portal.demo.prod.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "storybook" {
+  #This is a temporary record - MH
+  name                = "storybook"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "storybook.dev.lab.sapienceanalytics.com"
+} 
+
+resource "azurerm_dns_cname_record" "storybook_dev" {
+  name                = "storybook.dev"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "storybook.dev.lab.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "storybook_demo" {
+  name                = "storybook.demo"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "storybook.demo.prod.sapienceanalytics.com"
+}
+
 resource "azurerm_dns_cname_record" "spinnaker" {
   name                = "spinnaker"
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
