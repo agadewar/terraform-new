@@ -219,7 +219,6 @@ resource "azurerm_dns_cname_record" "portal_demo" {
 }
 
 resource "azurerm_dns_cname_record" "storybook" {
-  #This is a temporary record - MH
   name                = "storybook"
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
   resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
@@ -235,6 +234,7 @@ resource "azurerm_dns_cname_record" "storybook_dev" {
   record              = "storybook.dev.lab.sapienceanalytics.com"
 }
 
+#This is a temporary record because storybook will only exist in dev - MH
 resource "azurerm_dns_cname_record" "storybook_demo" {
   name                = "storybook.demo"
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"

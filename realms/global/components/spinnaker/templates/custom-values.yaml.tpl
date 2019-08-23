@@ -24,7 +24,7 @@ halyard:
     ## Uncomment if you want to use a pre-created ConfigMap rather than feeding data in via helm.
     # name:
   additionalProfileConfigMaps:
-    data: {}
+    # data: {}
       ## if you're running spinnaker behind a reverse proxy such as a GCE ingress
       ## you may need the following profile settings for the gate profile.
       ## see https://github.com/spinnaker/spinnaker/issues/1630
@@ -37,6 +37,33 @@ halyard:
       #       remoteIpHeader: X-Forwarded-For
       #       internalProxies: .*
       #       httpsServerPort: X-Forwarded-Port
+    data:
+      echo-local.yaml:
+        mail:
+          enabled: true
+          host: smtp.live.com
+          from: scardis@hotmail.com
+          properties:
+            mail:
+                smtp:
+                  auth: true
+                  starttls:
+                    enable: true
+        spring:
+          mail:
+            host: smtp.live.com
+            username: scardis@hotmail.com
+            password: N3478dQ1
+            port: 587
+            properties:
+              mail:
+                smtp:
+                  auth: true
+                  starttls:
+                    enable: true
+                transport:
+                  protocol: smtp
+                debug: true
 
   ## Define custom settings for Spinnaker services. Read more for details:
   ## https://www.spinnaker.io/reference/halyard/custom/#custom-service-settings

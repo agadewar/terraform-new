@@ -136,7 +136,7 @@ resource "kubernetes_deployment" "jenkins" {
         container {
           name = "jenkins"
           # image = "jenkins/jenkins:2.169"
-          image = "${var.sapience_container_registry_hostname}/jenkins:1.4"
+          image = "${var.sapience_container_registry_hostname}/jenkins:1.6"
           image_pull_policy = "Always"
 
           resources {

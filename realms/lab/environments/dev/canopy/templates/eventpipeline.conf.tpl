@@ -3,6 +3,8 @@ eventpipeline.channels = logger eventarchive
 eventpipeline.sinks = logger eventarchive
 
 eventpipeline.channel.type=memory
+eventpipeline.channel.transactionCapacity=1000
+eventpipeline.channel.capacity = 100000
 
 eventpipeline.sources.eventpipeline.type = com.banyanhills.eventpipeline.flume.source.KafkaSource
 eventpipeline.sources.eventpipeline.channels = logger eventarchive deviceregistration

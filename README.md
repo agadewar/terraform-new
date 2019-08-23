@@ -114,7 +114,7 @@
 			4. Set "Database id = canopy" AND "Graph Id = hierarchy"
 			5. For Dev, we set Storage Capacity = 'Fixed (10GB) and Throughput = 400
 	    2. Execute this Gremlin query via the Cosmos portal:
-			- `g.addV(label, 'User', 'name', 'steve.ardis@banyanhills.com', 'realm', 'banyan').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))`
+			- `g.addV(label, 'User', 'ref_id', 'steve.ardis@banyanhills.com', 'name', 'steve.ardis@banyanhills.com').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))`
 	5. Setup SQL Server (from Repo: canopy-sql)
 		1. Run DDL in canopy-sql/ddl
 		2. Run DML in canopy-sql/dml
