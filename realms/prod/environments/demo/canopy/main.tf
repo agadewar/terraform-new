@@ -21,7 +21,7 @@ provider "aws" {
 }
 
 provider "kubernetes" {
-  version     = "1.7.0"
+  version     = "1.9.0"
   config_path = local.config_path
 }
 

@@ -38,6 +38,18 @@ resource "kubernetes_secret" "eventpipeline_service" {
   type = "Opaque"
 }
 
+resource "kubernetes_service" "datalake" {
+  metadata {
+    name = "datalake"
+  }
+
+  spec {
+    external_name = "sapiencedatalake${var.environment}.dfs.core.windows.net"
+
+    type = "ExternalName"
+  }
+}
+
 resource "kubernetes_deployment" "eventpipeline_service_deployment" {
   metadata {
     name = "eventpipeline-service"
@@ -182,6 +194,14 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
             mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
           }
         }
+
+        # # Create an alias record because we have to hardcode the property name in eventpipeline-service's core-site.xml.  String
+        # # interpolation is only allowed in the value.  So, we need somethign constant... which is the "datalake.dfs.core.windows.net"
+        # # entry below.
+        # host_aliases {
+        #   ip = "sapiencedatalake${var.environment}.dfs.core.windows.net"
+        #   hostnames = [ "datalake.dfs.core.windows.net" ]
+        # }
 
         # needed by the user-service for Hazelcast
         # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
