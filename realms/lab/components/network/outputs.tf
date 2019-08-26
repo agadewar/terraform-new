@@ -1,3 +1,7 @@
+output "realm_network_name" {
+  value = azurerm_virtual_network.realm.name
+}
+
 output "default_subnet_id" {
   value = "${azurerm_subnet.default.id}"
 }
@@ -14,17 +18,17 @@ output "dev-data_subnet_id" {
   value = "${azurerm_subnet.dev-data.id}"
 }
 
-output "qa-default_subnet_id" {
-  value = "${azurerm_subnet.qa-default.id}"
-}
+# output "qa-default_subnet_id" {
+#   value = "${azurerm_subnet.qa-default.id}"
+# }
 
-output "qa-application_subnet_id" {
-  value = "${azurerm_subnet.qa-application.id}"
-}
+# output "qa-application_subnet_id" {
+#   value = "${azurerm_subnet.qa-application.id}"
+# }
 
-output "qa-data_subnet_id" {
-  value = "${azurerm_subnet.qa-data.id}"
-}
+# output "qa-data_subnet_id" {
+#   value = "${azurerm_subnet.qa-data.id}"
+# }
 
 output "aks-pool04_subnet_id" {
   value = "${azurerm_subnet.aks-pool04.id}"

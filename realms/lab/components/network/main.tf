@@ -81,29 +81,29 @@ resource "azurerm_subnet" "dev-data" {
   service_endpoints    = var.subnet_service_endpoints
 }
 
-resource "azurerm_subnet" "qa-default" {
-  name                 = "qa-default"
-  resource_group_name  = var.resource_group_name
-  virtual_network_name = azurerm_virtual_network.realm.name
-  address_prefix       = var.subnet_address_prefix_qa-default
-  service_endpoints    = var.subnet_service_endpoints
-}
+# resource "azurerm_subnet" "qa-default" {
+#   name                 = "qa-default"
+#   resource_group_name  = var.resource_group_name
+#   virtual_network_name = azurerm_virtual_network.realm.name
+#   address_prefix       = var.subnet_address_prefix_qa-default
+#   service_endpoints    = var.subnet_service_endpoints
+# }
 
-resource "azurerm_subnet" "qa-application" {
-  name                 = "qa-application"
-  resource_group_name  = var.resource_group_name
-  virtual_network_name = azurerm_virtual_network.realm.name
-  address_prefix       = var.subnet_address_prefix_qa-application
-  service_endpoints    = var.subnet_service_endpoints
-}
+# resource "azurerm_subnet" "qa-application" {
+#   name                 = "qa-application"
+#   resource_group_name  = var.resource_group_name
+#   virtual_network_name = azurerm_virtual_network.realm.name
+#   address_prefix       = var.subnet_address_prefix_qa-application
+#   service_endpoints    = var.subnet_service_endpoints
+# }
 
-resource "azurerm_subnet" "qa-data" {
-  name                 = "qa-data"
-  resource_group_name  = var.resource_group_name
-  virtual_network_name = azurerm_virtual_network.realm.name
-  address_prefix       = var.subnet_address_prefix_qa-data
-  service_endpoints    = var.subnet_service_endpoints
-}
+# resource "azurerm_subnet" "qa-data" {
+#   name                 = "qa-data"
+#   resource_group_name  = var.resource_group_name
+#   virtual_network_name = azurerm_virtual_network.realm.name
+#   address_prefix       = var.subnet_address_prefix_qa-data
+#   service_endpoints    = var.subnet_service_endpoints
+# }
 
 resource "azurerm_subnet" "aks-pool04" {
   name                 = "aks-pool04"
