@@ -61,9 +61,9 @@ resource "kubernetes_namespace" "namespace" {
 resource "null_resource" "default_token_secret_name" {
   depends_on = [ "kubernetes_namespace.namespace" ]
 
-  # triggers = {
-  #   timestamp = "${timestamp()}"
-  # }
+  triggers = {
+    timestamp = "${timestamp()}"
+  }
 
   provisioner "local-exec" {
     command = "mkdir -p .local && kubectl --kubeconfig=${local.config_path} get secret --namespace ${local.namespace} | grep \"default-token\" | cut -d' ' -f1 | tr -d $'\n' > .local/default_token_secret_name.out"

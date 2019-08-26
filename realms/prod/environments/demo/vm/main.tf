@@ -13,13 +13,13 @@ provider "azurerm" {
   tenant_id       = var.service_principal_tenant
 }
 
-data "terraform_remote_state" "network" {
+data "terraform_remote_state" "network_env" {
   backend = "azurerm"
 
   config = {
-    access_key           = var.realm_backend_access_key
-    storage_account_name = var.realm_backend_storage_account_name
-    container_name       = var.realm_backend_container_name
+    access_key           = var.env_backend_access_key
+    storage_account_name = var.env_backend_storage_account_name
+    container_name       = var.env_backend_container_name
     key                  = "network.tfstate"
   }
 }
@@ -264,7 +264,7 @@ resource "azurerm_network_interface" "sisense_appquery_001" {
 
   ip_configuration {
     name                          = "sisense-appquery-001-${var.environment}"
-    subnet_id                     = data.terraform_remote_state.network.outputs.dev-application_subnet_id
+    subnet_id                     = data.terraform_remote_state.network_env.outputs.env-application_subnet_id
     public_ip_address_id          = azurerm_public_ip.sisense_appquery_001.id
     private_ip_address_allocation = "Dynamic"
   }
@@ -350,7 +350,7 @@ resource "azurerm_network_interface" "sisense_appquery_002" {
 
   ip_configuration {
     name                          = "sisense-appquery-002-${var.environment}"
-    subnet_id                     = data.terraform_remote_state.network.outputs.dev-application_subnet_id
+    subnet_id                     = data.terraform_remote_state.network_env.outputs.env-application_subnet_id
     public_ip_address_id          = azurerm_public_ip.sisense_appquery_002.id
     private_ip_address_allocation = "Dynamic"
   }
@@ -436,7 +436,7 @@ resource "azurerm_network_interface" "sisense_build_001" {
 
   ip_configuration {
     name                          = "sisense-build-001-${var.environment}"
-    subnet_id                     = data.terraform_remote_state.network.outputs.dev-application_subnet_id
+    subnet_id                     = data.terraform_remote_state.network_env.outputs.env-application_subnet_id
     public_ip_address_id          = azurerm_public_ip.sisense_build_001.id
     private_ip_address_allocation = "Dynamic"
   }
