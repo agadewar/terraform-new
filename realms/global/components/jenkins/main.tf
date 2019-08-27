@@ -129,6 +129,8 @@ resource "kubernetes_deployment" "jenkins" {
         }
       }
       spec {
+        service_account_name = "jenkins"
+
         security_context {
             fs_group = 1000
             run_as_user = 1000
@@ -136,7 +138,7 @@ resource "kubernetes_deployment" "jenkins" {
         container {
           name = "jenkins"
           # image = "jenkins/jenkins:2.169"
-          image = "${var.sapience_container_registry_hostname}/jenkins:1.7"
+          image = "${var.sapience_container_registry_hostname}/jenkins:1.8"
           image_pull_policy = "Always"
 
           resources {
@@ -384,7 +386,7 @@ resource "kubernetes_cluster_role_binding" "jenkins" {
     subject {
         kind = "ServiceAccount"
         name = "jenkins"
-        namespace = "management"
+        namespace = local.namespace
         api_group = ""
     }
 }
