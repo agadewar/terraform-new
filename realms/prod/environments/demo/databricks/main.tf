@@ -20,10 +20,11 @@ locals {
 }
 
 resource "azurerm_databricks_workspace" "databricks" {
-  name                = "databricks-${var.environment}"
-  resource_group_name = var.resource_group_name
-  location            = var.resource_group_location
-  sku                 = "premium"
+  name                        = "databricks-${var.environment}"
+  resource_group_name         = var.resource_group_name
+  location                    = var.resource_group_location
+  managed_resource_group_name = "databricks-rg-${var.environment}"
+  sku                         = "premium"
 
   tags = merge(local.common_tags, {})
 }

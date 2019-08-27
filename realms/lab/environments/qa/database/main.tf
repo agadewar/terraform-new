@@ -15,7 +15,11 @@ data "terraform_remote_state" "kubernetes_namespace" {
   config = {
     access_key           = var.realm_backend_access_key
     storage_account_name = var.realm_backend_storage_account_name
-    container_name       = "environment-${var.environment}"
+    # HARD-CODED TO USE ENVIRONMENT DEV BECAUSE IT IS THE FIRST LOAD BALANCER SERVICE STOOD UP IN THE CLUSTER... THEREFORE IT BECAME THE IP ADDRESS FOR EGRESS. 
+    # WE NEED TO STAND UP A STATIC PUBLIC IP.
+    # SEE: https://docs.microsoft.com/en-us/azure/aks/egress
+    # container_name       = "environment-${var.environment}"
+    container_name       = "environment-dev"
     key                  = "kubernetes-namespace.tfstate"
   }
 }
