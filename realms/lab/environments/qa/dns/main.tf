@@ -19,6 +19,17 @@ data "terraform_remote_state" "ingress_controller" {
   }
 }
 
+data "terraform_remote_state" "vm" {
+  backend = "azurerm"
+  config = {
+    access_key           = var.env_backend_access_key
+    storage_account_name = var.env_backend_storage_account_name
+    container_name       = "environment-${var.environment}"
+    key                  = "vm.tfstate"
+  }
+}
+
+
 # locals {
 #   resource_group_name = "${var.resource_group_name}"
 
@@ -45,3 +56,21 @@ resource "azurerm_dns_a_record" "portal" {
   # returns a single list item then leave it as-is and remove this TODO comment.
   records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
 }
+
+resource "azurerm_dns_a_record" "sisense_build" {
+  name                = "sisense-build.${var.environment}.${var.realm}"
+  zone_name           = "sapienceanalytics.com"
+  resource_group_name = "Global"
+  ttl                 = 300
+  records = [data.terraform_remote_state.vm.outputs.public_ip_sisense_build_001]
+}
+
+resource "azurerm_dns_a_record" "sisense_appquery" {
+  name                = "sisense.${var.environment}.${var.realm}"
+  zone_name           = "sapienceanalytics.com"
+  resource_group_name = "Global"
+  ttl                 = 300
+  records = [data.terraform_remote_state.vm.outputs.public_ip_sisense_appquery_001,
+             data.terraform_remote_state.vm.outputs.public_ip_sisense_appquery_002]
+}
+

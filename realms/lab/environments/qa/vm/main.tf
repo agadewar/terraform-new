@@ -46,7 +46,7 @@ resource "azurerm_network_security_group" "sisense_appquery" {
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "TCP"
-    source_port_range          = "8081"
+    source_port_range          = "*"
     destination_port_range     = "8081"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
