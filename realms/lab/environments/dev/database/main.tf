@@ -5,14 +5,14 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "1.20.0"
+  version = "1.31.0"
   subscription_id = "${var.subscription_id}"
 }
 
 data "terraform_remote_state" "kubernetes_namespace" {
   backend = "azurerm"
   
-  config {
+  config = {
     access_key           = "${var.backend_access_key}"
     storage_account_name = "${var.backend_storage_account_name}"
 	  container_name       = "environment-${var.environment}"
@@ -46,7 +46,7 @@ resource "azurerm_sql_server" "sapience" {
 
   tags = "${merge(
     local.common_tags,
-    map()
+    {}
   )}"
 }
 
@@ -60,7 +60,7 @@ resource "azurerm_sql_database" "sedw" {
 
   tags = "${merge(
     local.common_tags,
-    map()
+    {}
   )}"
 }
 
@@ -72,7 +72,7 @@ resource "azurerm_sql_database" "device" {
 
   tags = "${merge(
     local.common_tags,
-    map()
+    {}
   )}"
 }
 
@@ -84,7 +84,7 @@ resource "azurerm_sql_database" "eventpipeline" {
 
   tags = "${merge(
     local.common_tags,
-    map()
+    {}
   )}"
 }
 
@@ -96,7 +96,7 @@ resource "azurerm_sql_database" "leafbroker" {
 
   tags = "${merge(
     local.common_tags,
-    map()
+    {}
   )}"
 }
 
@@ -108,7 +108,7 @@ resource "azurerm_sql_database" "user" {
 
   tags = "${merge(
     local.common_tags,
-    map()
+    {}
   )}"
 }
 
@@ -120,7 +120,7 @@ resource "azurerm_sql_database" "mad" {
 
   tags = "${merge(
     local.common_tags,
-    map()
+    {}
   )}"
 }
 
@@ -128,8 +128,8 @@ resource "azurerm_sql_firewall_rule" "aks_egress" {
   name                = "aks-egress"
   resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
   server_name         = "${azurerm_sql_server.sapience.name}"
-  start_ip_address    = "${data.terraform_remote_state.kubernetes_namespace.aks_egress_ip_address}"
-  end_ip_address      = "${data.terraform_remote_state.kubernetes_namespace.aks_egress_ip_address}"
+  start_ip_address    = "${data.terraform_remote_state.kubernetes_namespace.outputs.aks_egress_ip_address}"
+  end_ip_address      = "${data.terraform_remote_state.kubernetes_namespace.outputs.aks_egress_ip_address}"
 }
 
 resource "azurerm_sql_firewall_rule" "ip_banyan_office" {
@@ -156,13 +156,13 @@ resource "azurerm_sql_firewall_rule" "ip_sapience_office" {
   end_ip_address      = "${var.ip_sapience_office}"
 }
 
-resource "azurerm_sql_firewall_rule" "ip_sapience_office2" {
-  name                = "ip-sapience-office2"
-  resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
-  server_name         = "${azurerm_sql_server.sapience.name}"
-  start_ip_address    = "${var.ip_sapience_office2}"
-  end_ip_address      = "${var.ip_sapience_office2}"
-}
+# resource "azurerm_sql_firewall_rule" "ip_sapience_office2" {
+#   name                = "ip-sapience-office2"
+#   resource_group_name = "${azurerm_sql_server.sapience.resource_group_name}"
+#   server_name         = "${azurerm_sql_server.sapience.name}"
+#   start_ip_address    = "${var.ip_sapience_office2}"
+#   end_ip_address      = "${var.ip_sapience_office2}"
+# }
 
 resource "azurerm_sql_firewall_rule" "ip_steve_ardis_home" {
   name                = "ip-steve-ardis-home"
@@ -172,6 +172,13 @@ resource "azurerm_sql_firewall_rule" "ip_steve_ardis_home" {
   end_ip_address      = "${var.ip_steve_ardis_home}"
 }
 
+resource "azurerm_sql_firewall_rule" "ip_azure_services" {
+  name                = "ip-azure-services"
+  resource_group_name = azurerm_sql_server.sapience.resource_group_name
+  server_name         = azurerm_sql_server.sapience.name
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "0.0.0.0"
+}
 
 resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
   name                = "sapience-canopy-hierarchy-${var.environment}"
@@ -180,11 +187,9 @@ resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
   offer_type          = "Standard"
   kind                = "GlobalDocumentDB"
 
-  capabilities = [
-    {
-      name = "EnableGremlin"
-    }
-  ]
+  capabilities {
+    name = "EnableGremlin"
+  }
 
   consistency_policy {
     consistency_level = "Strong"
@@ -203,11 +208,9 @@ resource "azurerm_cosmosdb_account" "sapience_graph" {
   offer_type          = "Standard"
   kind                = "GlobalDocumentDB"
 
-  capabilities = [
-    {
-      name = "EnableGremlin"
-    }
-  ]
+  capabilities {
+    name = "EnableGremlin"
+  }
 
   consistency_policy {
     consistency_level = "Strong"
@@ -225,11 +228,9 @@ resource "azurerm_cosmosdb_account" "event_archive" {
   location            = "${var.resource_group_location}"
   offer_type          = "Standard"
 
-  capabilities = [
-    {
-      name = "EnableCassandra"
-    }
-  ]
+  capabilities {
+    name = "EnableCassandra"
+  }
 
   consistency_policy {
     consistency_level = "Eventual"

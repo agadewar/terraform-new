@@ -2,6 +2,10 @@ eventpipeline.sources = eventpipeline
 eventpipeline.channels = logger eventarchive
 eventpipeline.sinks = logger eventarchive
 
+eventpipeline.channel.type=memory
+eventpipeline.channel.transactionCapacity=1000
+eventpipeline.channel.capacity = 100000
+
 eventpipeline.sources.eventpipeline.type = com.banyanhills.eventpipeline.flume.source.KafkaSource
 eventpipeline.sources.eventpipeline.channels = logger eventarchive deviceregistration
 eventpipeline.sources.eventpipeline.batchSize = 1000
@@ -48,6 +52,7 @@ eventpipeline.channels.eventarchive.kafka.topic = eventarchive-channel
 eventpipeline.sinks.eventarchive.type = hdfs
 eventpipeline.sinks.eventarchive.channel = eventarchive
 eventpipeline.sinks.eventarchive.hdfs.path = abfss://sapience-adls@sapiencedatalake${environment}.dfs.core.windows.net/rawdata/avro/tenantId=%%{tenantId}/companyId=%%{companyId}/year=%Y/month=%m/day=%d/hour=%H/minute=%M
+#eventpipeline.sinks.eventarchive.hdfs.path = abfss://sapience-adls@datalake/rawdata/avro/tenantId=%%{tenantId}/companyId=%%{companyId}/year=%Y/month=%m/day=%d/hour=%H/minute=%M
 eventpipeline.sinks.eventarchive.hdfs.fileType = DataStream
 eventpipeline.sinks.eventarchive.hdfs.writeFormat = Text
 eventpipeline.sinks.eventarchive.hdfs.filePrefix = EventData
