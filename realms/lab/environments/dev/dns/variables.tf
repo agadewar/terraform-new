@@ -1,20 +1,15 @@
-variable "backend_access_key" {
-}
+variable "realm_backend_access_key" {}
+variable "realm_backend_storage_account_name" {}
+variable "env_backend_access_key" {}
+variable "env_backend_storage_account_name" {}
 
-variable "backend_storage_account_name" {
-}
 
-variable "realm" {
-}
+variable "realm" {}
+variable "environment" {}
 
-variable "environment" {
-}
+variable "subscription_id" {}
 
-variable "subscription_id" {
-}
-
-variable "resource_group_name" {
-}
+variable "resource_group_name" {}
 
 # variable "create_cname_api" {}
 
