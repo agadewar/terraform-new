@@ -116,10 +116,11 @@ resource "helm_release" "sonarqube" {
     value = "/"
   }
 
-  // set {
-  //   name  = "ingress.annotations.ingress.kubernetes.io/ssl-redirect"
-  //   value = "true"
-  // }
+  set_string {
+    name  = "ingress.annotations.ingress.kubernetes.io/ssl-redirect"
+    // name  = "ingress.annotations.ingress.\"kubernetes\\.io/ssl-redirect\""
+    value = "true"
+  }
 
   // set {
   //   name  = "ingress.annotations.kubernetes.io/ingress.class"
