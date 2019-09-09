@@ -41,18 +41,6 @@ resource "azurerm_network_security_group" "sisense_appquery" {
   resource_group_name = var.resource_group_name
 
   security_rule {
-    name                       = "Allow-8081-Open-To-The-World"
-    priority                   = 102
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "TCP"
-    source_port_range          = "8081"
-    destination_port_range     = "8081"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }  
-
-  security_rule {
     name                       = "Allow-AllTraffic-Sapience-Office"
     priority                   = 100
     direction                  = "Inbound"
@@ -73,6 +61,30 @@ resource "azurerm_network_security_group" "sisense_appquery" {
     source_port_range          = "*"
     destination_port_range     = "*"
     source_address_prefix      = var.ip_banyan_office
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Allow-8081-Open-To-The-World"
+    priority                   = 102
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "TCP"
+    source_port_range          = "*"
+    destination_port_range     = "8081"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Allow-AllTraffic-Sapience-Office-2"
+    priority                   = 103
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = var.ip_sapience_office_2
     destination_address_prefix = "*"
   }
 
@@ -140,6 +152,18 @@ resource "azurerm_network_security_group" "sisense_build" {
     source_port_range          = "*"
     destination_port_range     = "*"
     source_address_prefix      = var.ip_banyan_office
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Allow-AllTraffic-Sapience-Office-2"
+    priority                   = 102
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = var.ip_sapience_office_2
     destination_address_prefix = "*"
   }
 

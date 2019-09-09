@@ -38,6 +38,10 @@ variable "ip_sapience_office" {
   default = ""
 }
 
+variable "ip_sapience_office_2" {
+  default = ""
+}
+
 variable "ip_banyan_office" {
   default = ""
 }
