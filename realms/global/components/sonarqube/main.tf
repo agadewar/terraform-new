@@ -101,41 +101,72 @@ resource "helm_release" "sonarqube" {
     value = "ClusterIP"
   }
 
-  set {
-    name  = "ingress.enabled"
-    value = "true"
-  }
+  # set {
+  #   name  = "ingress.enabled"
+  #   value = "true"
+  # }
 
-  set {
-    name  = "ingress.hosts[0].name"
-    value = "sonarqube.${var.realm}.sapienceanalytics.com"
-  }
+  # set {
+  #   name  = "ingress.hosts[0].name"
+  #   value = "sonarqube.${var.realm}.sapienceanalytics.com"
+  # }
 
-  set {
-    name  = "ingress.hosts[0].path"
-    value = "/"
-  }
+  # set {
+  #   name  = "ingress.hosts[0].path"
+  #   value = "/"
+  # }
 
-  set_string {
-    name  = "ingress.annotations.ingress.kubernetes.io/ssl-redirect"
-    // name  = "ingress.annotations.ingress.\"kubernetes\\.io/ssl-redirect\""
-    value = "true"
-  }
+  # set {
+  #   # name  = "ingress.annotations[0].ingress.kubernetes.io/ssl-redirect"
+  #   # name  = "ingress.annotations[0].\"nginx\\.ingress\\.kubernetes\\.io/ssl-redirect\""
+  #   name  = "ingress.annotations.\"nginx\\.ingress\\.kubernetes\\.io/ssl-redirect\""
+  #   // name = "ingress.annotations[0].nginx.ingress.kubernetes.io/ssl-redirect"
+  #   // name  = "ingress.annotations.ingress.\"kubernetes\\.io/ssl-redirect\""
+  #   value = "true"
+  #   # name = "ingress.annotations"
+  #   # value = { 
+  #   #   "ingress.annotations.ingress.kubernetes.io/ssl-redirect" : "true  "
+  #   # }
+  # }
 
-  // set {
-  //   name  = "ingress.annotations.kubernetes.io/ingress.class"
-  //   value = "nginx"
-  // }
+  # set {
+  #   name  = "ingress.annotations.\"nginx\\.ingress\\.kubernetes\\.io/ingress.class\""
+  #   value = "nginx"
+  # }
+
+  # set {
+  #   name = "ingress.annotations"
+  #   value = map("nginx.ingress.kubernetes.io/ssl-redirect", "true", "nginx.ingress.kubernetes.io/ingress.class", "nginx")
+  # }
+
+  values = [<<EOF
+ingress:
+  enabled: true
+  annotations:
+    certmanager.k8s.io/acme-challenge-type             : dns01
+    certmanager.k8s.io/acme-dns01-provider             : azure-dns
+    certmanager.k8s.io/cluster-issuer                  : letsencrypt-prod
+    kubernetes.io/ingress.class                        : nginx
+    kubernetes.io/tls-acme                             : true
+    nginx.ingress.kubernetes.io/ssl-redirect           : true
+    nginx.ingress.kubernetes.io/whitelist-source-range : ${join(", ", var.sonarqube_source_ranges_allowed)}
+  hosts:
+    - path: /
+      name: sonarqube.${var.realm}.sapienceanalytics.com
+EOF
+  ]
 
   // set {
   //   name  = "ingress.annotations.kubernetes.io/tls-acme"
   //   value = "true"
   // }
 
-  set {
-    name  = "ingress.annotations[0].nginx.ingress.kubernetes.io/whitelist-source-range"
-    value = "${join(", ", var.sonarqube_source_ranges_allowed)}"
-  }
+  # set {
+  #   # name  = "ingress.annotations[0].nginx.ingress.kubernetes.io/whitelist-source-range"
+  #   name  = "ingress.annotations.\"nginx\\.ingress\\.kubernetes\\.io/whitelist-source-range\""
+  #   # value = join(", ", var.sonarqube_source_ranges_allowed)
+  #   value = "50.20.0.62/32, 24.99.117.169/32, 162.236.22.89/32, 24.125.218.36/32, 47.187.167.223/32, 47.187.172.225/32, 47.190.73.52/32, 209.170.229.238/32, 69.168.39.211/32"
+  # }
 
   // set {
   //   name  = "ingress.annotations.certmanager.k8s.io/acme-challenge-type"

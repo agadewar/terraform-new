@@ -15,6 +15,6 @@ variable "realm_common_tags" {
 }
 
 variable "sonarqube_source_ranges_allowed" {
-    type = "list"
+  type = list(string)
 }
 
