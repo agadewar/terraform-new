@@ -291,3 +291,11 @@ resource "azurerm_dns_cname_record" "sisense_build_qa" {
   ttl                 = 300
   record              = "sisense-build.qa.lab.sapienceanalytics.com"
 }
+
+resource "azurerm_dns_cname_record" "sonarqube" {
+  name                = "sonarqube"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "sonarqube.global.sapienceanalytics.com"
+}
