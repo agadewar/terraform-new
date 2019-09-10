@@ -203,6 +203,14 @@ resource "azurerm_dns_cname_record" "api_dev" {
   record              = "api.dev.lab.sapienceanalytics.com"
 }
 
+resource "azurerm_dns_cname_record" "api_qa" {
+  name                = "api.qa"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "api.qa.lab.sapienceanalytics.com"
+}
+
 resource "azurerm_dns_cname_record" "jenkins" {
   name                = "jenkins"
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
@@ -217,6 +225,14 @@ resource "azurerm_dns_cname_record" "portal_dev" {
   resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
   record              = "portal.dev.lab.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "portal_qa" {
+  name                = "portal.qa"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "portal.qa.lab.sapienceanalytics.com"
 }
 
 resource "azurerm_dns_cname_record" "portal_demo" {
