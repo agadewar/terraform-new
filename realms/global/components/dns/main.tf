@@ -49,7 +49,7 @@ resource "azurerm_dns_a_record" "sapienceanalytics_public" {
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
   resource_group_name = "${var.resource_group_name}"  # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
-  records             = ["162.241.235.230"]
+  records             = ["107.180.24.243"]
 }
 
 resource "azurerm_dns_mx_record" "sapienceanalytics_public" {

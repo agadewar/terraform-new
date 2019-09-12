@@ -8,13 +8,15 @@
 	az --version
 	az extension add --name storage-preview
 	```
-2. Helm locally installed
-3. Docker locally installed?
+2. Terraform locally installed
+3. ansible-vault locally installed
+4. Kubectl locally installed
+5. Helm locally installed
 
-### Create Storage Account and Access Key (Only do this when creating the very first Terraform environment)
+### Create Storage Account and Access Key (Only do this when creating a new realm)
 ----
-1. Create a Storage Account (via the Azure Portal) for Terraform remote state storage for the resource group (i.e. "tfstatelab")
-2. Create a "tfstate" Blob container (private)
+1. Create a Storage Account (manually via the Azure Portal) for Terraform remote state storage for the realm (i.e. "sapiencetfstatelab") in the "Production" Subscription / "devops" Resource Group
+2. Create a blob container for the <cloud>-<region>-<environment> (i.e. "azure-us-dev")
 3. Retrieve the "Access Key" for the Terraform remote state Storage Account via the Azure Portal... this will be used in Terraform "backend" blocks in each Terraform main.tf
 
 	**SECRET** :a:
@@ -22,14 +24,18 @@
 4. Create an Azure Service Principal via the Azure CLI: see Microsoft AKS documentation, Microsoft Azure CLI documentation, and Terraform documentation
 	```
 	az account set --subscription="<subscription_id>"
-	az ad sp create-for-rbac --skip-assignment --name Terraform`
+	az ad sp create-for-rbac --skip-assignment --name Terraform<Realm>
 	```
-	If the sp has already been created, use `az ad sp show --id http://Terraform`
+	If the sp has already been created, use `az ad sp show --id http://Terraform<Realm>`
 5. Copy and store the output of the command above
 
 	**SECRET** :b:
 
-	az role assignment create --assignee <sp object id> --role Contributor
+6. Give Contributor role to Terraform<Realm> service principal to the <Realm> resource group
+    az role assignment create --assignee <sp object id from show command above> --role Contributor
+
+7. Give Storage Blob Data Contributor role to Terraform<Realm> service principal to the "Production" subscription (so it can read/write to "sapiencetfstatelab")
+	az role assignment create --assignee <sp object id from show command above> --role "Storage Blob Data Contributor" --scope /subscriptions/<Production subscription id>/resourceGroups/devops/providers/Microsoft.Storage/storageAccounts/<i.e. sapiencetfstatelab>
 
 ### Create Realm and Environment Infrastructure
 ----
