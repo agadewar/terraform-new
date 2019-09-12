@@ -11,7 +11,6 @@
 2. Terraform locally installed
 3. Kubectl locally installed
 4. Helm locally installed
-5. Docker locally installed?
 
 ### Create Storage Account and Access Key (Only do this when creating the very first Terraform environment)
 ----
