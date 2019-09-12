@@ -51,8 +51,8 @@
 	```find . -type d -name ".local" -exec rm -rf {} +```
 
 3. Create "storage-account"
-    ```tfinit```
-    ```tfapply```
+    1. ```tfinit```
+    2. ```tfapply```
 2. Setup Kubernetes/AKS
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Remove any existing terraform/lab/kubernetes/kubeconfig
