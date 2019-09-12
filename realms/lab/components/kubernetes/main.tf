@@ -91,9 +91,9 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
 resource "null_resource" "kubeconfig" {
   depends_on = [azurerm_kubernetes_cluster.kubernetes]
 
-  # triggers = {
-  #   timestamp = "${timestamp()}"
-  # }
+  triggers = {
+    timestamp = "${timestamp()}"
+  }
 
   provisioner "local-exec" {
     command = "rm -f kubeconfig"

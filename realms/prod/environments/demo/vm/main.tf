@@ -268,7 +268,7 @@ resource "azurerm_managed_disk" "sisense_appquery_data_001" {
   )}"
   
   lifecycle{
-    prevent_destroy = "true"
+    prevent_destroy = "false"
   }
 }
 
@@ -354,7 +354,7 @@ resource "azurerm_managed_disk" "sisense_appquery_data_002" {
   )}"
   
   lifecycle{
-    prevent_destroy = "true"
+    prevent_destroy = "false"
   }
 }
 
@@ -440,7 +440,7 @@ resource "azurerm_managed_disk" "sisense_build_data_001" {
   )}"
   
   lifecycle{
-    prevent_destroy = "true"
+    prevent_destroy = "false"
   }
 }
 

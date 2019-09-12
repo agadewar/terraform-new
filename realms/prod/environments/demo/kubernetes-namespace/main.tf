@@ -76,12 +76,12 @@ resource "null_resource" "default_token_secret_name" {
 #   filename = ".local/default_token_secret_name.out"
 # }
 # see: https://github.com/hashicorp/terraform/issues/11806
-data "null_data_source" "default_token_secret_name" {
-  inputs = {
-    dummy = "${format(null_resource.default_token_secret_name.id)}"
-    data = "${file(".local/default_token_secret_name.out")}"
-  }
-}
+# data "null_data_source" "default_token_secret_name" {
+#   inputs = {
+#     dummy = "${format(null_resource.default_token_secret_name.id)}"
+#     data = "${file(".local/default_token_secret_name.out")}"
+#   }
+# }
 
 resource "kubernetes_resource_quota" "resource_quota" {
   metadata {
