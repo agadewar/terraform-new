@@ -47,6 +47,7 @@
 1. Setup resource group(s)
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 		```find . -type d -name ".terraform" -exec rm -rf {} +```
+		
 		```find . -type d -name ".local" -exec rm -rf {} +```
 
 	2. Edit "terraform/realms/lab/resource-group/main.tf"
