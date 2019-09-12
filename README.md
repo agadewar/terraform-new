@@ -14,7 +14,7 @@
 
 ### Create Storage Account and Access Key (Only do this when creating a new realm)
 ----
-1. Create a Storage Account (manually via the Azure Portal) for Terraform remote state storage for the realm (i.e. "sapiencetfstatelab")
+1. Create a Storage Account (manually via the Azure Portal) for Terraform remote state storage for the realm (i.e. "sapiencetfstatelab") in the "Production" Subscription / "devops" Resource Group
 2. Create a blob container for the <cloud>-<region>-<environment> (i.e. "azure-us-dev")
 3. Retrieve the "Access Key" for the Terraform remote state Storage Account via the Azure Portal... this will be used in Terraform "backend" blocks in each Terraform main.tf
 
