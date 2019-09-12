@@ -31,10 +31,12 @@
 
 	**SECRET** :b:
 
-6. Give Contributor role to Terraform<Realm> service principal to the <Realm> resource group
-    az role assignment create --assignee <sp object id from show command above> --role Contributor
+6. Create realm (i.e. <realm>-<region>) in subscription through portal
 
-7. Give Storage Blob Data Contributor role to Terraform<Realm> service principal to the "Production" subscription (so it can read/write to "sapiencetfstatelab")
+7. Give Contributor role to Terraform<Realm> service principal to the <realm>-<region> resource group created above
+    az role assignment create --assignee <sp object id from show command above> --role Contributor --scope /subscriptions/<subscription id>/resourceGroups/<resource group i.e. lab-us>
+
+8. Give Storage Blob Data Contributor role to Terraform<Realm> service principal to the "Production" subscription (so it can read/write to "sapiencetfstatelab")
 	az role assignment create --assignee <sp object id from show command above> --role "Storage Blob Data Contributor" --scope /subscriptions/<Production subscription id>/resourceGroups/devops/providers/Microsoft.Storage/storageAccounts/<i.e. sapiencetfstatelab>
 
 ### Create Realm and Environment Infrastructure
