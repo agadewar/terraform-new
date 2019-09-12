@@ -43,23 +43,16 @@
 
 ### Create Realm and Environment Infrastructure
 ----
-##### 1. Create "Lab" Realm Infrastructure
-1. Setup resource group(s)
-    1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
-	
-		```find . -type d -name ".terraform" -exec rm -rf {} +```
+##### 1. Create Realm Infrastructure
+1. Copy components from existing realm
+2. Cleanup temporary directories
+	```find . -type d -name ".terraform" -exec rm -rf {} +```
 		
-		```find . -type d -name ".local" -exec rm -rf {} +```
+	```find . -type d -name ".local" -exec rm -rf {} +```
 
-	2. Edit "terraform/realms/lab/resource-group/main.tf"
-		- Change 'key' in terraform{} block: "sapience.realm.<font color="red">lab</font>.resource-group.terraform.tfstate"
-	3. Terraform Initialize and Apply
-		```
-		cd terraform/realms/lab/resource-group
-		terraform init -backend-config="../../../config/backend.config"
-		terraform apply -var-file="../../../config/realm.lab.tfvars"
-		```
-
+3. Create "storage-account"
+    ```tfinit```
+    ```tfapply```
 2. Setup Kubernetes/AKS
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Remove any existing terraform/lab/kubernetes/kubeconfig
