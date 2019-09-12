@@ -23,7 +23,7 @@
 4. Create an Azure Service Principal via the Azure CLI: see Microsoft AKS documentation, Microsoft Azure CLI documentation, and Terraform documentation
 	```
 	az account set --subscription="<subscription_id>"
-	az ad sp create-for-rbac --skip-assignment --name Terraform`
+	az ad sp create-for-rbac --skip-assignment --name Terraform
 	```
 	If the sp has already been created, use `az ad sp show --id http://Terraform`
 5. Copy and store the output of the command above
