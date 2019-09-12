@@ -25,7 +25,7 @@
 	az account set --subscription="<subscription_id>"
 	az ad sp create-for-rbac --skip-assignment --name Terraform`
 	```
-	If the sp has already been created, use `az ad sp show --id http://Terraform
+	If the sp has already been created, use `az ad sp show --id http://Terraform`
 5. Copy and store the output of the command above
 
 	**SECRET** :b:
