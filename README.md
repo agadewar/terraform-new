@@ -12,10 +12,10 @@
 3. Kubectl locally installed
 4. Helm locally installed
 
-### Create Storage Account and Access Key (Only do this when creating the very first Terraform environment)
+### Create Storage Account and Access Key (Only do this when creating a new realm)
 ----
-1. Create a Storage Account (via the Azure Portal) for Terraform remote state storage for the resource group (i.e. "tfstatelab")
-2. Create a "tfstate" Blob container (private)
+1. Create a Storage Account (manually via the Azure Portal) for Terraform remote state storage for the realm (i.e. "sapiencetfstatelab")
+2. Create a blob container for the <cloud>-<region>-<environment> (i.e. "azure-us-dev")
 3. Retrieve the "Access Key" for the Terraform remote state Storage Account via the Azure Portal... this will be used in Terraform "backend" blocks in each Terraform main.tf
 
 	**SECRET** :a:
