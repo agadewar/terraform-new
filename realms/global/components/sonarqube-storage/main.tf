@@ -13,7 +13,13 @@ provider "azurerm" {
   tenant_id       = "${var.service_principal_tenant}"
 }
 
+provider "kubernetes" {
+  config_path = local.config_path
+}
+
 locals {
+  config_path = "../kubernetes/kubeconfig"
+  namespace   = "sonarqube"
   realm = "${var.realm}"
 
   common_tags = "${merge(
@@ -24,47 +30,157 @@ locals {
   )}"
 }
 
-data "terraform_remote_state" "storage_account" {
-  backend = "azurerm"
+data "template_file" "sonarqube_home_pv" {
+  template = "${file("templates/sonarqube-home-pv.yaml.tpl")}"
 
-  config = {
-    access_key            = "${var.backend_access_key}"
-    storage_account_name  = "${var.backend_storage_account_name}"
-	container_name        = "realm-${var.realm}"
-    key                   = "storage-account.tfstate"
+  vars = {
+    realm = "${var.realm}"
+    subscription_id = "${var.subscription_id}"
+    resource_group_name = "${var.resource_group_name}"
   }
 }
 
-// resource "azurerm_storage_account" "storage_account" {
-//   name                      = "sapiencerealm${var.realm}"
-//   resource_group_name       = "${var.resource_group_name}"
-//   location                  = "${var.resource_group_location}"
-//   account_tier              = "Standard"
-//   account_replication_type  = "LRS"
-//   account_kind              = "StorageV2"
-//   enable_https_traffic_only = "true"
+data "template_file" "sonarqube_postgresql_pv" {
+  template = "${file("templates/sonarqube-postgresql-pv.yaml.tpl")}"
 
-//   tags = "${merge(
-//     local.common_tags
-//   )}"
-
-//   lifecycle {
-//     prevent_destroy = "true"
-//   }
-// }
-
-resource "azurerm_storage_container" "sonarqube" {
-  name                  = "sonarqube"
-  resource_group_name   = "${var.resource_group_name}"
-  storage_account_name  = "${data.terraform_remote_state.storage_account.outputs.storage_account_name}"
-  container_access_type = "private"
+  vars = {
+    realm = "${var.realm}"
+    subscription_id = "${var.subscription_id}"
+    resource_group_name = "${var.resource_group_name}"
+  }
 }
 
-# resource "azurerm_storage_share" "spinnaker_storage" {
-#   name = "spinnaker-storage"
+resource "kubernetes_namespace" "namespace" {
+  metadata {
+    name = local.namespace
+  }
+}
 
-#   resource_group_name       = "${var.resource_group_name}"
-#   storage_account_name = "${azurerm_storage_account.spinnaker_storage.name}"
+resource "azurerm_managed_disk" "sonarqube" {
+  name                 = "sonarqube-${var.realm}"
+  location             = "${var.resource_group_location}"
+  resource_group_name  = "${var.resource_group_name}"
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = "50"
 
-#   quota = 20
-# }
+  tags = "${merge(
+    local.common_tags
+  )}"
+  
+  lifecycle{
+    prevent_destroy = "false"
+  }
+}
+
+resource "kubernetes_persistent_volume_claim" "sonarqube_home" {
+  depends_on = [ "null_resource.sonarqube_home_pv","kubernetes_namespace.namespace" ]
+  
+  metadata {
+    annotations = "${merge(
+      local.common_tags
+    )}"
+    
+    name = "sonarqube-home"
+    namespace = "${local.namespace}"
+  }
+
+  spec {
+    access_modes = ["ReadWriteMany"]
+    resources {
+      requests = {
+        storage = "25G"
+      }
+    }
+    volume_name = "sonarqube-home-${var.realm}"  // This is what it should be when PV is created under TF: "${null_resource.sonarqube.metadata.0.name}"
+    storage_class_name = "${kubernetes_storage_class.sonarqube_home.metadata.0.name}"
+  }
+}
+
+resource "null_resource" "sonarqube_home_pv" {
+  triggers = {
+    template_changed = "${data.template_file.sonarqube_home_pv.rendered}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.sonarqube_home_pv.rendered}\nEOF"
+  }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "kubectl delete --kubeconfig=${local.config_path} persistentvolume sonarqube-home-${var.realm}"
+  }  
+}
+
+resource "kubernetes_storage_class" "sonarqube_home" {
+  metadata {
+    annotations = "${merge(
+      local.common_tags
+    )}"
+    
+    name = "sonarqube-home"
+  }
+
+  storage_provisioner = "kubernetes.io/azure-disk"
+  reclaim_policy = "Retain"
+  parameters = {
+    storageaccounttype = "Standard_LRS"
+  }
+}
+
+resource "kubernetes_persistent_volume_claim" "sonarqube_postgresql" {
+  depends_on = [ "null_resource.sonarqube_postgresql_pv","kubernetes_namespace.namespace" ]
+  
+  metadata {
+    annotations = "${merge(
+      local.common_tags
+    )}"
+    
+    name = "sonarqube-postgresql"
+    namespace = "${local.namespace}"
+  }
+
+  spec {
+    access_modes = ["ReadWriteMany"]
+    resources {
+      requests = {
+        storage = "25G"
+      }
+    }
+    volume_name = "sonarqube-postgresql-${var.realm}"  // This is what it should be when PV is created under TF: "${null_resource.sonarqube_postgresql.metadata.0.name}"
+    storage_class_name = "${kubernetes_storage_class.sonarqube_postgresql.metadata.0.name}"
+  }
+}
+
+resource "null_resource" "sonarqube_postgresql_pv" {
+  triggers = {
+    template_changed = "${data.template_file.sonarqube_postgresql_pv.rendered}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.sonarqube_postgresql_pv.rendered}\nEOF"
+  }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "kubectl delete --kubeconfig=${local.config_path} persistentvolume sonarqube-postgresql-${var.realm}"
+  }  
+}
+
+resource "kubernetes_storage_class" "sonarqube_postgresql" {
+  metadata {
+    annotations = "${merge(
+      local.common_tags
+    )}"
+    
+    name = "sonarqube-postgresql"
+  }
+
+  storage_provisioner = "kubernetes.io/azure-disk"
+  reclaim_policy = "Retain"
+  parameters = {
+    storageaccounttype = "Standard_LRS"
+  }
+}

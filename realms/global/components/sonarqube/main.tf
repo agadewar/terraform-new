@@ -59,19 +59,11 @@ data "terraform_remote_state" "ingress-controller" {
   }
 }
 
-resource "kubernetes_namespace" "namespace" {
-  metadata {
-    name = local.namespace
-  }
-}
-
 # See: https://github.com/helm/charts/tree/master/stable/sonarqube
 resource "helm_release" "sonarqube" {
-  depends_on = [ "kubernetes_namespace.namespace"]
-
-  name       = "sonarqube"
-  namespace  = "${local.namespace}"
-  chart      = "stable/sonarqube"
+  name      = "sonarqube"
+  namespace = "${local.namespace}"
+  chart     = "stable/sonarqube"
 
   timeout = 600
 
@@ -101,6 +93,13 @@ ingress:
       hosts: 
         - sonarqube.sapienceanalytics.com
         - sonarqube.${var.realm}.sapienceanalytics.com
+persistence:
+  enabled: true
+  existingClaim: sonarqube-home
+postgresql:
+  persistence:
+    enabled: true
+    existingClaim: sonarqube-postgresql
 EOF
   ]
 
@@ -113,3 +112,4 @@ resource "azurerm_dns_a_record" "sonarqube" {
   ttl                 = 30
   records             = [ "${data.terraform_remote_state.ingress-controller.outputs.nginx_ingress_controller_ip}" ]
 }
+
