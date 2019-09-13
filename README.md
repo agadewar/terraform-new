@@ -24,20 +24,20 @@
 4. Create an Azure Service Principal via the Azure CLI: see Microsoft AKS documentation, Microsoft Azure CLI documentation, and Terraform documentation
 	```
 	az account set --subscription="<subscription_id>"
-	az ad sp create-for-rbac --skip-assignment --name Terraform<Realm>
+	az ad sp create-for-rbac --skip-assignment --name Terraform<Subscription>
 	```
-	If the sp has already been created, use `az ad sp show --id http://Terraform<Realm>`
+	If the sp has already been created, use `az ad sp show --id http://Terraform<Subscription>`
 5. Copy and store the output of the command above
 
 	**SECRET** :b:
 
 6. Create realm (i.e. <realm>-<region>) in subscription through portal
 
-7. Give Contributor role to Terraform<Realm> service principal to the <realm>-<region> resource group created above
+7. Give Contributor role to Terraform<Subscription> service principal to the <realm>-<region> resource group created above
 
    ```az role assignment create --assignee <sp object id from show command above> --role Contributor --scope /subscriptions/<subscription id>/resourceGroups/<resource group i.e. lab-us>```
 
-8. Give Storage Blob Data Contributor role to Terraform<Realm> service principal to the "Production" subscription (so it can read/write to "sapiencetfstatelab")
+8. Give Storage Blob Data Contributor role to Terraform<Subscription> service principal to the "Production" subscription (so it can read/write to "sapiencetfstatelab")
 
    ```az role assignment create --assignee <sp object id from show command above> --role "Storage Blob Data Contributor" --scope /subscriptions/<Production subscription id>/resourceGroups/devops/providers/Microsoft.Storage/storageAccounts/<i.e. sapiencetfstatelab>```
 
