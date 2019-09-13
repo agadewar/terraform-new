@@ -53,23 +53,14 @@
 3. Create "storage-account"
     1. ```tfinit```
     2. ```tfapply```
-3. Create "network"
+4. Create "network"
     1. ```tfinit```
     2. ```tfapply```
-2. Setup Kubernetes/AKS
-    1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
-	2. Remove any existing terraform/lab/kubernetes/kubeconfig
-	3. Edit "terraform/realms/lab/kubernetes/main.tf"
-		- Change 'key' in terraform{} block: "sapience.realm.<font color="red">lab</font>.kubernetes.terraform.tfstate"
-	4. Terraform Initialize and Apply
-		```
-		cd terraform/realms/lab/kubernetes
-		terraform init -backend-config="../../../config/backend.config"
-		terraform apply -var-file="../../../config/realm.lab.tfvars"
-		```
-	- If it returns an error similar to this, you'll need to run Step 5 (Create "Lab" infrastructure -> Set resource group): 
-
-		`Error inspecting states in the "azurerm" backend: Get https://terraformstatesapience.blob.core.windows.net/tfstate?comp=list&prefix=sapience.lab.kubernetes.terraform.tfstateenv%3A&restype=container: dial tcp: lookup terraformstatesapience.blob.core.windows.net on 64.238.96.12:53: no such host`
+5. Create "kubernetes"
+6. Create "kured"
+7. Create "ingress-controller"
+8. Create "helm"
+9. Create "certificates"
 
 ##### 2. Create "Dev" Environment Infrastructure
 1. Setup Kubernetes namespace
