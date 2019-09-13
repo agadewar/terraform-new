@@ -57,10 +57,10 @@
     1. ```tfinit```
     2. ```tfapply```
 5. Create "kubernetes"
-6. Create "kured"
-7. Create "ingress-controller"
-8. Create "helm"
-9. Create "certificates"
+6. Create "helm"
+7. Create "kured"
+8. Create "certificates"
+9. Create "ingress-controller"
 
 ##### 2. Create "Dev" Environment Infrastructure
 1. Setup Kubernetes namespace
