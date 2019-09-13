@@ -8,13 +8,15 @@
 	az --version
 	az extension add --name storage-preview
 	```
-2. Helm locally installed
-3. Docker locally installed?
+2. Terraform locally installed
+3. ansible-vault locally installed
+4. Kubectl locally installed
+5. Helm locally installed
 
-### Create Storage Account and Access Key (Only do this when creating the very first Terraform environment)
+### Create Storage Account and Access Key (Only do this when creating a new realm)
 ----
-1. Create a Storage Account (via the Azure Portal) for Terraform remote state storage for the resource group (i.e. "tfstatelab")
-2. Create a "tfstate" Blob container (private)
+1. Create a Storage Account (manually via the Azure Portal) for Terraform remote state storage for the realm (i.e. "sapiencetfstatelab") in the "Production" Subscription / "devops" Resource Group
+2. Create a blob container for the <cloud>-<region>-<environment> (i.e. "azure-us-dev")
 3. Retrieve the "Access Key" for the Terraform remote state Storage Account via the Azure Portal... this will be used in Terraform "backend" blocks in each Terraform main.tf
 
 	**SECRET** :a:
@@ -22,29 +24,38 @@
 4. Create an Azure Service Principal via the Azure CLI: see Microsoft AKS documentation, Microsoft Azure CLI documentation, and Terraform documentation
 	```
 	az account set --subscription="<subscription_id>"
-	az ad sp create-for-rbac --skip-assignment --name Terraform`
+	az ad sp create-for-rbac --skip-assignment --name Terraform<Subscription>
 	```
-	If the sp has already been created, use `az ad sp show --id http://Terraform`
+	If the sp has already been created, use `az ad sp show --id http://Terraform<Subscription>`
 5. Copy and store the output of the command above
 
 	**SECRET** :b:
 
-	az role assignment create --assignee <sp object id> --role Contributor
+6. Create realm (i.e. <realm>-<region>) in subscription through portal
+
+7. Give Contributor role to Terraform<Subscription> service principal to the <realm>-<region> resource group created above
+
+   ```az role assignment create --assignee <sp object id from show command above> --role Contributor --scope /subscriptions/<subscription id>/resourceGroups/<resource group i.e. lab-us>```
+
+8. Give Storage Blob Data Contributor role to Terraform<Subscription> service principal to the "Production" subscription (so it can read/write to "sapiencetfstatelab")
+
+   ```az role assignment create --assignee <sp object id from show command above> --role "Storage Blob Data Contributor" --scope /subscriptions/<Production subscription id>/resourceGroups/devops/providers/Microsoft.Storage/storageAccounts/<i.e. sapiencetfstatelab>```
 
 ### Create Realm and Environment Infrastructure
 ----
-##### 1. Create "Lab" Realm Infrastructure
-1. Setup resource group(s)
-    1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
-	2. Edit "terraform/realms/lab/resource-group/main.tf"
-		- Change 'key' in terraform{} block: "sapience.realm.<font color="red">lab</font>.resource-group.terraform.tfstate"
-	3. Terraform Initialize and Apply
-		```
-		cd terraform/realms/lab/resource-group
-		terraform init -backend-config="../../../config/backend.config"
-		terraform apply -var-file="../../../config/realm.lab.tfvars"
-		```
+##### 1. Create Realm Infrastructure
+1. Copy components from existing realm
+2. Cleanup temporary directories
+	```find . -type d -name ".terraform" -exec rm -rf {} +```
+		
+	```find . -type d -name ".local" -exec rm -rf {} +```
 
+3. Create "storage-account"
+    1. ```tfinit```
+    2. ```tfapply```
+3. Create "network"
+    1. ```tfinit```
+    2. ```tfapply```
 2. Setup Kubernetes/AKS
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Remove any existing terraform/lab/kubernetes/kubeconfig

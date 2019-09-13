@@ -35,7 +35,7 @@ resource "azurerm_storage_account" "storage_account" {
   tags = merge(local.common_tags)
 
   lifecycle {
-    prevent_destroy = "true"
+    prevent_destroy = "false"
   }
 }
 
