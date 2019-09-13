@@ -11,17 +11,15 @@ trap 'after $config_location' EXIT ERR INT TERM
 
 if [[ $PWD =~ $regexp ]]
 then
-	realm="${BASH_REMATCH[1]}"
 	environment="${BASH_REMATCH[2]}"
-	echo "realm = ${realm}"
 	echo "environment = $environment"
 
 	config_location="../../../../../config"
 
 	echo "Creating decrypted files..."
-    ansible-vault decrypt "$config_location/realm.$realm.environment.$environment.backend.config.vault" --output "$config_location/realm.$realm.environment.$environment.backend.config" --vault-password-file $config_location/$realm.vault.password
+    ansible-vault decrypt "$config_location/environment.$environment.backend.config.vault" --output "$config_location/environment.$environment.backend.config" --vault-password-file $config_location/vault.password
 
-	terraform init -backend-config $config_location/realm.$realm.environment.$environment.backend.config
+	terraform init -backend-config $config_location/environment.$environment.backend.config
 else
 	regexp="terraform/realms/(.*)/components/.+"
 	
@@ -33,7 +31,7 @@ else
 		config_location="../../../../config"
 
 	    echo "Creating decrypted files..."
-	    ansible-vault decrypt "$config_location/realm.$realm.backend.config.vault" --output "$config_location/realm.$realm.backend.config" --vault-password-file $config_location/$realm.vault.password
+	    ansible-vault decrypt "$config_location/realm.$realm.backend.config.vault" --output "$config_location/realm.$realm.backend.config" --vault-password-file $config_location/vault.password
 
 		terraform init -backend-config $config_location/realm.$realm.backend.config
 	fi
