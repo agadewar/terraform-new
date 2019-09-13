@@ -53,6 +53,9 @@
 3. Create "storage-account"
     1. ```tfinit```
     2. ```tfapply```
+3. Create "network"
+    1. ```tfinit```
+    2. ```tfapply```
 2. Setup Kubernetes/AKS
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Remove any existing terraform/lab/kubernetes/kubeconfig
