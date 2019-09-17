@@ -78,7 +78,7 @@
 12. vm
 13. dns
 
-
+#### 
 1. Setup Kubernetes namespace
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/environments/dev/kubernetes-namespace/main.tf"
