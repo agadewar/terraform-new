@@ -49,3 +49,4 @@ resource "azurerm_recovery_services_protection_policy_vm" "daily_14" {
 }
 
 # The VMs must have the Azure VM Agent installed.  https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/agent-windows
+# You may also need to set allowExtensionOperations to True on the VM.  Run from your local command line:  az vm update -n <<VM NAME>> -g <<RESOURCE GROUP>>  --set osProfile.allowExtensionOperations=true
