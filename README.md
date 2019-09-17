@@ -63,6 +63,22 @@
 12. Create "logging"
 
 ##### 2. Create "Dev" Environment Infrastructure
+1. network
+2. kubernetes-namespace
+3. cronjob
+4. service-bus
+
+5. data-lake
+6. database
+7. canopy
+8. ambassador
+9. databricks
+10. sapience-app-api
+11. functions
+12. vm
+13. dns
+
+
 1. Setup Kubernetes namespace
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/environments/dev/kubernetes-namespace/main.tf"
