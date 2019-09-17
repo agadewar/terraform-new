@@ -20,7 +20,7 @@ provider "helm" {
 }
 
 locals {
-  config_path = "../kubernetes/kubeconfig"
+  config_path = "../kubernetes/.local/kubeconfig"
   namespace   = "monitoring"
 
   common_tags = merge(

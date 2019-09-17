@@ -144,6 +144,41 @@ resource "null_resource" "kubernetes_config_autoscaler" {
   }
 }
 
+resource "azurerm_public_ip" "aks_egress" {
+  name                = "aks-egress"
+  # location            = "${var.resource_group_location}"
+  location            = "${azurerm_kubernetes_cluster.kubernetes.location}"
+  resource_group_name = "${data.template_file.node_resource_group.rendered}"
+  
+  public_ip_address_allocation = "Static"
+
+  tags = "${merge(
+    local.common_tags,
+    {}
+  )}"
+}
+
+resource "kubernetes_service" "aks_egress" {
+  // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
+  //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+  metadata {
+    labels = {
+      "sapienceanalytics.com/name" = "aks-egress"
+    }
+
+    name = "aks-egress"
+    namespace = "default"
+  }
+
+  spec {
+    load_balancer_ip = "${azurerm_public_ip.aks_egress.ip_address}"
+    type = "LoadBalancer"
+    port {
+      port = "80"
+    }
+  }
+}
+
 # ### Helm
 
 # resource "kubernetes_service_account" "tiller" {

@@ -13,9 +13,9 @@ variable "virtual_network_address_space" {
 }
 
 variable "subnet_address_prefix_default" {}
-variable "subnet_address_prefix_demo-default" {}
-variable "subnet_address_prefix_demo-application" {}
-variable "subnet_address_prefix_demo-data" {}
+# variable "subnet_address_prefix_demo-default" {}
+# variable "subnet_address_prefix_demo-application" {}
+# variable "subnet_address_prefix_demo-data" {}
 variable "subnet_address_prefix_aks-pool" {}
 
 variable "subnet_service_endpoints" {
