@@ -54,12 +54,13 @@
 3. Create "storage-account"
 4. Create "network"
 5. Create "kubernetes"
-6. Create "helm"
-7. Create "kured"
-8. Create "certificates"
-9. Create "ingress-controller"
-10. Create "monitoring"
-11. Create "logging"
+6. Create "aks-egress"
+7. Create "helm"
+8. Create "kured"
+9. Create "certificates"
+10. Create "ingress-controller"
+11. Create "monitoring"
+12. Create "logging"
 
 ##### 2. Create "Dev" Environment Infrastructure
 1. Setup Kubernetes namespace
