@@ -398,6 +398,13 @@ resource "azurerm_network_interface" "sisense_appquery_002" {
   }
 }
 
+resource "azurerm_recovery_services_protected_vm" "sisense_appquery_002" {
+  resource_group_name = "${var.resource_group_name}"
+  recovery_vault_name = "${data.terraform_remote_state.backup.outputs.vault}"
+  source_vm_id        = "${azurerm_virtual_machine.sisense_appquery_002.id}"
+  backup_policy_id    = "${data.terraform_remote_state.backup.outputs.id_daily_14}"
+}
+
 resource "azurerm_virtual_machine" "sisense_build_001" {
   depends_on            = [azurerm_network_interface.sisense_build_001]
   name                  = "sisense-build-001-${var.environment}"
