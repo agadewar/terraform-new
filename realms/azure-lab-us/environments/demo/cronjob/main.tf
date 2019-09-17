@@ -16,7 +16,7 @@ provider "null" {
 locals {
   namespace = "${var.environment}"
 
-  config_path = "../../../components/kubernetes/kubeconfig"
+  config_path = "../../../components/kubernetes/.local/kubeconfig"
 
   common_tags = "${merge(
     var.realm_common_tags,

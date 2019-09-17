@@ -33,7 +33,3 @@ output "kubernetes_location" {
 output "kubernetes_node_resource_group_name" {
   value = data.template_file.node_resource_group.rendered
 }
-
-output "aks_egress_ip_address" {
-  value = "${azurerm_public_ip.aks_egress.ip_address}"
-}
