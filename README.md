@@ -46,21 +46,20 @@
 ##### 1. Create Realm Infrastructure
 1. Copy components from existing realm
 2. Cleanup temporary directories
+
 	```find . -type d -name ".terraform" -exec rm -rf {} +```
 		
 	```find . -type d -name ".local" -exec rm -rf {} +```
 
 3. Create "storage-account"
-    1. ```tfinit```
-    2. ```tfapply```
 4. Create "network"
-    1. ```tfinit```
-    2. ```tfapply```
 5. Create "kubernetes"
 6. Create "helm"
 7. Create "kured"
 8. Create "certificates"
 9. Create "ingress-controller"
+10. Create "monitoring"
+11. Create "logging"
 
 ##### 2. Create "Dev" Environment Infrastructure
 1. Setup Kubernetes namespace
