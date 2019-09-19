@@ -130,7 +130,7 @@
 			2. Click on sapience-canopy-hierarchy-${realm}-${environment}
 			3. Click 'Add Graph'
 			4. Set "Database id = canopy" AND "Graph Id = hierarchy"
-			5. For Dev, we set Storage Capacity = 'Fixed (10GB) and Throughput = 400
+			5. For Dev, we set Storage Capacity = 'Fixed (10GB) and Throughput = 400; Partition Key = "/name"
 	    2. Execute this Gremlin query via the Cosmos portal:
 			- `g.addV(label, 'User', 'ref_id', 'steve.ardis@banyanhills.com', 'name', 'steve.ardis@banyanhills.com').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))`
 	5. Setup SQL Server (from Repo: canopy-sql)
