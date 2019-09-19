@@ -127,7 +127,7 @@
 	4. Configure user(s) in Gremlin
 	    1. Create graph database in Cosmos
 			1. In Azure Portal, go to Azure Cosmos DB
-			2. Click on sapience-canopy-hierarchy-dev
+			2. Click on sapience-canopy-hierarchy-${realm}-${environment}
 			3. Click 'Add Graph'
 			4. Set "Database id = canopy" AND "Graph Id = hierarchy"
 			5. For Dev, we set Storage Capacity = 'Fixed (10GB) and Throughput = 400
