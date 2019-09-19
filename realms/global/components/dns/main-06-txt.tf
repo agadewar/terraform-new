@@ -10,9 +10,9 @@ resource "azurerm_dns_txt_record" "sapienceanalytics_txt" {
              
   }
   record {
-    value = "v=spf1 include: _spf.sendergen.com include:spf.protection.outlook.com -all"
+    value = "v=spf1 include: _spf.sendergen.com include: _spf.protection.outlook.com -all"
   }
-
+  
   record {
     value = "sapienceanalytics.azurewebsites.net"
   }
