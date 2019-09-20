@@ -44,7 +44,7 @@ resource "azurerm_subnet" "env-application" {
   name                 = "${var.environment}-application"
   resource_group_name  = var.resource_group_name
   virtual_network_name = data.terraform_remote_state.network_realm.outputs.realm_network_name
-  address_prefix       = var.subnet_address_prefix_env-application
+  address_prefix       = var.subnet_address_prefix_prod-application
 }
 
 resource "azurerm_subnet" "env-data" {

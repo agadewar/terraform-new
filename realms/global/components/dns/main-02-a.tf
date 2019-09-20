@@ -87,6 +87,15 @@ resource "azurerm_dns_a_record" "sapience_artofworking" {
   records             = ["199.116.77.52"]
 }
 
+resource "azurerm_dns_a_record" "sisense_dev" {
+  name                = "sisense.dev"
+  zone_name           = "${azurerm_dns_zone.sapience_public.name}"
+  resource_group_name = "${var.resource_group_name}"  # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  records             = ["52.234.226.40"]
+}
+
+
 
 
 # NEW WEBSITE

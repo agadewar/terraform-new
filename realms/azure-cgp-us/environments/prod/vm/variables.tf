@@ -18,8 +18,8 @@ variable "realm_common_tags" {
 }
 
 # WINDOWS ADMINISTRATOR
-variable "sapience_cgp_demo_admin_username" {}
-variable "sapience_cgp_demo_admin_password" {}
+variable "sapience_cgp_prod_admin_username" {}
+variable "sapience_cgp_prod_admin_password" {}
 
 # WHITELIST IP ADDRESSES
 variable "ip_sapience_dallas_office" {

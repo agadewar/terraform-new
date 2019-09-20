@@ -62,15 +62,20 @@ resource "azurerm_network_security_group" "sapience-cgp" {
     source_address_prefix      = var.ip_sapience_pune_office
     destination_address_prefix = "*"
   } 
+
+  tags = "${merge(
+    local.common_tags
+  )}"
+  
 }
 
 # DEMO VIRTUAL MACHINE
-resource "azurerm_virtual_machine" "sapience_cgp_demo" {
-  depends_on            = [azurerm_network_interface.sapience_cgp_demo]
-  name                  = "sapience-cgp-${var.environment}"
+resource "azurerm_virtual_machine" "sapience_cgp_001" {
+  depends_on            = [azurerm_network_interface.sapience_cgp_001]
+  name                  = "sapience-cgp-001-${var.environment}"
   resource_group_name   = var.resource_group_name
   location              = var.resource_group_location
-  network_interface_ids = [azurerm_network_interface.sapience_cgp_demo.id]
+  network_interface_ids = [azurerm_network_interface.sapience_cgp_001.id]
   vm_size               = "Standard_D4s_v3"
 
   # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
@@ -91,14 +96,14 @@ resource "azurerm_virtual_machine" "sapience_cgp_demo" {
   }
 
   storage_os_disk {
-    name              = "sapience-cgp-os-${var.environment}"
+    name              = "sapience-cgp-os-001-${var.environment}"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
 
   os_profile {
-    computer_name  = "sap-cgp-demo"
+    computer_name  = "sapcgp-demo001"
     admin_username = var.sapience_cgp_demo_admin_username
     admin_password = var.sapience_cgp_demo_admin_password
   }
@@ -106,17 +111,21 @@ resource "azurerm_virtual_machine" "sapience_cgp_demo" {
   os_profile_windows_config {}
 
   storage_data_disk {
-    name            = "sapience-cgp-data-${var.environment}"
-    managed_disk_id = azurerm_managed_disk.sapience_cgp_data_demo.id
+    name            = "sapience-cgp-data-001-${var.environment}"
+    managed_disk_id = azurerm_managed_disk.sapience_cgp_data_001.id
     create_option   = "Attach"
     disk_size_gb    = "100"
     lun             = "1"
   }
+
+  tags = "${merge(
+    local.common_tags
+  )}"
 }
 
 # MANAGED DISK
-resource "azurerm_managed_disk" "sapience_cgp_data_demo" {
-  name                 = "sapience-cgp-data-${var.environment}"
+resource "azurerm_managed_disk" "sapience_cgp_data_001" {
+  name                 = "sapience-cgp-data-001-${var.environment}"
   location             = "${var.resource_group_location}"
   resource_group_name  = "${var.resource_group_name}"
   storage_account_type = "Standard_LRS"
@@ -128,22 +137,27 @@ resource "azurerm_managed_disk" "sapience_cgp_data_demo" {
   )}"
   
   lifecycle{
-    prevent_destroy = "true"
+    prevent_destroy = "false"
   }
 }
 
 # PUBLIC IP ADDRESS
-resource "azurerm_public_ip" "sapience_cgp_demo" {
-  name                         = "sapience-cgp-${var.environment}"
+resource "azurerm_public_ip" "sapience_cgp_001" {
+  name                         = "sapience-cgp-001-${var.environment}"
   location                     = "East US"
   resource_group_name          = var.resource_group_name
   public_ip_address_allocation = "Static"
+  
+  tags = "${merge(
+    local.common_tags
+  )}"
 }
 
+
 # NETWORK INTERFACE
-resource "azurerm_network_interface" "sapience_cgp_demo" {
-  depends_on                = [azurerm_public_ip.sapience_cgp_demo, azurerm_network_security_group.sapience-cgp]
-  name                      = "sapience-cgp-${var.environment}"
+resource "azurerm_network_interface" "sapience_cgp_001" {
+  depends_on                = [azurerm_public_ip.sapience_cgp_001, azurerm_network_security_group.sapience-cgp]
+  name                      = "sapience-cgp-001-${var.environment}"
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
   network_security_group_id = azurerm_network_security_group.sapience-cgp.id
@@ -151,7 +165,11 @@ resource "azurerm_network_interface" "sapience_cgp_demo" {
   ip_configuration {
     name                          = "sapience-cgp-${var.environment}"
     subnet_id                     = data.terraform_remote_state.network_env.outputs.env-application_subnet_id
-    public_ip_address_id          = azurerm_public_ip.sapience_cgp_demo.id
+    public_ip_address_id          = azurerm_public_ip.sapience_cgp_001.id
     private_ip_address_allocation = "Dynamic"
   }
+
+  tags = "${merge(
+    local.common_tags
+  )}"
 }
