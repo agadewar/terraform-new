@@ -22,6 +22,7 @@ locals {
   )
 }
 
+# CREATE REALM VIRTUAL NETWORK
 resource "azurerm_virtual_network" "realm" {
   name                = "${var.resource_group_name}"
   location            = var.resource_group_location
@@ -29,6 +30,7 @@ resource "azurerm_virtual_network" "realm" {
   address_space       = var.virtual_network_address_space
 }
 
+# CREATE DEFAULT REALM SUBNET
 resource "azurerm_subnet" "default" {
   name                 = "default"
   resource_group_name  = var.resource_group_name
@@ -36,35 +38,3 @@ resource "azurerm_subnet" "default" {
   address_prefix       = var.subnet_address_prefix_default
   service_endpoints    = var.subnet_service_endpoints
 }
-
-# resource "azurerm_subnet" "demo-default" {
-#   name                 = "demo-default"
-#   resource_group_name  = var.resource_group_name
-#   virtual_network_name = azurerm_virtual_network.realm.name
-#   address_prefix       = var.subnet_address_prefix_demo-default
-#   service_endpoints    = var.subnet_service_endpoints
-# }
-
-# resource "azurerm_subnet" "demo-application" {
-#   name                 = "demo-application"
-#   resource_group_name  = var.resource_group_name
-#   virtual_network_name = azurerm_virtual_network.realm.name
-#   address_prefix       = var.subnet_address_prefix_demo-application
-#   service_endpoints    = var.subnet_service_endpoints
-# }
-
-# resource "azurerm_subnet" "demo-data" {
-#   name                 = "demo-data"
-#   resource_group_name  = var.resource_group_name
-#   virtual_network_name = azurerm_virtual_network.realm.name
-#   address_prefix       = var.subnet_address_prefix_demo-data
-#   service_endpoints    = var.subnet_service_endpoints
-# }
-
-# resource "azurerm_subnet" "aks-pool" {
-#   name                 = "aks-pool"
-#   resource_group_name  = var.resource_group_name
-#   virtual_network_name = azurerm_virtual_network.realm.name
-#   address_prefix       = var.subnet_address_prefix_aks-pool
-#   service_endpoints    = var.subnet_service_endpoints
-# }
