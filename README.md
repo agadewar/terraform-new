@@ -63,6 +63,22 @@
 12. Create "logging"
 
 ##### 2. Create "Dev" Environment Infrastructure
+1. network
+2. kubernetes-namespace
+3. cronjob
+4. service-bus
+
+5. data-lake
+6. database
+7. canopy
+8. ambassador
+9. databricks
+10. sapience-app-api
+11. functions
+12. vm
+13. dns
+
+#### 
 1. Setup Kubernetes namespace
     1. Remove any existing ".terraform" folder if copying from an existing folder and this is new non-existing infrastructure
 	2. Edit "terraform/environments/dev/kubernetes-namespace/main.tf"
@@ -111,10 +127,10 @@
 	4. Configure user(s) in Gremlin
 	    1. Create graph database in Cosmos
 			1. In Azure Portal, go to Azure Cosmos DB
-			2. Click on sapience-canopy-hierarchy-dev
+			2. Click on sapience-canopy-hierarchy-${realm}-${environment}
 			3. Click 'Add Graph'
 			4. Set "Database id = canopy" AND "Graph Id = hierarchy"
-			5. For Dev, we set Storage Capacity = 'Fixed (10GB) and Throughput = 400
+			5. For Dev, we set Storage Capacity = 'Fixed (10GB) and Throughput = 400; Partition Key = "/name"
 	    2. Execute this Gremlin query via the Cosmos portal:
 			- `g.addV(label, 'User', 'ref_id', 'steve.ardis@banyanhills.com', 'name', 'steve.ardis@banyanhills.com').addE("BELONGS_TO").to(g.addV(label, 'Branch', 'ref_id', 'Sapience', 'name', 'Sapience'))`
 	5. Setup SQL Server (from Repo: canopy-sql)
