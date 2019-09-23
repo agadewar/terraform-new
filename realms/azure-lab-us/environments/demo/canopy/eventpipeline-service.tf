@@ -44,7 +44,7 @@ resource "kubernetes_service" "datalake" {
   }
 
   spec {
-    external_name = "sapiencedatalake${var.environment}.dfs.core.windows.net"
+    external_name = "sapdl${replace(lower(var.realm), "-", "")}${var.environment}.dfs.core.windows.net"
 
     type = "ExternalName"
   }

@@ -1,14 +1,11 @@
-variable "environment" {
-}
 
-variable "subscription_id" {
-}
+variable "realm" {}
+variable "environment" {}
 
-variable "resource_group_name" {
-}
+variable "subscription_id" {}
 
-variable "resource_group_location" {
-}
+variable "resource_group_name" {}
+variable "resource_group_location" {}
 
 variable "realm_common_tags" {
   type = map(string)

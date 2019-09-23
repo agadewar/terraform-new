@@ -34,29 +34,12 @@ variable "sisense_appquery_002_admin_password" {}
 variable "sisense_build_001_admin_username" {}
 variable "sisense_build_001_admin_password" {}
 
-variable "ip_sapience_office" {
-  default = ""
-}
-
-variable "ip_sapience_office_2" {
-  default = ""
-}
-
-variable "ip_banyan_office" {
-  default = ""
-}
-
-variable "ip_benjamin_john_home" {
-  default = ""
-}
-
-variable "ip_steve_ardis_home" {
-  default = ""
-}
-
-variable "ip_milind_kadbane_home" {
-  default = ""
-}
+variable "ip_sapience_dallas_office" {}
+variable "ip_sapience_pune_office" {}
+variable "ip_banyan_office" {}
+variable "ip_benjamin_john_home" {}
+variable "ip_steve_ardis_home" {}
+variable "ip_milind_kadbane_home" {}
 
 variable "environment_common_tags" {
   type = map(string)

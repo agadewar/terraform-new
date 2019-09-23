@@ -27,7 +27,7 @@ provider "kubernetes" {
 
 locals {
   namespace   = var.environment
-  config_path = "../../../components/kubernetes/kubeconfig"
+  config_path = "../../../components/kubernetes/.local/kubeconfig"
 
   canopy_container_registry_image_pull_secret_name   = "canopy-container-registry-credential"
   sapience_container_registry_image_pull_secret_name = "sapience-container-registry-credential"
@@ -63,9 +63,9 @@ data "terraform_remote_state" "service_bus" {
   backend = "azurerm"
 
   config = {
-    access_key           = var.realm_backend_access_key
-    storage_account_name = var.realm_backend_storage_account_name
-    container_name       = "environment-${var.environment}"
+    access_key           = var.env_backend_access_key
+    storage_account_name = var.env_backend_storage_account_name
+    container_name       = var.env_backend_container_name
     key                  = "service-bus.tfstate"
   }
 }
@@ -74,9 +74,9 @@ data "terraform_remote_state" "database" {
   backend = "azurerm"
 
   config = {
-    access_key           = var.realm_backend_access_key
-    storage_account_name = var.realm_backend_storage_account_name
-    container_name       = "environment-${var.environment}"
+    access_key           = var.env_backend_access_key
+    storage_account_name = var.env_backend_storage_account_name
+    container_name       = var.env_backend_container_name
     key                  = "database.tfstate"
   }
 }
@@ -85,9 +85,9 @@ data "terraform_remote_state" "data_lake" {
   backend = "azurerm"
 
   config = {
-    access_key           = var.realm_backend_access_key
-    storage_account_name = var.realm_backend_storage_account_name
-    container_name       = "environment-${var.environment}"
+    access_key           = var.env_backend_access_key
+    storage_account_name = var.env_backend_storage_account_name
+    container_name       = var.env_backend_container_name
     key                  = "data-lake.tfstate"
   }
 }
@@ -96,6 +96,7 @@ data "template_file" "global_properties" {
   template = file("templates/global.properties.tpl")
 
   vars = {
+    realm                   = var.realm
     environment             = var.environment
     kafka_bootstrap_servers = var.kafka_bootstrap_servers
   }

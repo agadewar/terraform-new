@@ -1,3 +1,4 @@
+realm=${realm}
 environment=${environment}
 
 config_folder=/opt/canopy/config
@@ -17,7 +18,7 @@ email.enabled = false
 email.fromAddress=steve.ardis@banyanhills.com
 
 spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
-spring.datasource.url=jdbc:sqlserver://sapience-$${environment}.database.windows.net:1433;databaseName=$${database.name};
+spring.datasource.url=jdbc:sqlserver://sapience-$${realm}-$${environment}.database.windows.net:1433;databaseName=canopy-$${database.name};
 spring.datasource.username=$${CANOPY_DATABASE_USERNAME}
 spring.datasource.password=$${CANOPY_DATABASE_PASSWORD}
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.SQLServerDialect
@@ -25,7 +26,7 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.SQLServerDialect
 
 flyway.enabled=false
 
-amqp.url=amqps://sapience-$${environment}.servicebus.windows.net?amqp.idleTimeout=120000&amqp.traceFrames=true
+amqp.url=amqps://sapience-$${realm}-$${environment}.servicebus.windows.net?amqp.idleTimeout=120000&amqp.traceFrames=true
 amqp.username=RootManageSharedAccessKey
 amqp.password=$${CANOPY_AMQP_PASSWORD}
 

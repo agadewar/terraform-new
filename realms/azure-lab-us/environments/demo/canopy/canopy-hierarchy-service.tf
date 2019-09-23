@@ -15,6 +15,7 @@ data "template_file" "gremlin_cosmos" {
   template = file("templates/gremlin-cosmos.yaml.tpl")
 
   vars = {
+    realm                            = var.realm
     environment                      = var.environment
     canopy_hierarchy_cosmos_password = data.terraform_remote_state.database.outputs.canopy_hierarchy_cosmos_password
   }

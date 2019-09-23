@@ -9,18 +9,14 @@ provider "azurerm" {
   subscription_id = var.subscription_id
 }
 
-data "terraform_remote_state" "kubernetes_namespace" {
+data "terraform_remote_state" "aks_egress" {
   backend = "azurerm"
 
   config = {
     access_key           = var.realm_backend_access_key
     storage_account_name = var.realm_backend_storage_account_name
-    # HARD-CODED TO USE ENVIRONMENT DEV BECAUSE IT IS THE FIRST LOAD BALANCER SERVICE STOOD UP IN THE CLUSTER... THEREFORE IT BECAME THE IP ADDRESS FOR EGRESS. 
-    # WE NEED TO STAND UP A STATIC PUBLIC IP.
-    # SEE: https://docs.microsoft.com/en-us/azure/aks/egress
-    # container_name       = "environment-${var.environment}"
-    container_name       = "environment-dev"
-    key                  = "kubernetes-namespace.tfstate"
+    container_name       = var.realm_backend_container_name
+    key                  = "aks-egress.tfstate"
   }
 }
 
@@ -28,7 +24,7 @@ locals {
   sql_server_version                    = "12.0"
   sql_server_administrator_login        = var.sql_server_administrator_login
   sql_server_administrator_password     = var.sql_server_administrator_password
-  sedw_requested_service_objective_name = var.sedw_requested_service_objective_name
+  # sedw_requested_service_objective_name = var.sedw_requested_service_objective_name
   cosmos_failover_location              = "eastus2"
 
   common_tags = merge(
@@ -41,7 +37,7 @@ locals {
 }
 
 resource "azurerm_sql_server" "sapience" {
-  name                         = "sapience-${var.environment}"
+  name                         = "sapience-${var.realm}-${var.environment}"
   resource_group_name          = var.resource_group_name
   location                     = var.resource_group_location
   version                      = local.sql_server_version
@@ -57,52 +53,62 @@ resource "azurerm_sql_database" "sedw" {
   location                         = azurerm_sql_server.sapience.location
   server_name                      = azurerm_sql_server.sapience.name
   edition                          = "DataWarehouse"
-  requested_service_objective_name = local.sedw_requested_service_objective_name
+  requested_service_objective_name = var.sql_database_sedw_requested_service_objective_name
 
   tags = merge(local.common_tags, {})
 }
 
-resource "azurerm_sql_database" "device" {
-  name                = "device"
-  resource_group_name = azurerm_sql_server.sapience.resource_group_name
-  location            = azurerm_sql_server.sapience.location
-  server_name         = azurerm_sql_server.sapience.name
+resource "azurerm_sql_database" "canopy_device" {
+  name                             = "canopy-device"
+  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
+  location                         = azurerm_sql_server.sapience.location
+  server_name                      = azurerm_sql_server.sapience.name
+  edition                          = var.sql_database_canopy_device_edition
+  requested_service_objective_name = var.sql_database_canopy_device_requested_service_objective_name
 
   tags = merge(local.common_tags, {})
 }
 
-resource "azurerm_sql_database" "eventpipeline" {
-  name                = "eventpipeline"
-  resource_group_name = azurerm_sql_server.sapience.resource_group_name
-  location            = azurerm_sql_server.sapience.location
-  server_name         = azurerm_sql_server.sapience.name
+resource "azurerm_sql_database" "canopy_eventpipeline" {
+  name                             = "canopy-eventpipeline"
+  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
+  location                         = azurerm_sql_server.sapience.location
+  server_name                      = azurerm_sql_server.sapience.name
+  edition                          = var.sql_database_canopy_eventpipeline_edition
+  requested_service_objective_name = var.sql_database_canopy_eventpipeline_requested_service_objective_name
 
   tags = merge(local.common_tags, {})
 }
 
-resource "azurerm_sql_database" "leafbroker" {
-  name                = "leafbroker"
-  resource_group_name = azurerm_sql_server.sapience.resource_group_name
-  location            = azurerm_sql_server.sapience.location
-  server_name         = azurerm_sql_server.sapience.name
+resource "azurerm_sql_database" "canopy_leafbroker" {
+  name                             = "canopy-leafbroker"
+  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
+  location                         = azurerm_sql_server.sapience.location
+  server_name                      = azurerm_sql_server.sapience.name
+  edition                          = var.sql_database_canopy_leafbroker_edition
+  requested_service_objective_name = var.sql_database_canopy_leafbroker_requested_service_objective_name
 
   tags = merge(local.common_tags, {})
 }
 
-resource "azurerm_sql_database" "user" {
-  name                = "user"
-  resource_group_name = azurerm_sql_server.sapience.resource_group_name
-  location            = azurerm_sql_server.sapience.location
-  server_name         = azurerm_sql_server.sapience.name
+resource "azurerm_sql_database" "canopy_user" {
+  name                             = "canopy-user"
+  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
+  location                         = azurerm_sql_server.sapience.location
+  server_name                      = azurerm_sql_server.sapience.name
+  edition                          = var.sql_database_canopy_user_edition
+  requested_service_objective_name = var.sql_database_canopy_user_requested_service_objective_name
 
   tags = merge(local.common_tags, {})
 }
 
 resource "azurerm_sql_database" "mad" {
-  name                = "mad"
-  resource_group_name = azurerm_sql_server.sapience.resource_group_name
-  location            = azurerm_sql_server.sapience.location
-  server_name         = azurerm_sql_server.sapience.name
+  name                             = "mad"
+  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
+  location                         = azurerm_sql_server.sapience.location
+  server_name                      = azurerm_sql_server.sapience.name
+  edition                          = var.sql_database_mad_edition
+  requested_service_objective_name = var.sql_database_mad_requested_service_objective_name
 
   tags = merge(local.common_tags, {})
 }
@@ -111,8 +117,8 @@ resource "azurerm_sql_firewall_rule" "aks_egress" {
   name                = "aks-egress"
   resource_group_name = azurerm_sql_server.sapience.resource_group_name
   server_name         = azurerm_sql_server.sapience.name
-  start_ip_address    = data.terraform_remote_state.kubernetes_namespace.outputs.aks_egress_ip_address
-  end_ip_address      = data.terraform_remote_state.kubernetes_namespace.outputs.aks_egress_ip_address
+  start_ip_address    = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
+  end_ip_address      = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
 }
 
 resource "azurerm_sql_firewall_rule" "ip_banyan_office" {
@@ -131,12 +137,20 @@ resource "azurerm_sql_firewall_rule" "ip_benjamin_john_home" {
   end_ip_address      = var.ip_benjamin_john_home
 }
 
-resource "azurerm_sql_firewall_rule" "ip_sapience_office" {
-  name                = "ip-sapience-office"
+resource "azurerm_sql_firewall_rule" "ip_sapience_dallas_office" {
+  name                = "ip-sapience-dallas-office"
   resource_group_name = azurerm_sql_server.sapience.resource_group_name
   server_name         = azurerm_sql_server.sapience.name
-  start_ip_address    = var.ip_sapience_office
-  end_ip_address      = var.ip_sapience_office
+  start_ip_address    = var.ip_sapience_dallas_office
+  end_ip_address      = var.ip_sapience_dallas_office
+}
+
+resource "azurerm_sql_firewall_rule" "ip_sapience_pune_office" {
+  name                = "ip-sapience-pune-office"
+  resource_group_name = azurerm_sql_server.sapience.resource_group_name
+  server_name         = azurerm_sql_server.sapience.name
+  start_ip_address    = var.ip_sapience_pune_office
+  end_ip_address      = var.ip_sapience_pune_office
 }
 
 resource "azurerm_sql_firewall_rule" "ip_steve_ardis_home" {
@@ -156,7 +170,7 @@ resource "azurerm_sql_firewall_rule" "ip_azure_services" {
 }
 
 resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
-  name                = "sapience-canopy-hierarchy-${var.environment}"
+  name                = "sapience-canopy-hierarchy-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
   offer_type          = "Standard"
@@ -176,44 +190,44 @@ resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
   }
 }
 
-resource "azurerm_cosmosdb_account" "sapience_graph" {
-  name                = "sapience-graph-${var.environment}"
-  resource_group_name = var.resource_group_name
-  location            = var.resource_group_location
-  offer_type          = "Standard"
-  kind                = "GlobalDocumentDB"
+# resource "azurerm_cosmosdb_account" "sapience_graph" {
+#   name                = "sapience-graph-${var.environment}"
+#   resource_group_name = var.resource_group_name
+#   location            = var.resource_group_location
+#   offer_type          = "Standard"
+#   kind                = "GlobalDocumentDB"
 
-  capabilities {
-    name = "EnableGremlin"
-  }
+#   capabilities {
+#     name = "EnableGremlin"
+#   }
 
-  consistency_policy {
-    consistency_level = "Strong"
-  }
+#   consistency_policy {
+#     consistency_level = "Strong"
+#   }
 
-  geo_location {
-    location          = local.cosmos_failover_location
-    failover_priority = 0
-  }
-}
+#   geo_location {
+#     location          = local.cosmos_failover_location
+#     failover_priority = 0
+#   }
+# }
 
-resource "azurerm_cosmosdb_account" "event_archive" {
-  name                = "sapience-event-archive-${var.environment}"
-  resource_group_name = var.resource_group_name
-  location            = var.resource_group_location
-  offer_type          = "Standard"
+# resource "azurerm_cosmosdb_account" "event_archive" {
+#   name                = "sapience-event-archive-${var.environment}"
+#   resource_group_name = var.resource_group_name
+#   location            = var.resource_group_location
+#   offer_type          = "Standard"
 
-  capabilities {
-    name = "EnableCassandra"
-  }
+#   capabilities {
+#     name = "EnableCassandra"
+#   }
 
-  consistency_policy {
-    consistency_level = "Eventual"
-  }
+#   consistency_policy {
+#     consistency_level = "Eventual"
+#   }
 
-  geo_location {
-    location          = local.cosmos_failover_location
-    failover_priority = 0
-  }
-}
+#   geo_location {
+#     location          = local.cosmos_failover_location
+#     failover_priority = 0
+#   }
+# }
 

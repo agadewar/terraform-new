@@ -13,12 +13,23 @@ provider "azurerm" {
   tenant_id       = var.service_principal_tenant
 }
 
+provider "azurerm" {
+  alias = "global"
+
+  version = "1.31.0"
+
+  subscription_id = var.global_subscription_id
+  client_id       = var.service_principal_app_id
+  client_secret   = var.service_principal_password
+  tenant_id       = var.service_principal_tenant
+}
+
 provider "kubernetes" {
   config_path = local.config_path
 }
 
 locals {
-  config_path = "../../../components/kubernetes/kubeconfig"
+  config_path = "../../../components/kubernetes/.local/kubeconfig"
   namespace   = var.environment
 
   common_tags = merge(
@@ -57,7 +68,7 @@ resource "kubernetes_ingress" "api" {
 
   spec {
     rule {
-      host = "api.${var.environment}.${var.realm}.sapienceanalytics.com"
+      host = "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
       http {
         path {
           backend {
@@ -86,7 +97,7 @@ resource "kubernetes_ingress" "api" {
 
     tls {
       hosts = [
-        "api.${var.environment}.${var.realm}.sapienceanalytics.com",
+        "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
         "api.${var.environment}.sapienceanalytics.com",
       ]
       secret_name = "ambassador-certs"
@@ -200,7 +211,9 @@ EOF
 }
 
 resource "azurerm_dns_a_record" "api" {
-  name = "api.${var.environment}.${var.realm}"
+  provider = azurerm.global
+
+  name = "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name = "sapienceanalytics.com"
   resource_group_name = "global"
   ttl = 30

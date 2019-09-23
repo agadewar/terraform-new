@@ -1,4 +1,4 @@
-hosts: [ sapience-canopy-hierarchy-${environment}.gremlin.cosmos.azure.com ]
+hosts: [ sapience-canopy-hierarchy-${realm}-${environment}.gremlin.cosmos.azure.com ]
 port: 443
 username: /dbs/canopy/colls/hierarchy
 password: ${canopy_hierarchy_cosmos_password}

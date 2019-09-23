@@ -19,41 +19,6 @@ locals {
   )}"
 }
 
-# resource "azurerm_data_lake_store" "sapience" {
-#   name                = "sapience${var.environment}"
-#   resource_group_name = "${var.resource_group_name}"
-#   location            = "eastus2"
-#   encryption_state    = "Enabled"
-#   encryption_type     = "ServiceManaged"
-
-#   tags = "${merge(
-#     local.common_tags,
-#     map()
-#   )}"
-# }
-
-# resource "azurerm_data_lake_store_firewall_rule" "ardis_home" {
-#   name                = "ardis-home"
-#   account_name        = "${azurerm_data_lake_store.sapience.name}"
-#   resource_group_name = "${var.resource_group_name}"
-#   start_ip_address    = "24.99.117.169"
-#   end_ip_address      = "24.99.117.169"
-# }
-
-# resource "azurerm_data_lake_store_firewall_rule" "banyan" {
-#   name                = "banyan"
-#   account_name        = "${azurerm_data_lake_store.sapience.name}"
-#   resource_group_name = "${var.resource_group_name}"
-#   start_ip_address    = "50.20.0.62"
-#   end_ip_address      = "50.20.0.62"
-# }
-
-
-
-
-
-
-
 resource "null_resource" "azure_data_lake_storage_gen2" {
   # triggers = {
   #   manifest_sha1 = "${sha1("${file("files/ambassador-rbac.yaml")}")}"
@@ -65,13 +30,13 @@ resource "null_resource" "azure_data_lake_storage_gen2" {
   # !!! To interact with Data Lake Storage Gen2 by using the CLI, you'll have to add an extension to your shell... "az extension add --name storage-preview"
   provisioner "local-exec" {
     # command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f -<<EOF\n${file("files/ambassador-rbac.yaml")}\nEOF"
-    command = "az storage account create --name sapiencedatalake${var.environment} --subscription ${var.subscription_id} --resource-group ${var.resource_group_name} --location ${var.resource_group_location} --sku Standard_LRS --kind StorageV2 --hierarchical-namespace true"
+    command = "az storage account create --name sapdl${replace(lower(var.realm), "-", "")}${var.environment} --subscription ${var.subscription_id} --resource-group ${var.resource_group_name} --location ${var.resource_group_location} --sku Standard_LRS --kind StorageV2 --hierarchical-namespace true"
   }
 
   provisioner "local-exec" {
     when = "destroy"
 
-    command = "az storage account delete --name sapiencedatalake${var.environment} --subscription ${var.subscription_id} --resource-group ${var.resource_group_name} --yes"
+    command = "az storage account delete --name sapdl${replace(lower(var.realm), "-", "")}${var.environment} --subscription ${var.subscription_id} --resource-group ${var.resource_group_name} --yes"
   }
 }
 
@@ -83,7 +48,7 @@ resource "null_resource" "azure_data_lake_storage_gen2_key_1" {
   }
 
   provisioner "local-exec" {
-    command = "mkdir -p .local && az storage account keys list --account-name sapiencedatalake${var.environment} --subscription ${var.subscription_id} --resource-group ${var.resource_group_name} | jq -r .[0].value > .local/azure_data_lake_storage_gen2.key1"
+    command = "mkdir -p .local && az storage account keys list --account-name sapdl${replace(lower(var.realm), "-", "")}${var.environment} --subscription ${var.subscription_id} --resource-group ${var.resource_group_name} | jq -r .[0].value > .local/azure_data_lake_storage_gen2.key1"
   }
 }
 
@@ -101,7 +66,7 @@ resource "null_resource" "azure_data_lake_storage_gen2_key_2" {
   }
 
   provisioner "local-exec" {
-    command = "mkdir -p .local && az storage account keys list --account-name sapiencedatalake${var.environment} --subscription ${var.subscription_id} --resource-group ${var.resource_group_name} | jq -r .[1].value > .local/azure_data_lake_storage_gen2.key2"
+    command = "mkdir -p .local && az storage account keys list --account-name sapdl${replace(lower(var.realm), "-", "")}${var.environment} --subscription ${var.subscription_id} --resource-group ${var.resource_group_name} | jq -r .[1].value > .local/azure_data_lake_storage_gen2.key2"
   }
 }
 
@@ -110,10 +75,3 @@ data "local_file" "azure_data_lake_storage_gen2_key_2" {
 
   filename = ".local/azure_data_lake_storage_gen2.key2"
 }
-
-# resource "azurerm_storage_container" "raw-data" {
-#   name                  = "raw-data"
-#   resource_group_name   = "${var.resource_group_name}"
-#   storage_account_name  = "sapiencedatalake${var.environment}"
-#   container_access_type = "private"
-# }

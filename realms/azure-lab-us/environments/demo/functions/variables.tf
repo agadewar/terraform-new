@@ -1,14 +1,14 @@
-variable "environment" {
-}
+variable "realm_backend_access_key" {}
+variable "realm_backend_storage_account_name" {}
+variable "realm_backend_container_name" {}
 
-variable "subscription_id" {
-}
+variable "realm" {}
+variable "environment" {}
 
-variable "resource_group_name" {
-}
+variable "subscription_id" {}
 
-variable "resource_group_location" {
-}
+variable "resource_group_name" {}
+variable "resource_group_location" {}
 
 variable "realm_common_tags" {
   type = map(string)

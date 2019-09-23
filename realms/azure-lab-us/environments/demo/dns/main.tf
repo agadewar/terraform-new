@@ -6,15 +6,19 @@ terraform {
 
 provider "azurerm" {
   version         = "1.31.0"
-  subscription_id = var.subscription_id
+  
+  subscription_id = var.global_subscription_id
+  client_id       = var.service_principal_app_id
+  client_secret   = var.service_principal_password
+  tenant_id       = var.service_principal_tenant
 }
 
 data "terraform_remote_state" "ingress_controller" {
   backend = "azurerm"
   config = {
-    access_key           = "${var.realm_backend_access_key}"
-    storage_account_name = "${var.realm_backend_storage_account_name}"
-	  container_name       = "${var.realm_backend_container_name}"
+    access_key           = var.realm_backend_access_key
+    storage_account_name = var.realm_backend_storage_account_name
+	  container_name       = var.realm_backend_container_name
     key                  = "ingress-controller.tfstate"
   }
 }
@@ -24,11 +28,10 @@ data "terraform_remote_state" "vm" {
   config = {
     access_key           = var.env_backend_access_key
     storage_account_name = var.env_backend_storage_account_name
-    container_name       = "environment-${var.environment}"
+    container_name       = var.env_backend_container_name
     key                  = "vm.tfstate"
   }
 }
-
 
 # locals {
 #   resource_group_name = "${var.resource_group_name}"
@@ -42,7 +45,7 @@ data "terraform_remote_state" "vm" {
 # }
 
 resource "azurerm_dns_a_record" "portal" {
-  name                = "portal.${var.environment}.${var.realm}"
+  name                = "portal.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "Global"
   ttl                 = 300
@@ -58,7 +61,7 @@ resource "azurerm_dns_a_record" "portal" {
 }
 
 resource "azurerm_dns_a_record" "sisense_build" {
-  name                = "sisense-build.${var.environment}.${var.realm}"
+  name                = "sisense-build.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "Global"
   ttl                 = 300
@@ -66,7 +69,7 @@ resource "azurerm_dns_a_record" "sisense_build" {
 }
 
 resource "azurerm_dns_a_record" "sisense_appquery" {
-  name                = "sisense.${var.environment}.${var.realm}"
+  name                = "sisense.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "Global"
   ttl                 = 300
