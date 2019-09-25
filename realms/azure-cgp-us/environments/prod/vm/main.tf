@@ -171,3 +171,10 @@ resource "azurerm_network_interface" "sapience_cgp_001" {
       local.common_tags
   )}"
 }
+
+resource "azurerm_recovery_services_protected_vm" "sapience_cgp_001" {
+  resource_group_name = "${var.resource_group_name}"
+  recovery_vault_name = "${data.terraform_remote_state.backup.outputs.vault}"
+  source_vm_id        = "${azurerm_virtual_machine.sapience_cgp_001.id}"
+  backup_policy_id    = "${data.terraform_remote_state.backup.outputs.id_daily_14}"
+}
