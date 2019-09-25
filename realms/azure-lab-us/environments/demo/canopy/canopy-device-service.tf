@@ -18,8 +18,8 @@ resource "kubernetes_secret" "canopy_device_service" {
 
   data = {
     "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
-    "canopy.database.username" = var.sql_server_administrator_login
-    "canopy.database.password" = var.sql_server_administrator_password
+    "canopy.database.username" = var.sql_server_canopy_username
+    "canopy.database.password" = var.sql_server_canopy_password
     "kafka.username"           = var.kafka_username
     "kafka.password"           = var.kafka_password
     "google.api.key"           = var.google_api_key

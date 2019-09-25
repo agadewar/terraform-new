@@ -1,1 +1,1 @@
-$(dirname $(readlink $(which tfapply)))/tfwrapper apply $@
+$(dirname $(readlink $(which `basename -- "$0"`)))/tfwrapper apply $@

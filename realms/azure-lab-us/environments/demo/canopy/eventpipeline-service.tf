@@ -2,7 +2,8 @@ data "template_file" "eventpipeline_conf" {
   template = file("templates/eventpipeline.conf.tpl")
 
   vars = {
-    environment             = var.environment
+    datalake_name           = "sapdl${replace(lower(var.realm), "-", "")}${var.environment}"
+    # datalake_name           = "datalake"
     kafka_bootstrap_servers = var.kafka_bootstrap_servers
   }
 }
@@ -28,8 +29,8 @@ resource "kubernetes_secret" "eventpipeline_service" {
 
   data = {
     "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
-    "canopy.database.username" = var.sql_server_administrator_login
-    "canopy.database.password" = var.sql_server_administrator_password
+    "canopy.database.username" = var.sql_server_canopy_username
+    "canopy.database.password" = var.sql_server_canopy_password
     "kafka.username"           = var.kafka_username
     "kafka.password"           = var.kafka_password
     "azure.datalake.key"       = data.terraform_remote_state.data_lake.outputs.azure_data_lake_storage_gen2_key_1
@@ -38,17 +39,19 @@ resource "kubernetes_secret" "eventpipeline_service" {
   type = "Opaque"
 }
 
-resource "kubernetes_service" "datalake" {
-  metadata {
-    name = "datalake"
-  }
+# resource "kubernetes_service" "datalake" {
+#   metadata {
+#     name = "datalake"
+#     namespace = local.namespace
+#   }
 
-  spec {
-    external_name = "sapdl${replace(lower(var.realm), "-", "")}${var.environment}.dfs.core.windows.net"
+#   spec {
+#     external_name = "sapdl${replace(lower(var.realm), "-", "")}${var.environment}.dfs.core.windows.net"
+#     # external_name = "datalake.dfs.core.windows.net"
 
-    type = "ExternalName"
-  }
-}
+#     type = "ExternalName"
+#   }
+# }
 
 resource "kubernetes_deployment" "eventpipeline_service_deployment" {
   metadata {

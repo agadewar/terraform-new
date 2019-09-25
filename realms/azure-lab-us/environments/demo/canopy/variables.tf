@@ -16,8 +16,10 @@ variable "sapience_container_registry_hostname" {}
 variable "sapience_container_registry_username" {}
 variable "sapience_container_registry_password" {}
 
-variable "sql_server_administrator_login" {}
-variable "sql_server_administrator_password" {}
+# variable "sql_server_administrator_login" {}
+# variable "sql_server_administrator_password" {}
+variable "sql_server_canopy_username" {}
+variable "sql_server_canopy_password" {}
 
 variable "google_api_key" {
   default = ""
