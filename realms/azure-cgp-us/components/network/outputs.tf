@@ -6,3 +6,7 @@ output "realm_network_name" {
 output "default_subnet_id" {
   value = "${azurerm_subnet.default.id}"
 }
+
+output "managed_domain_subnet_id" {
+  value = "${azurerm_subnet.managed_domain.id}"
+}
