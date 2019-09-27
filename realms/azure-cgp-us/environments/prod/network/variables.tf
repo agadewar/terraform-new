@@ -18,6 +18,7 @@ variable "virtual_network_address_space" {
 }
 
 variable "subnet_address_prefix_env-default" {}
+variable "subnet_address_prefix_env-gateway" {}
 variable "subnet_address_prefix_env-application" {}
 variable "subnet_address_prefix_env-data" {}
 

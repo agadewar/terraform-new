@@ -40,6 +40,13 @@ resource "azurerm_subnet" "env-default" {
   address_prefix       = var.subnet_address_prefix_env-default
 }
 
+resource "azurerm_subnet" "env-gateway" {
+  name                 = "${var.environment}-gateway"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = data.terraform_remote_state.network_realm.outputs.realm_network_name
+  address_prefix       = var.subnet_address_prefix_env-gateway
+}
+
 resource "azurerm_subnet" "env-application" {
   name                 = "${var.environment}-application"
   resource_group_name  = var.resource_group_name

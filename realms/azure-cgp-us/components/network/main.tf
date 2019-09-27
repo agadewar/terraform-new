@@ -38,3 +38,11 @@ resource "azurerm_subnet" "default" {
   address_prefix       = var.subnet_address_prefix_default
   service_endpoints    = var.subnet_service_endpoints
 }
+
+resource "azurerm_subnet" "managed_domain" {
+  name                 = "managed-domain"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.realm.name
+  address_prefix       = var.subnet_address_prefix_managed-domain
+  service_endpoints    = var.subnet_service_endpoints
+}

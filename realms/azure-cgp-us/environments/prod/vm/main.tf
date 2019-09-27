@@ -141,7 +141,8 @@ resource "azurerm_managed_disk" "sapience_cgp_data_001" {
 }
 
 # PUBLIC IP ADDRESS
-resource "azurerm_public_ip" "sapience_cgp_001" {
+
+/* resource "azurerm_public_ip" "sapience_cgp_001" {
   name                         = "sapience-cgp-001-${var.environment}"
   location                     = "East US"
   resource_group_name          = var.resource_group_name
@@ -150,11 +151,11 @@ resource "azurerm_public_ip" "sapience_cgp_001" {
   tags = "${merge(
       local.common_tags
   )}"
-}
+} */
 
 # NETWORK INTERFACE
 resource "azurerm_network_interface" "sapience_cgp_001" {
-  depends_on                = [azurerm_public_ip.sapience_cgp_001, azurerm_network_security_group.sapience-cgp]
+  depends_on                = [azurerm_network_security_group.sapience-cgp]
   name                      = "sapience-cgp-001-${var.environment}"
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
@@ -163,11 +164,19 @@ resource "azurerm_network_interface" "sapience_cgp_001" {
   ip_configuration {
     name                          = "sapience-cgp-${var.environment}"
     subnet_id                     = data.terraform_remote_state.network_env.outputs.env-application_subnet_id
-    public_ip_address_id          = azurerm_public_ip.sapience_cgp_001.id
+    #public_ip_address_id          = azurerm_public_ip.sapience_cgp_001.id
     private_ip_address_allocation = "Dynamic"
   }
 
+#azurerm_public_ip.sapience_cgp_001,
   tags = "${merge(
       local.common_tags
   )}"
 }
+/* 
+resource "azurerm_recovery_services_protected_vm" "sapience_cgp_001" {
+  resource_group_name = "${var.resource_group_name}"
+  recovery_vault_name = "${data.terraform_remote_state.backup.outputs.vault}"
+  source_vm_id        = "${azurerm_virtual_machine.sapience_cgp_001.id}"
+  backup_policy_id    = "${data.terraform_remote_state.backup.outputs.id_daily_14}"
+} */
