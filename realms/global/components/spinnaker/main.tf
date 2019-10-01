@@ -102,7 +102,9 @@ resource "null_resource" "kubeconfig" {
   
   provisioner "local-exec" {
     # combine kubeconfigs
-    command = "mkdir -p .local && KUBECONFIG=${join(":", formatlist("../../../%s/components/kubernetes/.local/kubeconfig", concat(var.spinnaker_additional_kubeconfig_contexts, list("global"))))} kubectl config view --merge --flatten > .local/kubeconfig"
+    ### TODO - this "rename-context" isn't maintainable like this... need to fix; the problem is that we've stripped "azure-" from the cluster name when 
+    ###        we create it, but we need to be able to identify it as "azure-" or "aws-" in Spinnaker
+    command = "mkdir -p .local && KUBECONFIG=${join(":", formatlist("../../../%s/components/kubernetes/.local/kubeconfig", concat(var.spinnaker_additional_kubeconfig_contexts, list("global"))))} kubectl config view --merge --flatten > .local/kubeconfig && kubectl --kubeconfig .local/kubeconfig config rename-context lab-us azure-lab-us"
   }
 
   provisioner "local-exec" {
