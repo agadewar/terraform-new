@@ -1,30 +1,49 @@
+#########################################
+# SUMMARY
+# - Network Security Group
+# - Virtual Machines
+#     - CGP-US-PROD-WEB-APP-001
+#     - CGP-US-PROD-SQL-001
+#########################################
+
+#########################################
+# TERRAFROM REMOTE STATE - (READ / WRITE)
+#########################################
 terraform {
   backend "azurerm" {
     key = "vm.tfstate"
   }
 }
 
+#########################################
+# TERRAFORM REMOTE STATE - (READ-ONLY)
+#########################################
+data "terraform_remote_state" "network" {
+  backend = "azurerm"
+  config  = {
+    access_key           = var.realm_backend_access_key
+    storage_account_name = var.realm_backend_storage_account_name
+    container_name       = var.environment_backend_container_name
+    key                  = "network.tfstate"
+  }
+}
+
+#########################################
+# AZURE PLUGIN
+#########################################
 provider "azurerm" {
   version         = "1.31.0"
-
   subscription_id = var.subscription_id
   client_id       = var.service_principal_app_id
   client_secret   = var.service_principal_password
   tenant_id       = var.service_principal_tenant
 }
 
-data "terraform_remote_state" "network_env" {
-  backend = "azurerm"
-
-  config = {
-    access_key           = var.env_backend_access_key
-    storage_account_name = var.env_backend_storage_account_name
-    container_name       = var.env_backend_container_name
-    key                  = "network.tfstate"
-  }
-}
-
+#########################################
+# LOCAL VARIABLES
+#########################################
 locals {
+  resource_name = "${var.realm}-${var.environment}"
   common_tags = merge(
     var.environment_common_tags,
     {
@@ -33,11 +52,13 @@ locals {
   )
 }
 
-# NETWORK SECURITY GROUP
-resource "azurerm_network_security_group" "sapience-cgp" {
-  name                = "sapience-cgp-${var.environment}"
-  location            = var.resource_group_location
+#####################################################
+# NETWORK SECURITY GROUP - WHITELIST SAPIENCE OFFICES
+#####################################################
+resource "azurerm_network_security_group" "sapience" {
+  name                = local.resource_name
   resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
 
   security_rule {
     name                       = "Allow-AllTraffic-Sapience-Dallas-Office"
@@ -68,13 +89,290 @@ resource "azurerm_network_security_group" "sapience-cgp" {
   )}"
 }
 
-# DEMO VIRTUAL MACHINE
-resource "azurerm_virtual_machine" "sapience_cgp_001" {
-  depends_on            = [azurerm_network_interface.sapience_cgp_001]
-  name                  = "sapience-cgp-001-${var.environment}"
+##################################
+# VIRTUAL MACHINE - WEB APP SERVER
+##################################
+resource "azurerm_virtual_machine" "web_app_001" {
+  name                  = "${local.resource_name}-web-app-001"
   resource_group_name   = var.resource_group_name
   location              = var.resource_group_location
-  network_interface_ids = [azurerm_network_interface.sapience_cgp_001.id]
+  depends_on            = [azurerm_network_interface.web_app_001]
+  network_interface_ids = [azurerm_network_interface.web_app_001.id]
+  vm_size               = "Standard_D4s_v3"
+
+  ####################################################################################
+  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  ####################################################################################
+  delete_os_disk_on_termination = false
+
+  ######################################################################################
+  # This means the Data Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  ######################################################################################
+  delete_data_disks_on_termination = false
+
+  #######################################
+  # az vm image list --all --output table
+  #######################################
+  storage_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2016-Datacenter"
+    version   = "latest"
+  }
+
+  storage_os_disk {
+    name              = "${local.resource_name}-web-app-001-os"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  storage_data_disk {
+    name            = "${local.resource_name}-web-app-001-data"
+    managed_disk_id = azurerm_managed_disk.web_app_001_data.id
+    create_option   = "Attach"
+    disk_size_gb    = "100"
+    lun             = "1"
+  }
+  
+  os_profile {
+    computer_name  = "WEB-APP-SVR-001"
+    admin_username = var.cgp_us_prod_web_app_001_admin_username
+    admin_password = var.cgp_us_prod_web_app_001_admin_password
+  }
+  
+  os_profile_windows_config { 
+    provision_vm_agent   = true
+  }
+
+  tags = "${merge(
+      local.common_tags
+  )}"
+}
+
+#########################################
+# MANAGED DISK
+#########################################
+resource "azurerm_managed_disk" "web_app_001_data" {
+  name                 = "${local.resource_name}-web-app-001-data"
+  resource_group_name  = var.resource_group_name
+    location           = var.resource_group_location
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = "100"
+
+  tags = "${merge(
+    local.common_tags
+  )}"
+  
+  lifecycle{
+    prevent_destroy = "true"
+  }
+}
+
+#########################################
+# NETWORK INTERFACE
+#########################################
+resource "azurerm_network_interface" "web_app_001" {
+  name                      = "${local.resource_name}-web-app-001"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  depends_on                = [azurerm_network_security_group.sapience]
+  network_security_group_id = azurerm_network_security_group.sapience.id
+
+  ip_configuration {
+    name                          = "${local.resource_name}-web-app-001"
+    subnet_id                     =  data.terraform_remote_state.network.outputs.env-application_subnet_id
+    private_ip_address_allocation = "Dynamic"
+  }
+
+  tags = "${merge(
+      local.common_tags
+  )}"
+}
+
+###############################################################################
+# Virtual Machine Extension
+# - https://jackstromberg.com/2018/11/using-terraform-with-azure-vm-extensions/
+###############################################################################
+resource "azurerm_virtual_machine_extension" "web_app_001" {
+  name                 = "${local.resource_name}-web-app-001"
+  resource_group_name  = var.resource_group_name
+  location             = var.resource_group_location
+  virtual_machine_name = azurerm_virtual_machine.web_app_001.name
+  publisher            = "Microsoft.Compute"
+  type                 = "JsonADDomainExtension"
+  type_handler_version = "1.3"
+  
+  settings = <<SETTINGS
+    {
+        "Name": "sapience.net",
+        "User": "${var.domain_admin_username}",
+        "OUPath": "",
+        "Restart": "true",
+        "Options": "3"
+    }
+SETTINGS
+  protected_settings = <<PROTECTED_SETTINGS
+     {
+        "Password": "${var.domain_admin_password}"
+      }
+    PROTECTED_SETTINGS
+  depends_on = ["azurerm_virtual_machine.web_app_001"]
+
+  tags = "${merge(
+      local.common_tags
+  )}"
+}
+
+##################################
+# VIRTUAL MACHINE - WEB APP SERVER
+##################################
+resource "azurerm_virtual_machine" "sql_001" {
+  name                  = "${local.resource_name}-sql-001"
+  resource_group_name   = var.resource_group_name
+  location              = var.resource_group_location
+  depends_on            = [azurerm_network_interface.sql_001]
+  network_interface_ids = [azurerm_network_interface.sql_001.id]
+  vm_size               = "Standard_D4s_v3"
+
+  ####################################################################################
+  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  ####################################################################################
+  delete_os_disk_on_termination = false
+
+  ######################################################################################
+  # This means the Data Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  ######################################################################################
+  delete_data_disks_on_termination = false
+
+  #######################################
+  # az vm image list --all --output table
+  #######################################
+  storage_image_reference {
+    publisher = "MicrosoftSQLServer"
+    offer     = "SQL2016SP2-WS2016"
+    sku       = "Standard"
+    version   = "latest"
+  }
+
+  storage_os_disk {
+    name              = "${local.resource_name}-sql-001-os"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  storage_data_disk {
+    name            = "${local.resource_name}-sql-001-data"
+    managed_disk_id = azurerm_managed_disk.sql_001_data.id
+    create_option   = "Attach"
+    disk_size_gb    = "100"
+    lun             = "1"
+  }
+  
+  os_profile {
+    computer_name  = "SQL-SVR-001"
+    admin_username = var.cgp_us_prod_sql_001_admin_username
+    admin_password = var.cgp_us_prod_sql_001_admin_password
+  }
+  
+  os_profile_windows_config { 
+    provision_vm_agent   = true
+  }
+
+  tags = "${merge(
+      local.common_tags
+  )}"
+}
+
+#########################################
+# MANAGED DISK
+#########################################
+resource "azurerm_managed_disk" "sql_001_data" {
+  name                 = "${local.resource_name}-sql-001-data"
+  resource_group_name  = var.resource_group_name
+    location           = var.resource_group_location
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = "100"
+
+  tags = "${merge(
+    local.common_tags
+  )}"
+  
+  lifecycle{
+    prevent_destroy = "true"
+  }
+}
+
+#########################################
+# NETWORK INTERFACE
+#########################################
+resource "azurerm_network_interface" "sql_001" {
+  name                      = "${local.resource_name}-sql-001"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  depends_on                = [azurerm_network_security_group.sapience]
+  network_security_group_id = azurerm_network_security_group.sapience.id
+
+  ip_configuration {
+    name                          = "${local.resource_name}-sql-001"
+    subnet_id                     =  data.terraform_remote_state.network.outputs.env-data_subnet_id
+    private_ip_address_allocation = "Dynamic"
+  }
+
+  tags = "${merge(
+      local.common_tags
+  )}"
+}
+
+###############################################################################
+# Virtual Machine Extension
+# - https://jackstromberg.com/2018/11/using-terraform-with-azure-vm-extensions/
+###############################################################################
+resource "azurerm_virtual_machine_extension" "sql_001" {
+  name                 = "${local.resource_name}-sql-001"
+  resource_group_name  = var.resource_group_name
+  location             = var.resource_group_location
+  virtual_machine_name = azurerm_virtual_machine.sql_001.name
+  publisher            = "Microsoft.Compute"
+  type                 = "JsonADDomainExtension"
+  type_handler_version = "1.3"
+  
+  settings = <<SETTINGS
+    {
+        "Name": "sapience.net",
+        "User": "${var.domain_admin_username}",
+        "OUPath": "",
+        "Restart": "true",
+        "Options": "3"
+    }
+SETTINGS
+  protected_settings = <<PROTECTED_SETTINGS
+     {
+        "Password": "${var.domain_admin_password}"
+      }
+    PROTECTED_SETTINGS
+  depends_on = ["azurerm_virtual_machine.sql_001"]
+
+  tags = "${merge(
+      local.common_tags
+  )}"
+}
+
+
+/* # VIRTUAL MACHINE - SQL SERVER
+resource "azurerm_virtual_machine" "cgp_sql_001" {
+  depends_on            = [azurerm_network_interface.cgp_sql_001]
+  name                  = "cgp-sql-001-${var.environment}"
+  resource_group_name   = var.resource_group_name
+  location              = var.resource_group_location
+  network_interface_ids = [azurerm_network_interface.cgp_sql_001.id]
   vm_size               = "Standard_D4s_v3"
 
   # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
@@ -85,7 +383,7 @@ resource "azurerm_virtual_machine" "sapience_cgp_001" {
   # NOTE: This may not be optimal in all cases.
   delete_data_disks_on_termination = true
 
- # https://docs.microsoft.com/th-th/azure/virtual-machines/windows/cli-ps-findimage
+
  # az vm image list --publisher MicrosoftSQLServer --all --output table
   storage_image_reference {
     publisher = "MicrosoftSQLServer"
@@ -95,23 +393,25 @@ resource "azurerm_virtual_machine" "sapience_cgp_001" {
   }
 
   storage_os_disk {
-    name              = "sapience-cgp-os-001-${var.environment}"
+    name              = "cgp-sql-os-001-${var.environment}"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
 
   os_profile {
-    computer_name  = "sapcgp-prod001"
-    admin_username = var.sapience_cgp_prod_admin_username
-    admin_password = var.sapience_cgp_prod_admin_password
+    computer_name  = "sql-${var.environment}-001"
+    admin_username = var.cgp_sql_prod_001_admin_username
+    admin_password = var.cgp_sql_prod_001_admin_password
   }
 
-  os_profile_windows_config {}
+  os_profile_windows_config {
+    provision_vm_agent   = true
+  }
 
   storage_data_disk {
-    name            = "sapience-cgp-data-001-${var.environment}"
-    managed_disk_id = azurerm_managed_disk.sapience_cgp_data_001.id
+    name            = "cgp-sql-data-001-${var.environment}"
+    managed_disk_id = azurerm_managed_disk.cgp_sql_data_001.id
     create_option   = "Attach"
     disk_size_gb    = "100"
     lun             = "1"
@@ -123,8 +423,8 @@ resource "azurerm_virtual_machine" "sapience_cgp_001" {
 }
 
 # MANAGED DISK
-resource "azurerm_managed_disk" "sapience_cgp_data_001" {
-  name                 = "sapience-cgp-data-001-${var.environment}"
+resource "azurerm_managed_disk" "cgp_sql_data_001" {
+  name                 = "cgp-sql-data-001-${var.environment}"
   location             = "${var.resource_group_location}"
   resource_group_name  = "${var.resource_group_name}"
   storage_account_type = "Standard_LRS"
@@ -140,31 +440,17 @@ resource "azurerm_managed_disk" "sapience_cgp_data_001" {
   }
 }
 
-# PUBLIC IP ADDRESS
-
-/* resource "azurerm_public_ip" "sapience_cgp_001" {
-  name                         = "sapience-cgp-001-${var.environment}"
-  location                     = "East US"
-  resource_group_name          = var.resource_group_name
-  public_ip_address_allocation = "Static"
-  
-  tags = "${merge(
-      local.common_tags
-  )}"
-} */
-
 # NETWORK INTERFACE
-resource "azurerm_network_interface" "sapience_cgp_001" {
+resource "azurerm_network_interface" "cgp_sql_001" {
   depends_on                = [azurerm_network_security_group.sapience-cgp]
-  name                      = "sapience-cgp-001-${var.environment}"
+  name                      = "cgp-sql-001-${var.environment}"
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
   network_security_group_id = azurerm_network_security_group.sapience-cgp.id
 
   ip_configuration {
-    name                          = "sapience-cgp-${var.environment}"
-    subnet_id                     = data.terraform_remote_state.network_env.outputs.env-application_subnet_id
-    #public_ip_address_id          = azurerm_public_ip.sapience_cgp_001.id
+    name                          = "cgp-sql-001-${var.environment}"
+    subnet_id                     =  data.terraform_remote_state.network_env.outputs.env-data_subnet_id
     private_ip_address_allocation = "Dynamic"
   }
 
@@ -173,10 +459,34 @@ resource "azurerm_network_interface" "sapience_cgp_001" {
       local.common_tags
   )}"
 }
-/* 
-resource "azurerm_recovery_services_protected_vm" "sapience_cgp_001" {
-  resource_group_name = "${var.resource_group_name}"
-  recovery_vault_name = "${data.terraform_remote_state.backup.outputs.vault}"
-  source_vm_id        = "${azurerm_virtual_machine.sapience_cgp_001.id}"
-  backup_policy_id    = "${data.terraform_remote_state.backup.outputs.id_daily_14}"
+
+resource "azurerm_virtual_machine_extension" "cgp-sql-001" {
+  name                 = "cgp-sql-001-${var.environment}"
+  location             = var.resource_group_location
+  resource_group_name  = var.resource_group_name
+  virtual_machine_name = "${azurerm_virtual_machine.cgp_sql_001.name}"
+  publisher            = "Microsoft.Compute"
+  type                 = "JsonADDomainExtension"
+  type_handler_version = "1.3"
+  
+  settings = <<SETTINGS
+    {
+        "Name": "sapience.net",
+        "User": "cgp-us-admin@sapience.net",
+        "OUPath": "",
+        "Restart": "true",
+        "Options": "3"
+    }
+SETTINGS
+  protected_settings = <<PROTECTED_SETTINGS
+      {
+        "Password": "skTkZmDjCKHejhATo-B9"
+      }
+    PROTECTED_SETTINGS
+  depends_on = ["azurerm_virtual_machine.cgp_sql_001"]
+
+  tags = "${merge(
+      local.common_tags
+  )}"
 } */
+

@@ -1,39 +1,54 @@
-# REFERENCED IN MAIN.TF
+###################################################
+# REALM VARIABLES (realm.azure-cgp-us.tfvars.vault)
+###################################################
+
+# PRODUCTION SUBSCRIPTION
 variable "subscription_id" {}
+
+# SERVICE PRINCIPAL - http://TerraformProduction
 variable "service_principal_app_id" {}
 variable "service_principal_password" {}
 variable "service_principal_tenant" {}
 
-variable "env_backend_access_key" {}
-variable "env_backend_storage_account_name" {}
-variable "env_backend_container_name" {}
+# REMOTE TFSTATE STORAGE ACCOUNT
+variable "realm_backend_access_key" {}
+variable "realm_backend_storage_account_name" {}
 
+# REALM
 variable "realm" {}
-variable "environment" {}
-variable "subnet_address_prefix" {}
-variable "app_gateway_private_ip" {}
 
 # RESOURCE GROUPS
 variable "resource_group_name" {}
 variable "resource_group_location" {}
-variable "realm_common_tags" {
-  type = map(string)
-}
-
-# WINDOWS ADMINISTRATOR
-variable "sapience_cgp_prod_admin_username" {}
-variable "sapience_cgp_prod_admin_password" {}
-
-# WHITELIST IP ADDRESSES
-variable "ip_sapience_dallas_office" {
-  default = ""
-}
-variable "ip_sapience_pune_office" {
-  default = ""
-}
 
 # TAGS
-variable "environment_common_tags" {
-  type = map(string)
-}
+variable "realm_common_tags" {type = map(string)}
 
+##########################################################################
+# ENVIRONMENT VARIABLES (realm.azure-cgp-us.environment.prod.tfvars.vault)
+##########################################################################
+
+# STORAGE BLOB CONTAINER
+variable "environment_backend_container_name" {}
+
+# ENVIRONMENT
+variable "environment" {}
+
+# DOMAIN ADMIN
+variable "domain_admin_username" {}
+variable "domain_admin_password" {}
+
+# SAPIENCE SERVER LOCAL ADMIN ACCOUNT
+variable "cgp_us_prod_web_app_001_admin_username" {}
+variable "cgp_us_prod_web_app_001_admin_password" {}
+
+# SQL SERVER LOCAL ADMIN ACCOUNT
+variable "cgp_us_prod_sql_001_admin_username" {}
+variable "cgp_us_prod_sql_001_admin_password" {}
+
+# SAPIENCE OFFICES
+variable "ip_sapience_dallas_office" {default = ""}
+variable "ip_sapience_pune_office" {default = ""}
+
+# TAGS
+variable "environment_common_tags" {type = map(string)}
