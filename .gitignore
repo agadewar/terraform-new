@@ -32,7 +32,13 @@ override.tf.json
 
 /config/*
 !/config/*.vault
-!/config/id_rsa.pub
+
+# but, allow subdirectories
+!/config/*/
+# but not all files in all subdirectories
+/config/*/*
+!/config/*/id_rsa.pub
+!/config/*/id_rsa.vault
 
 
 **/*_original
