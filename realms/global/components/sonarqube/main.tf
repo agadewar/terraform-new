@@ -82,7 +82,7 @@ ingress:
     kubernetes.io/ingress.class                        : nginx
     kubernetes.io/tls-acme                             : true
     nginx.ingress.kubernetes.io/ssl-redirect           : true
-    nginx.ingress.kubernetes.io/whitelist-source-range : ${join(", ", var.sonarqube_source_ranges_allowed)}
+    nginx.ingress.kubernetes.io/whitelist-source-range : ${join(", ", concat([data.terraform_remote_state.ingress-controller.outputs.nginx_ingress_controller_ip], var.sonarqube_source_ranges_allowed))}
   hosts:
     - name: sonarqube.sapienceanalytics.com
       path: /

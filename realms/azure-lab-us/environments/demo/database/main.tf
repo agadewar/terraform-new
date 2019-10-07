@@ -113,6 +113,17 @@ resource "azurerm_sql_database" "mad" {
   tags = merge(local.common_tags, {})
 }
 
+resource "azurerm_sql_database" "staging" {
+  name                             = "Staging"
+  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
+  location                         = azurerm_sql_server.sapience.location
+  server_name                      = azurerm_sql_server.sapience.name
+  edition                          = var.sql_database_staging_edition
+  requested_service_objective_name = var.sql_database_staging_requested_service_objective_name
+
+  tags = merge(local.common_tags, {})
+}
+
 resource "azurerm_sql_firewall_rule" "aks_egress" {
   name                = "aks-egress"
   resource_group_name = azurerm_sql_server.sapience.resource_group_name

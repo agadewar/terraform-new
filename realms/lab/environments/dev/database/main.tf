@@ -50,19 +50,19 @@ resource "azurerm_sql_server" "sapience" {
   )}"
 }
 
-resource "azurerm_sql_database" "sedw" {
-  name                             = "sedw"
-  resource_group_name              = "${azurerm_sql_server.sapience.resource_group_name}"
-  location                         = "${azurerm_sql_server.sapience.location}"
-  server_name                      = "${azurerm_sql_server.sapience.name}"
-  edition                          = "DataWarehouse"
-  requested_service_objective_name = "${local.sedw_requested_service_objective_name}"
+# resource "azurerm_sql_database" "sedw" {
+#   name                             = "sedw"
+#   resource_group_name              = "${azurerm_sql_server.sapience.resource_group_name}"
+#   location                         = "${azurerm_sql_server.sapience.location}"
+#   server_name                      = "${azurerm_sql_server.sapience.name}"
+#   edition                          = "DataWarehouse"
+#   requested_service_objective_name = "${local.sedw_requested_service_objective_name}"
 
-  tags = "${merge(
-    local.common_tags,
-    {}
-  )}"
-}
+#   tags = "${merge(
+#     local.common_tags,
+#     {}
+#   )}"
+# }
 
 resource "azurerm_sql_database" "device" {
   name                = "device"
