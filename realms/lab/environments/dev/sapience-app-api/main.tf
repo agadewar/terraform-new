@@ -34,7 +34,7 @@ resource "kubernetes_secret" "sapience_app_api" {
   }
 
   data = {
-      StagingDB__Password = var.sql_server_appsvc_etl_user_password
+      StagingDB__Password = var.sql_server_appsvc_api_user_password
       Sisense__Secret = var.sisense_secret
   }
 }
