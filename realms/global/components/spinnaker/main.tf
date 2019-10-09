@@ -85,6 +85,10 @@ data "template_file" "custom_values" {
     acr-username                   = "${var.sapience_container_registry_username}"
     acr-password                   = "${var.sapience_container_registry_password}"
     acr-email                      = "${var.devops_email}"
+    smtp-host                      = "${var.smtp_host}"
+    smtp-username                  = "${var.smtp_username}"
+    smtp-password                  = "${var.smtp_password}"
+    smtp-from-email                = "${var.devops_email}"
   }
 }
 

@@ -16,6 +16,10 @@ variable "sapience_container_registry_hostname" {}
 variable "sapience_container_registry_username" {}
 variable "sapience_container_registry_password" {}
 
+variable "smtp_host" {}
+variable "smtp_username" {}
+variable "smtp_password" {}
+
 variable "spinnaker_additional_kubeconfig_contexts" {
     type = "list"
 }

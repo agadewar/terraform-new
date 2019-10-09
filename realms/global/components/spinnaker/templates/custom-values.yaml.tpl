@@ -41,8 +41,8 @@ halyard:
       echo-local.yaml:
         mail:
           enabled: true
-          host: smtp.office365.com
-          from: devops@sapience.net
+          host: ${smtp-host}
+          from: ${smtp-from-email}
           properties:
             mail:
                 smtp:
@@ -51,9 +51,9 @@ halyard:
                     enable: true
         spring:
           mail:
-            host: smtp.office365.com
-            username: devops@sapience.net
-            password: 8BGdKk8qB5iRKzoOh4Cx
+            host: ${smtp-host}
+            username: ${smtp-username}
+            password: ${smtp-password}
             port: 587
             properties:
               mail:
