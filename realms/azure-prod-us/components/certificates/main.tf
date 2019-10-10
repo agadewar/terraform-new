@@ -101,22 +101,12 @@ resource "helm_release" "cert_manager" {
   name       = "cert-manager"
   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
   chart      = "cert-manager"
-  version    = "v0.8.1"
+  version    = "v0.10.1"
   repository = data.helm_repository.jetstack.metadata[0].name
 
   set {
     name  = "webhook.enabled"
     value = "false"
-  }
-
-  set {
-    name  = "resources.requests.cpu"
-    value = "10m"
-  }
-
-  set {
-    name  = "resources.requests.memory"
-    value = "32Mi"
   }
 }
 
@@ -137,7 +127,7 @@ data "template_file" "letsencrypt_cluster_issuer_staging" {
 }
 
 resource "null_resource" "letsencrypt_cluster_issuer_staging" {
-  depends_on = [ kubernetes_secret.service_principal_password ]
+  depends_on = [ kubernetes_secret.service_principal_password, null_resource.create_cert_manager_crd ]
 
   triggers = {
     template_changed = data.template_file.letsencrypt_cluster_issuer_staging.rendered
@@ -165,7 +155,7 @@ data "template_file" "letsencrypt_cluster_issuer_prod" {
 }
 
 resource "null_resource" "letsencrypt_cluster_issuer_prod" {
-  depends_on = [ kubernetes_secret.service_principal_password ]
+  depends_on = [ kubernetes_secret.service_principal_password, null_resource.create_cert_manager_crd ]
 
   triggers = {
     template_changed = data.template_file.letsencrypt_cluster_issuer_prod.rendered

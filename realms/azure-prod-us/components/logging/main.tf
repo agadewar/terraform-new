@@ -57,4 +57,3 @@ resource "helm_release" "efk" {
   repository = data.helm_repository.akomljen_charts.name
   chart      = "akomljen-charts/efk"
 }
-

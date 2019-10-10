@@ -13,14 +13,6 @@ provider "azurerm" {
   tenant_id       = var.service_principal_tenant
 }
 
-# provider "helm" {
-#   kubernetes {
-#     config_path = local.config_path
-#   }
-
-#   service_account = kubernetes_service_account.tiller.metadata[0].name
-# }
-
 provider "kubernetes" {
   config_path = local.config_path
 }

@@ -27,6 +27,8 @@ resource "azurerm_virtual_network" "realm" {
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
   address_space       = var.virtual_network_address_space
+
+  tags = merge(local.common_tags, {})
 }
 
 resource "azurerm_subnet" "default" {

@@ -22,16 +22,6 @@ provider "helm" {
   service_account = "tiller"
 }
 
-# data "terraform_remote_state" "dns" {
-#   backend = "azurerm"
-#   config {
-#     access_key           = "${var.backend_access_key}"
-#     storage_account_name = "${var.backend_storage_account_name}"
-# 	  container_name       = "realm-${var.realm}"
-#     key                  = "dns.tfstate"
-#   }
-# }
-
 locals {
   resource_group_name = var.resource_group_name
   config_path         = "../kubernetes/.local/kubeconfig"
@@ -54,17 +44,6 @@ resource "helm_release" "nginx_ingress" {
     name  = "controller.replicaCount"
     value = var.nginx_ingress_replica_count
   }
-
-  # See: https://docs.microsoft.com/en-us/azure/aks/ingress-tls
-  # set {
-  #   name  = "controller.nodeSelector.\"beta\\.kubernetes\\.io/os\""
-  #   value = "linux"
-  # }
-
-  # set {
-  #   name  = "defaultBackend.nodeSelector.\"beta\\.kubernetes\\.io/os\""
-  #   value = "linux"
-  # }
 
   set {
     name  = "controller.service.externalTrafficPolicy"
