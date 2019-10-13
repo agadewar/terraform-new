@@ -1,8 +1,10 @@
-variable "realm" {}
 variable "environment" {}
+variable "realm" {}
 
-variable "canopy_aws_access_key_id" {}
-variable "canopy_aws_secret_access_key" {}
+variable "subscription_id" {}
+
+variable "resource_group_name" {}
+variable "resource_group_location" {}
 
 variable "realm_common_tags" {
     type = "map"
