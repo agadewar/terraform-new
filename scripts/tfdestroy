@@ -1,1 +1,2 @@
-$(dirname $(readlink $(which tfdestroy)))/tfwrapper destroy $@
+#$(dirname $(readlink $(which tfdestroy)))/tfwrapper destroy $@
+$(dirname $(readlink $(which `basename -- "$0"`)))/tfwrapper destroy $@
