@@ -14,4 +14,4 @@ spec:
   storageClassName: maven-repo
   azureFile: 
     secretName: "${secret_name}"
-    shareName: maven-repo
+    shareName: jenkins-maven-repo

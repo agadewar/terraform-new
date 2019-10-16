@@ -47,9 +47,9 @@ resource "azurerm_managed_disk" "jenkins_home" {
     local.common_tags
   )}"
   
-  # lifecycle{
-  #   prevent_destroy = "true"
-  # }
+  lifecycle{
+    prevent_destroy = "true"
+  }
 }
 
 

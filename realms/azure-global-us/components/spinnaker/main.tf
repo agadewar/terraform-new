@@ -40,6 +40,17 @@ locals {
   )}"
 }
 
+data "terraform_remote_state" "container_registry" {
+  backend = "azurerm"
+
+  config = {
+    access_key            = "${var.realm_backend_access_key}"
+    storage_account_name  = "${var.realm_backend_storage_account_name}"
+	  container_name        = "${var.realm_backend_container_name}"
+    key                   = "container-registry.tfstate"
+  }
+}
+
 data "terraform_remote_state" "storage_account" {
   backend = "azurerm"
 
@@ -73,22 +84,25 @@ data "terraform_remote_state" "ingress-controller" {
 }
 
 data "template_file" "custom_values" {
-  template = "${file("templates/custom-values.yaml.tpl")}"
+  template = "${file("templates/values.yaml.tpl")}"
 
   vars = {
-    realm                          = "${var.realm}"
-    storageAccountName             = "${data.terraform_remote_state.storage_account.outputs.storage_account_name}"
-    accessKey                      = "${data.terraform_remote_state.storage_account.outputs.storage_account_access_key}"
+    realm                          = "${var.cloud}-${var.realm}"
+    dns_realm                      = var.dns_realm
+    region                         = var.region
+    cloud                          = var.cloud
+    storageAccountName             = data.terraform_remote_state.storage_account.outputs.storage_account_gen_v2_name
+    accessKey                      = data.terraform_remote_state.storage_account.outputs.storage_account_gen_v2_access_key
     whitelist-source-range         = "${join(", ", var.spinnaker_source_ranges_allowed)}"
     additional-kubeconfig-contexts = "${indent(2, join("\n", formatlist("- %s", var.spinnaker_additional_kubeconfig_contexts)))}"
-    acr-address                    = "${var.sapience_container_registry_hostname}"
-    acr-username                   = "${var.sapience_container_registry_username}"
-    acr-password                   = "${var.sapience_container_registry_password}"
-    acr-email                      = "${var.devops_email}"
-    smtp-host                      = "${var.smtp_host}"
-    smtp-username                  = "${var.smtp_username}"
-    smtp-password                  = "${var.smtp_password}"
-    smtp-from-email                = "${var.devops_email}"
+    acr-address                    = data.terraform_remote_state.container_registry.outputs.login_server
+    acr-username                   = data.terraform_remote_state.container_registry.outputs.admin_username
+    acr-password                   = data.terraform_remote_state.container_registry.outputs.admin_password
+    acr-email                      = var.devops_email
+    smtp-host                      = var.smtp_host
+    smtp-username                  = var.smtp_username
+    smtp-password                  = var.smtp_password
+    smtp-from-email                = var.devops_email
   }
 }
 
@@ -100,7 +114,7 @@ resource "kubernetes_namespace" "spinnaker" {
 
 resource "null_resource" "kubeconfig" {
   triggers = {
-    spinnaker_additional_kubeconfig_contexts_changed = "${join(":", formatlist("../../../%s/components/kubernetes/.local/kubeconfig", concat(var.spinnaker_additional_kubeconfig_contexts, list("global"))))}"
+    spinnaker_additional_kubeconfig_contexts_changed = "${join(":", formatlist("../../../%s/components/kubernetes/.local/kubeconfig", concat(var.spinnaker_additional_kubeconfig_contexts, list("azure-global-us"))))}"
     timestamp = timestamp()
   }
   
@@ -108,7 +122,7 @@ resource "null_resource" "kubeconfig" {
     # combine kubeconfigs
     ### TODO - this "rename-context" isn't maintainable like this... need to fix; the problem is that we've stripped "azure-" from the cluster name when 
     ###        we create it, but we need to be able to identify it as "azure-" or "aws-" in Spinnaker
-    command = "mkdir -p .local && KUBECONFIG=${join(":", formatlist("../../../%s/components/kubernetes/.local/kubeconfig", concat(var.spinnaker_additional_kubeconfig_contexts, list("global"))))} kubectl config view --merge --flatten > .local/kubeconfig && kubectl --kubeconfig .local/kubeconfig config rename-context lab-us azure-lab-us"
+    command = "mkdir -p .local && KUBECONFIG=${join(":", formatlist("../../../%s/components/kubernetes/.local/kubeconfig", concat(var.spinnaker_additional_kubeconfig_contexts, list("azure-global-us"))))} kubectl config view --merge --flatten > .local/kubeconfig && kubectl --kubeconfig .local/kubeconfig config rename-context global-us azure-global-us && kubectl --kubeconfig .local/kubeconfig config rename-context lab-us azure-lab-us"
   }
 
   provisioner "local-exec" {
@@ -351,7 +365,7 @@ resource "helm_release" "spinnaker" {
 # }
 
 resource "azurerm_dns_a_record" "spinnaker" {
-  name                = "spinnaker.${var.realm}"
+  name                = "spinnaker.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "${data.terraform_remote_state.dns.outputs.sapienceanalytics_public_zone_name}"
   resource_group_name = "${var.resource_group_name}"
   ttl                 = 30

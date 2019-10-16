@@ -159,7 +159,7 @@ resource "kubernetes_deployment" "jenkins" {
         container {
           name = "jenkins"
           # image = "jenkins/jenkins:2.169"
-          image = "${data.terraform_remote_state.container_registry.outputs.login_server}/jenkins:1.10"
+          image = "${data.terraform_remote_state.container_registry.outputs.login_server}/jenkins:1.12"
           image_pull_policy = "Always"
 
           resources {
@@ -355,6 +355,7 @@ data "template_file" "maven_repo_pv" {
 
 resource "null_resource" "maven_repo_pv" {
   depends_on = [ "null_resource.maven_repo_storage_class" ]
+
   triggers = {
     template_changed = "${data.template_file.maven_repo_pv.rendered}"
   }
@@ -416,90 +417,90 @@ resource "kubernetes_cluster_role_binding" "jenkins" {
     }
 }
 
-# data "azurerm_subnet" "default" {
-#   name                 = "default"
-#   virtual_network_name = "${var.resource_group_name}-vnet"
-#   resource_group_name  = "${var.resource_group_name}"
-# }
+data "azurerm_subnet" "default" {
+  name                 = "default"
+  virtual_network_name = "${var.resource_group_name}-vnet"
+  resource_group_name  = "${var.resource_group_name}"
+}
 
-# resource "azurerm_public_ip" "jenkins_windows_slave" {
-#   name                = "jenkins-windows-slave-${var.realm}"
-#   location            = "East US"
-#   resource_group_name = "${var.resource_group_name}"
-#   public_ip_address_allocation   = "Static"
-# }
+resource "azurerm_public_ip" "jenkins_windows_slave" {
+  name                = "jenkins-windows-slave-${var.realm}"
+  location            = "East US"
+  resource_group_name = "${var.resource_group_name}"
+  public_ip_address_allocation   = "Static"
+}
 
-# resource "azurerm_network_interface" "jenkins_windows_slave_nic" {
-#   depends_on          = [ "azurerm_public_ip.jenkins_windows_slave", "azurerm_network_security_group.jenkins_windows_slave" ]
-#   name                = "jenkins-windows-slave-nic-${var.realm}"
-#   resource_group_name   = "${var.resource_group_name}"
-#   location              = "${var.resource_group_location}"
-#   network_security_group_id = "${azurerm_network_security_group.jenkins_windows_slave.id}"
+resource "azurerm_network_interface" "jenkins_windows_slave_nic" {
+  depends_on          = [ "azurerm_public_ip.jenkins_windows_slave", "azurerm_network_security_group.jenkins_windows_slave" ]
+  name                = "jenkins-windows-slave-nic-${var.realm}"
+  resource_group_name   = "${var.resource_group_name}"
+  location              = "${var.resource_group_location}"
+  network_security_group_id = "${azurerm_network_security_group.jenkins_windows_slave.id}"
 
-#   ip_configuration {
-#     name                          = "jenkins-windows-slave-${var.realm}"
-#     subnet_id                     = "${data.azurerm_subnet.default.id}"
-#     public_ip_address_id          = "${azurerm_public_ip.jenkins_windows_slave.id}"
-#     private_ip_address_allocation = "Dynamic"
-#   }
-# }
+  ip_configuration {
+    name                          = "jenkins-windows-slave-${var.realm}"
+    subnet_id                     = "${data.azurerm_subnet.default.id}"
+    public_ip_address_id          = "${azurerm_public_ip.jenkins_windows_slave.id}"
+    private_ip_address_allocation = "Dynamic"
+  }
+}
 
-# resource "azurerm_network_security_group" "jenkins_windows_slave" {
-#   name = "jenkins-windows-slave-${var.realm}"
-#   location              = "${var.resource_group_location}"
-#   resource_group_name   = "${var.resource_group_name}"
+resource "azurerm_network_security_group" "jenkins_windows_slave" {
+  name = "jenkins-windows-slave-${var.realm}"
+  location              = "${var.resource_group_location}"
+  resource_group_name   = "${var.resource_group_name}"
 
-#   # security_rule {
-#   #   name = "Allow-AllTraffic-BanyanOffice"
-#   #   priority = 100
-#   #   direction = "Inbound"
-#   #   access = "Allow"
-#   #   protocol = "*"
-#   #   source_port_range = "*"
-#   #   destination_port_range = "*"
-#   #   source_address_prefix = "50.20.0.62/32"
-#   #   destination_address_prefix = "*"
-#   # }
-# }
+  # security_rule {
+  #   name = "Allow-AllTraffic-BanyanOffice"
+  #   priority = 100
+  #   direction = "Inbound"
+  #   access = "Allow"
+  #   protocol = "*"
+  #   source_port_range = "*"
+  #   destination_port_range = "*"
+  #   source_address_prefix = "50.20.0.62/32"
+  #   destination_address_prefix = "*"
+  # }
+}
 
-# resource "azurerm_virtual_machine" "jenkins_windows_slave" {
-#   depends_on            = [ "azurerm_network_interface.jenkins_windows_slave_nic" ]
-#   name                  = "jenkins-windows-slave-${var.realm}"
-#   resource_group_name   = "${var.resource_group_name}"
-#   location              = "${var.resource_group_location}"
-#   network_interface_ids = ["${azurerm_network_interface.jenkins_windows_slave_nic.id}"]
-#   vm_size               = "Standard_D2_v3"
+resource "azurerm_virtual_machine" "jenkins_windows_slave" {
+  depends_on            = [ "azurerm_network_interface.jenkins_windows_slave_nic" ]
+  name                  = "jenkins-windows-slave-${var.realm}"
+  resource_group_name   = "${var.resource_group_name}"
+  location              = "${var.resource_group_location}"
+  network_interface_ids = ["${azurerm_network_interface.jenkins_windows_slave_nic.id}"]
+  vm_size               = "Standard_D2_v3"
 
-#   # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
-#   # NOTE: This may not be optimal in all cases.
-#   delete_os_disk_on_termination = true
+  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  delete_os_disk_on_termination = true
 
-#   # This means the Data Disk will be deleted when Terraform destroys the Virtual Machine
-#   # NOTE: This may not be optimal in all cases.
-#   delete_data_disks_on_termination = true
+  # This means the Data Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  delete_data_disks_on_termination = true
 
-#   storage_image_reference {
-#     publisher = "MicrosoftWindowsDesktop"
-#     offer     = "Windows-10"
-#     sku       = "RS3-Pro"
-#     version   = "latest"
-#   }
+  storage_image_reference {
+    publisher = "MicrosoftWindowsDesktop"
+    offer     = "Windows-10"
+    sku       = "RS3-Pro"
+    version   = "latest"
+  }
 
-#   storage_os_disk {
-#     name              = "jenkins-windows-slave-os-${var.realm}"
-#     caching           = "ReadWrite"
-#     create_option     = "FromImage"
-#     managed_disk_type = "Standard_LRS"
-#   }
+  storage_os_disk {
+    name              = "jenkins-windows-slave-os-${var.realm}"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
 
-#   os_profile {
-#     computer_name  = "jenkins-win-slv"
-#     admin_username = "testadmin2"
-#     admin_password = "Password1234!"
-#   }
+  os_profile {
+    computer_name  = "jenkins-win-slv"
+    admin_username = "testadmin2"
+    admin_password = "Password1234!"
+  }
 
-#   os_profile_windows_config {}
-# }
+  os_profile_windows_config {}
+}
 
 resource "azurerm_dns_a_record" "jenkins" {
   name                = "jenkins.${var.dns_realm}.${var.region}.${var.cloud}"
