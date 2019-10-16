@@ -1,3 +1,7 @@
+variable "global_realm_backend_access_key" {}
+variable "global_realm_backend_storage_account_name" {}
+variable "global_realm_backend_container_name" {}
+
 variable "env_backend_access_key" {}
 variable "env_backend_storage_account_name" {}
 variable "env_backend_container_name" {}
@@ -12,9 +16,9 @@ variable "kafka_password" {}
 
 variable "canopy_container_registry_hostname" {}
 
-variable "sapience_container_registry_hostname" {}
-variable "sapience_container_registry_username" {}
-variable "sapience_container_registry_password" {}
+# variable "sapience_container_registry_hostname" {}
+# variable "sapience_container_registry_username" {}
+# variable "sapience_container_registry_password" {}
 
 # variable "sql_server_administrator_login" {}
 # variable "sql_server_administrator_password" {}
