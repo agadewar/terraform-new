@@ -220,13 +220,13 @@ resource "azurerm_dns_cname_record" "login-dev" {
 #   record              = "portal.dev.lab.sapienceanalytics.com"
 # }
 
-# resource "azurerm_dns_cname_record" "sisense_dev" {
-#   name                = "sisense.dev"
-#   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
-#   resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
-#   ttl                 = 300
-#   record              = "sisense.dev.lab.sapienceanalytics.com"
-# }
+resource "azurerm_dns_cname_record" "sisense_dev" {
+  name                = "sisense.dev"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "sisense.dev.lab.us.azure.sapienceanalytics.com"
+}
 
 # resource "azurerm_dns_cname_record" "sisense_build_dev" {
 #   name                = "sisense-build.dev"
