@@ -60,6 +60,11 @@ resource "helm_release" "nginx_ingress" {
     value = var.nginx_ingress_resource_requests_memory
   }
 
+  set {
+    name = "tcp.50000"
+    value = "jenkins/jenkins:50000"
+  }
+
   timeout = 600
 }
 
