@@ -215,7 +215,7 @@ resource "azurerm_dns_a_record" "api" {
 
   name = "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name = "sapienceanalytics.com"
-  resource_group_name = "global"
+  resource_group_name = "global-us"
   ttl = 30
   # TF-UPGRADE-TODO: In Terraform v0.10 and earlier, it was sometimes necessary to
   # force an interpolation expression to be interpreted as a list by wrapping it
