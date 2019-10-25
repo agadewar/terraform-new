@@ -33,6 +33,17 @@ provider "template" {
   version = "2.1.2"
 }
 
+data "terraform_remote_state" "log_analytics_workspace" {
+  backend = "azurerm"
+
+  config = {
+    access_key           = var.realm_backend_access_key
+    storage_account_name = var.realm_backend_storage_account_name
+    container_name       = var.realm_backend_container_name
+    key                  = "log-analytics-workspace.tfstate"
+  }
+}
+
 locals {
   config_path = ".local/kubeconfig"
 
@@ -78,6 +89,13 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     vm_size         = var.kubernetes_agent_pool_profile_1_vm_size
     os_type         = "Linux"
     os_disk_size_gb = 30
+  }
+
+  addon_profile {
+    oms_agent {
+      enabled = true
+      log_analytics_workspace_id = data.terraform_remote_state.log_analytics_workspace.outputs.log_analytics_workspace_id   # https://github.com/terraform-providers/terraform-provider-azurerm/issues/3457
+    }
   }
 
   service_principal {
