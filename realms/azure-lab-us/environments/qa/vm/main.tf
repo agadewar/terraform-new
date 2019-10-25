@@ -5,7 +5,7 @@ terraform {
 }
 
 provider "azurerm" {
-  version         = "1.31.0"
+  version         = "1.35.0"
 
   subscription_id = var.subscription_id
   client_id       = var.service_principal_app_id
@@ -21,6 +21,28 @@ data "terraform_remote_state" "network_env" {
     storage_account_name = var.env_backend_storage_account_name
     container_name       = var.env_backend_container_name
     key                  = "network.tfstate"
+  }
+}
+
+data "terraform_remote_state" "backup" {
+  backend = "azurerm"
+
+  config = {
+    access_key           = var.realm_backend_access_key
+    storage_account_name = var.realm_backend_storage_account_name
+    container_name       = var.realm_backend_container_name
+    key                  = "backup.tfstate"
+  }
+}
+
+data "terraform_remote_state" "dns_realm" {
+  backend = "azurerm"
+
+  config = {
+    access_key           = var.realm_backend_access_key
+    storage_account_name = var.realm_backend_storage_account_name
+    container_name       = var.realm_backend_container_name
+    key                  = "dns.tfstate"
   }
 }
 
@@ -210,6 +232,7 @@ resource "azurerm_network_security_group" "sisense_build" {
 
 resource "azurerm_virtual_machine" "sisense_appquery_001" {
   depends_on            = [azurerm_network_interface.sisense_appquery_001]
+
   name                  = "sisense-appquery-001-${var.realm}-${var.environment}"
   resource_group_name   = var.resource_group_name
   location              = var.resource_group_location
@@ -292,6 +315,21 @@ resource "azurerm_network_interface" "sisense_appquery_001" {
     public_ip_address_id          = azurerm_public_ip.sisense_appquery_001.id
     private_ip_address_allocation = "Dynamic"
   }
+}
+
+resource "azurerm_recovery_services_protected_vm" "sisense_appquery_001" {
+  resource_group_name = "${var.resource_group_name}"
+  recovery_vault_name = "${data.terraform_remote_state.backup.outputs.vault}"
+  source_vm_id        = "${azurerm_virtual_machine.sisense_appquery_001.id}"
+  backup_policy_id    = "${data.terraform_remote_state.backup.outputs.id_daily_14}"
+}
+
+resource "azurerm_private_dns_a_record" "sisense_appquery_001" {
+  name                = "sisense-appquery-001.${var.environment}"
+  zone_name           = data.terraform_remote_state.dns_realm.outputs.private_dns_zone_name
+  resource_group_name = var.resource_group_name
+  ttl                 = 300
+  records             = [azurerm_network_interface.sisense_appquery_001.private_ip_address]
 }
 
 resource "azurerm_virtual_machine" "sisense_appquery_002" {
@@ -380,6 +418,21 @@ resource "azurerm_network_interface" "sisense_appquery_002" {
   }
 }
 
+resource "azurerm_recovery_services_protected_vm" "sisense_appquery_002" {
+  resource_group_name = "${var.resource_group_name}"
+  recovery_vault_name = "${data.terraform_remote_state.backup.outputs.vault}"
+  source_vm_id        = "${azurerm_virtual_machine.sisense_appquery_002.id}"
+  backup_policy_id    = "${data.terraform_remote_state.backup.outputs.id_daily_14}"
+}
+
+resource "azurerm_private_dns_a_record" "sisense_appquery_002" {
+  name                = "sisense-appquery-002.${var.environment}"
+  zone_name           = data.terraform_remote_state.dns_realm.outputs.private_dns_zone_name
+  resource_group_name = var.resource_group_name
+  ttl                 = 300
+  records             = [azurerm_network_interface.sisense_appquery_002.private_ip_address]
+}
+
 resource "azurerm_virtual_machine" "sisense_build_001" {
   depends_on            = [azurerm_network_interface.sisense_build_001]
   name                  = "sisense-build-001-${var.realm}-${var.environment}"
@@ -464,4 +517,19 @@ resource "azurerm_network_interface" "sisense_build_001" {
     public_ip_address_id          = azurerm_public_ip.sisense_build_001.id
     private_ip_address_allocation = "Dynamic"
   }
+}
+
+resource "azurerm_recovery_services_protected_vm" "sisense_build_001" {
+  resource_group_name = "${var.resource_group_name}"
+  recovery_vault_name = "${data.terraform_remote_state.backup.outputs.vault}"
+  source_vm_id        = "${azurerm_virtual_machine.sisense_build_001.id}"
+  backup_policy_id    = "${data.terraform_remote_state.backup.outputs.id_daily_14}"
+}
+
+resource "azurerm_private_dns_a_record" "sisense_build_001" {
+  name                = "sisense-build-001.${var.environment}"
+  zone_name           = data.terraform_remote_state.dns_realm.outputs.private_dns_zone_name
+  resource_group_name = var.resource_group_name
+  ttl                 = 300
+  records             = [azurerm_network_interface.sisense_build_001.private_ip_address]
 }

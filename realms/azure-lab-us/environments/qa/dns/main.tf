@@ -47,7 +47,7 @@ data "terraform_remote_state" "vm" {
 resource "azurerm_dns_a_record" "portal" {
   name                = "portal.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
-  resource_group_name = "Global"
+  resource_group_name = "global-us"
   ttl                 = 300
   # TF-UPGRADE-TODO: In Terraform v0.10 and earlier, it was sometimes necessary to
   # force an interpolation expression to be interpreted as a list by wrapping it
@@ -63,7 +63,7 @@ resource "azurerm_dns_a_record" "portal" {
 resource "azurerm_dns_a_record" "sisense_build" {
   name                = "sisense-build.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
-  resource_group_name = "Global"
+  resource_group_name = "global-us"
   ttl                 = 300
   records = [data.terraform_remote_state.vm.outputs.public_ip_sisense_build_001]
 }
@@ -71,7 +71,7 @@ resource "azurerm_dns_a_record" "sisense_build" {
 resource "azurerm_dns_a_record" "sisense_appquery" {
   name                = "sisense.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
-  resource_group_name = "Global"
+  resource_group_name = "global-us"
   ttl                 = 300
   records = [data.terraform_remote_state.vm.outputs.public_ip_sisense_appquery_001,
              data.terraform_remote_state.vm.outputs.public_ip_sisense_appquery_002]
