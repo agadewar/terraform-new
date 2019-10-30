@@ -11,6 +11,22 @@ variable "kafka_username" {}
 variable "kafka_password" {}
 
 variable "canopy_container_registry_hostname" {}
+variable "canopy_device_service_deployment_replicas" {}
+variable "canopy_device_service_deployment_request_memory" {}
+variable "canopy_device_service_deployment_request_cpu" {}
+variable "canopy_hierarchy_service_deployment_replicas" {}
+variable "canopy_hierarchy_service_deployment_request_memory" {}
+variable "canopy_hierarchy_service_deployment_request_cpu" {}
+variable "canopy_user_service_deployment_replicas" {}
+variable "canopy_user_service_deployment_request_memory" {}
+variable "canopy_user_service_deployment_request_cpu" {}
+variable "eventpipeline_leaf_broker_service_deployment_replicas" {}
+variable "eventpipeline_leaf_broker_service_deployment_request_memory" {}
+variable "eventpipeline_leaf_broker_service_deployment_request_cpu" {}
+variable "eventpipeline_service_deployment_replicas" {}
+variable "eventpipeline_service_deployment_request_memory" {}
+variable "eventpipeline_service_deployment_request_cpu" {}
+
 
 variable "sapience_container_registry_hostname" {}
 variable "sapience_container_registry_username" {}

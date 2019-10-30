@@ -6,8 +6,6 @@ variable "service_principal_password" {}
 variable "resource_group_name" {}
 variable "resource_group_location" {}
 
-variable "subnet_address_prefix" {}
-
 variable "virtual_network_address_space" {
   type = list(string)
 }

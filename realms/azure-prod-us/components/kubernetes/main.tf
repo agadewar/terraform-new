@@ -25,6 +25,17 @@ provider "template" {
   version = "2.1.2"
 }
 
+data "terraform_remote_state" "network" {
+  backend = "azurerm"
+
+  config = {
+    access_key           = var.realm_backend_access_key
+    storage_account_name = var.realm_backend_storage_account_name
+    container_name       = var.realm_backend_container_name
+    key                  = "network.tfstate"
+  }
+}
+
 locals {
   config_path = ".local/kubeconfig"
 
@@ -46,7 +57,7 @@ locals {
 resource "azurerm_kubernetes_cluster" "kubernetes" {
   lifecycle {
     ignore_changes  = [agent_pool_profile[0].count]
-    prevent_destroy = "true"
+    prevent_destroy = "false"
   }
 
   name                = local.cluster_name
@@ -64,12 +75,18 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     }
   }
 
+  network_profile {
+    network_plugin = "azure"
+  }
+
   agent_pool_profile {
     name            = local.agent_pool_profile_1_name
     count           = var.kubernetes_min_count
     vm_size         = var.kubernetes_agent_pool_profile_1_vm_size
     os_type         = "Linux"
     os_disk_size_gb = var.kubernetes_agent_pool_profile_1_os_disk_size_gb
+
+    vnet_subnet_id = data.terraform_remote_state.network.outputs.aks-pool_subnet_id
   }
 
   service_principal {
