@@ -533,3 +533,12 @@ resource "azurerm_private_dns_a_record" "sisense_build_001" {
   ttl                 = 300
   records             = [azurerm_network_interface.sisense_build_001.private_ip_address]
 }
+
+resource "azurerm_private_dns_a_record" "sisense_appquery" {
+  name                = "sisense.${var.environment}"
+  zone_name           = data.terraform_remote_state.dns_realm.outputs.private_dns_zone_name
+  resource_group_name = var.resource_group_name
+  ttl                 = 300
+  records = [azurerm_network_interface.sisense_appquery_001.private_ip_address,
+             azurerm_network_interface.sisense_appquery_002.private_ip_address]
+}
