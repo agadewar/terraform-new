@@ -12,34 +12,38 @@ trap 'after $config_location' EXIT ERR INT TERM
 if [[ $PWD =~ $regexp ]]
 then
 	realm="${BASH_REMATCH[1]}"
+	tfvarsrealm=`echo $realm | sed -r 's/-(black|red)//g'`
 	environment="${BASH_REMATCH[2]}"
-	echo "realm = ${realm}"
+	echo "realm = $realm"
+	echo "tfvarsrealm = $tfvarsrealm"
 	echo "environment = $environment"
 
 	config_location="../../../../../config"
 
 	echo "Creating decrypted files..."
-    ansible-vault decrypt "$config_location/realm.$realm.environment.$environment.backend.config.vault" --output "$config_location/realm.$realm.environment.$environment.backend.config" --vault-password-file $config_location/$realm.vault.password
+    ansible-vault decrypt "$config_location/realm.$tfvarsrealm.environment.$environment.backend.config.vault" --output "$config_location/realm.$tfvarsrealm.environment.$environment.backend.config" --vault-password-file $config_location/$tfvarsrealm.vault.password
 
-	terraform init -backend-config $config_location/realm.$realm.environment.$environment.backend.config
+	terraform init -backend-config $config_location/realm.$tfvarsrealm.environment.$environment.backend.config
 else
 	regexp="terraform/realms/(.*)/components/.+"
 	
 	if [[ $PWD =~ $regexp ]]
 	then
 		realm="${BASH_REMATCH[1]}"
+        	tfvarsrealm=`echo $realm | sed -r 's/-(black|red)//g'`
 		echo "realm = ${realm}"
+	        echo "tfvarsrealm = $tfvarsrealm"
 
 		config_location="../../../../config"
 
 	    echo "Creating decrypted files..."
-	    ansible-vault decrypt "$config_location/realm.$realm.backend.config.vault" --output "$config_location/realm.$realm.backend.config" --vault-password-file $config_location/$realm.vault.password
+	    ansible-vault decrypt "$config_location/realm.$tfvarsrealm.backend.config.vault" --output "$config_location/realm.$tfvarsrealm.backend.config" --vault-password-file $config_location/$tfvarsrealm.vault.password
 
-		terraform init -backend-config $config_location/realm.$realm.backend.config
+		terraform init -backend-config $config_location/realm.$tfvarsrealm.backend.config
 	fi
 fi
 
-echo "realm = ${realm}"
+echo "realm = ${tfvarsrealm}"
 echo "environment = $environment"
 
 
