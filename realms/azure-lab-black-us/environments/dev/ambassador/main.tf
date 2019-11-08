@@ -204,6 +204,12 @@ service: eventpipeline-service
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  sapience_app_dashboard_mapping
+prefix: /dashboard/
+service: sapience-app-dashboard
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  sapience_app_api_mapping
 prefix: /
 service: sapience-app-api

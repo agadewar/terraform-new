@@ -213,7 +213,7 @@ resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
 }
 
 resource "azurerm_cosmosdb_account" "lab_us_dev" {
-  name                = "${var.realm}-${var.environment}"
+  name                = "sapience-app-dashboard-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
   offer_type          = "Standard"
