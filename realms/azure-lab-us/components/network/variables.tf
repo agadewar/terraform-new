@@ -13,10 +13,10 @@ variable "virtual_network_address_space" {
 }
 
 variable "subnet_address_prefix_default" {}
-# variable "subnet_address_prefix_demo-default" {}
-# variable "subnet_address_prefix_demo-application" {}
-# variable "subnet_address_prefix_demo-data" {}
-variable "subnet_address_prefix_aks-pool" {}
+variable "subnet_address_prefix_aks-pool01" {}
+variable "subnet_address_prefix_aks-pool02" {}
+variable "subnet_address_prefix_aks-pool03" {}
+variable "subnet_address_prefix_aks-pool04" {}
 
 variable "subnet_service_endpoints" {
   type = list(string)

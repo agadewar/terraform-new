@@ -10,18 +10,18 @@ output "default_subnet_id" {
   value = "${azurerm_subnet.default.id}"
 }
 
-# output "demo-default_subnet_id" {
-#   value = "${azurerm_subnet.demo-default.id}"
-# }
+output "aks-pool01_subnet_id" {
+  value = "${azurerm_subnet.aks-pool01.id}"
+}
 
-# output "demo-application_subnet_id" {
-#   value = "${azurerm_subnet.demo-application.id}"
-# }
+output "aks-pool02_subnet_id" {
+  value = "${azurerm_subnet.aks-pool02.id}"
+}
 
-# output "demo-data_subnet_id" {
-#   value = "${azurerm_subnet.demo-data.id}"
-# }
+output "aks-pool03_subnet_id" {
+  value = "${azurerm_subnet.aks-pool03.id}"
+}
 
-output "aks-pool_subnet_id" {
-  value = "${azurerm_subnet.aks-pool.id}"
+output "aks-pool04_subnet_id" {
+  value = "${azurerm_subnet.aks-pool04.id}"
 }
