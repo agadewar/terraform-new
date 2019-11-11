@@ -165,6 +165,13 @@ resource "null_resource" "kubernetes_config_autoscaler" {
   provisioner "local-exec" {
     command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.autoscaler_config.rendered}\nEOF"
   }
+
+  provisioner "local-exec" {
+    when = "destroy"
+
+    command = "kubectl delete --kubeconfig=${local.config_path} --ignore-not-found -f - <<EOF\n${data.template_file.autoscaler_config.rendered}\nEOF"
+    # command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete customresourcedefinition alertmanagers.monitoring.coreos.com --ignore-not-found"
+  }
 }
 
 # ### Helm
