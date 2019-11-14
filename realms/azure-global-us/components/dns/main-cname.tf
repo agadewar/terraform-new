@@ -130,6 +130,22 @@ resource "azurerm_dns_cname_record" "sapienceanalytics_www_public" {
   record              = "sapienceanalytics.com"
 }
 
+resource "azurerm_dns_cname_record" "sapienceanalytics_dev_public" {
+  name                = "dev"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 3600
+  record              = "www.dev.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "sapienceanalytics_staging_public" {
+  name                = "staging"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 3600
+  record              = "www.staging.sapienceanalytics.com"
+}
+
 resource "azurerm_dns_cname_record" "autodiscover" {
   name                = "autodiscover"
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
@@ -218,6 +234,14 @@ resource "azurerm_dns_cname_record" "portal_dev" {
   resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
   record              = "portal.dev.lab.us.azure.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "kubernetes_dev" {
+  name                = "kubernetes.dev"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "kubernetes.dev.lab.us.azure.sapienceanalytics.com"
 }
 
 resource "azurerm_dns_cname_record" "sisense_dev" {

@@ -102,9 +102,36 @@ resource "azurerm_dns_a_record" "sapienceanalytics_public" {
   name                = "@"
   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
   resource_group_name = "${var.resource_group_name}"  # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
-  ttl                 = 300
+  ttl                 = 3600
   records             = ["107.180.24.243"]
 }
+
+resource "azurerm_dns_a_record" "sapienceanalytics_dev_public" {
+  name                = "www.dev"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"  # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 3600
+  records             = ["3.17.111.37"]
+}
+
+resource "azurerm_dns_a_record" "sapienceanalytics_staging_public" {
+  name                = "www.staging"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"  # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 3600
+  records             = ["3.19.50.27"]
+}
+
+### sapienceu.com
+resource "azurerm_dns_a_record" "sapienceu_public" {
+  name                = "@"
+  zone_name           = "sapienceu.com"
+  resource_group_name = "${var.resource_group_name}"  # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 3600
+  records             = ["54.88.17.160"]
+}
+
+
 
 
 

@@ -18,3 +18,9 @@ resource "azurerm_dns_zone" "sapienceinsider_public" {
   resource_group_name = "${var.resource_group_name}"  
   zone_type           = "Public"
 }
+
+resource "azurerm_dns_zone" "sapienceu_public" {
+  name                = "sapienceu.com"
+  resource_group_name = "${var.resource_group_name}"  
+  zone_type           = "Public"
+}
