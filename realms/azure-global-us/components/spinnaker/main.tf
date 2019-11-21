@@ -122,7 +122,7 @@ resource "null_resource" "kubeconfig" {
     # combine kubeconfigs
     ### TODO - this "rename-context" isn't maintainable like this... need to fix; the problem is that we've stripped "azure-" from the cluster name when 
     ###        we create it, but we need to be able to identify it as "azure-" or "aws-" in Spinnaker
-    command = "mkdir -p .local && KUBECONFIG=${join(":", formatlist("../../../%s/components/kubernetes/.local/kubeconfig", concat(var.spinnaker_additional_kubeconfig_contexts, list("azure-global-us"))))} kubectl config view --merge --flatten > .local/kubeconfig && kubectl --kubeconfig .local/kubeconfig config rename-context global-us azure-global-us && kubectl --kubeconfig .local/kubeconfig config rename-context lab-us azure-lab-us && kubectl --kubeconfig .local/kubeconfig config rename-context lab-us-black azure-lab-black-us"
+    command = "mkdir -p .local && KUBECONFIG=${join(":", formatlist("../../../%s/components/kubernetes/.local/kubeconfig", concat(var.spinnaker_additional_kubeconfig_contexts, list("azure-global-us"))))} kubectl config view --merge --flatten > .local/kubeconfig && kubectl --kubeconfig .local/kubeconfig config rename-context global-us azure-global-us && kubectl --kubeconfig .local/kubeconfig config rename-context lab-us azure-lab-us && kubectl --kubeconfig .local/kubeconfig config rename-context lab-us-black azure-lab-black-us && kubectl --kubeconfig .local/kubeconfig config rename-context load-us azure-load-us && kubectl --kubeconfig .local/kubeconfig config rename-context prod-us azure-prod-us"
   }
 
   provisioner "local-exec" {

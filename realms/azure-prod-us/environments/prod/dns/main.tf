@@ -73,7 +73,5 @@ resource "azurerm_dns_a_record" "sisense_appquery" {
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "global-us"
   ttl                 = 300
-  records = [data.terraform_remote_state.vm.outputs.public_ip_sisense_appquery_001,
-             data.terraform_remote_state.vm.outputs.public_ip_sisense_appquery_002]
+  records = ["20.42.57.10"]
 }
-

@@ -3,8 +3,8 @@
 # OLD DOMAIN
 resource "azurerm_dns_srv_record" "sapience_sip" {
   name                = "_sip._tls"
-  zone_name           = "${azurerm_dns_zone.sapience_public.name}"
-  resource_group_name = "${var.resource_group_name}" 
+  zone_name           = azurerm_dns_zone.sapience_public.name
+  resource_group_name = var.resource_group_name
   ttl                 = 3600
 
   record {
@@ -21,8 +21,8 @@ resource "azurerm_dns_srv_record" "sapience_sip" {
 
 resource "azurerm_dns_srv_record" "sapience_sipfederationtls" {
   name                = "_sipfederationtls._tcp"
-  zone_name           = "${azurerm_dns_zone.sapience_public.name}"
-  resource_group_name = "${var.resource_group_name}" 
+  zone_name           = azurerm_dns_zone.sapience_public.name
+  resource_group_name = var.resource_group_name
   ttl                 = 3600
 
   record {
@@ -40,8 +40,8 @@ resource "azurerm_dns_srv_record" "sapience_sipfederationtls" {
 # NEW DOMAIN
 resource "azurerm_dns_srv_record" "_sip" {
   name                = "_sip._tls"
-  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
-  resource_group_name = "${var.resource_group_name}" 
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name
   ttl                 = 3600
 
   record {
@@ -58,8 +58,8 @@ resource "azurerm_dns_srv_record" "_sip" {
 
 resource "azurerm_dns_srv_record" "_sipfederationtls" {
   name                = "_sipfederationtls._tcp"
-  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
-  resource_group_name = "${var.resource_group_name}" 
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name
   ttl                 = 3600
 
   record {
@@ -73,3 +73,4 @@ resource "azurerm_dns_srv_record" "_sipfederationtls" {
     Environment = "Production"
   }
 }
+

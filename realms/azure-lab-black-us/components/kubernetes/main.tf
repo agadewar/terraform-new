@@ -137,7 +137,7 @@ data "template_file" "node_resource_group" {
   }
 }
 
-data "template_file" "autoscaler_config" {
+/* data "template_file" "autoscaler_config" {
   template = file("autoscaler/cluster-autoscaler-containerservice.yaml.tpl")
 
   vars = {
@@ -153,9 +153,9 @@ data "template_file" "autoscaler_config" {
     autoscaler_agentpool           = local.agent_pool_profile_1_name
     autoscaler_version             = "v1.15.0"
   }
-}
+} */
 
-resource "null_resource" "kubernetes_config_autoscaler" {
+/* resource "null_resource" "kubernetes_config_autoscaler" {
   depends_on = [null_resource.kubeconfig]
 
   triggers = {
@@ -172,7 +172,7 @@ resource "null_resource" "kubernetes_config_autoscaler" {
     command = "kubectl delete --kubeconfig=${local.config_path} --ignore-not-found -f - <<EOF\n${data.template_file.autoscaler_config.rendered}\nEOF"
     # command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete customresourcedefinition alertmanagers.monitoring.coreos.com --ignore-not-found"
   }
-}
+} */
 
 # ### Helm
 

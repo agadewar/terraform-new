@@ -3,8 +3,8 @@
 # OLD DOMAIN
 resource "azurerm_dns_mx_record" "sapience_public" {
   name                = "@"
-  zone_name           = "${azurerm_dns_zone.sapience_public.name}"
-  resource_group_name = "${var.resource_group_name}"
+  zone_name           = azurerm_dns_zone.sapience_public.name
+  resource_group_name = var.resource_group_name
   ttl                 = 3600
 
   record {
@@ -19,8 +19,8 @@ resource "azurerm_dns_mx_record" "sapience_public" {
 # NEW DOMAIN
 resource "azurerm_dns_mx_record" "sapienceanalytics_public" {
   name                = "@"
-  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
-  resource_group_name = "${var.resource_group_name}"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name
   ttl                 = 3600
 
   record {
@@ -31,3 +31,4 @@ resource "azurerm_dns_mx_record" "sapienceanalytics_public" {
     Environment = "Production"
   }
 }
+
