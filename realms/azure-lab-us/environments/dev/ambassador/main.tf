@@ -195,6 +195,12 @@ service: sapience-app-dashboard
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  sapience_app_alerts_mapping
+prefix: /alerts/
+service: sapience-app-alerts
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  sapience_app_api_mapping
 prefix: /
 service: sapience-app-api
@@ -216,6 +222,7 @@ EOF
   }
 }
 
+#
 # resource "azurerm_dns_a_record" "api" {
 #   provider = azurerm.global
 
