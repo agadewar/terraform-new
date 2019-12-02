@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience-app-dashboard.tfstate"
+    key = "sapience-app-alerts.tfstate"
   }
 }
 
@@ -18,23 +18,23 @@ locals {
     var.realm_common_tags,
     var.environment_common_tags,
     map(
-      "Component", "Sapience App Dashboard"
+      "Component", "Sapience App Alerts"
     )
   )}"
 }
 
-resource "kubernetes_secret" "sapience_app_dashboard" {
+resource "kubernetes_secret" "sapience_app_alerts" {
   metadata {
     labels = {
-      "sapienceanalytics.com/name" = "sapience-app-dashboard"
+      "sapienceanalytics.com/name" = "sapience-app-alerts"
     }
 
-    name = "sapience-app-dashboard"
+    name = "sapience-app-alerts"
     namespace = local.namespace
   }
 
   data = {
-      CosmosDb__Key = var.cosmosdb_key_dashboard
+      CosmosDb__Key = var.cosmosdb_key_alerts
       ApplicationInsights__InstrumentationKey = var.appinsights_key
   }
 }

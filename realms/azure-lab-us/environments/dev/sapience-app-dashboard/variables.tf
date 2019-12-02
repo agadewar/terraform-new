@@ -1,6 +1,6 @@
 variable "environment" {}
 
-variable "cosmosdb_key" {}
+variable "cosmosdb_key_dashboard" {}
 
 variable "appinsights_key" {}
 

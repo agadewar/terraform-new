@@ -34,7 +34,7 @@ resource "kubernetes_secret" "sapience_app_dashboard" {
   }
 
   data = {
-      CosmosDb__Key = var.cosmosdb_key
+      CosmosDb__Key = var.cosmosdb_key_dashboard
       ApplicationInsights__InstrumentationKey = var.appinsights_key
   }
 }
