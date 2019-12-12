@@ -5,6 +5,7 @@ variable "realm_backend_container_name" {}
 variable "cloud" {}
 variable "region" {}
 variable "dns_realm" {}
+variable "realm" {}
 
 variable "subscription_id" {}
 variable "service_principal_app_id" {}
