@@ -10,7 +10,7 @@ resource "kubernetes_config_map" "eventpipeline_leaf_broker" {
   }
 }
 
-resource "kubernetes_secret" "eventpipeline_leaf_broker" {
+/* resource "kubernetes_secret" "eventpipeline_leaf_broker" {
   metadata {
     name      = "eventpipeline-leaf-broker"
     namespace = local.namespace
@@ -25,7 +25,7 @@ resource "kubernetes_secret" "eventpipeline_leaf_broker" {
   }
 
   type = "Opaque"
-}
+} */
 
 resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
   metadata {
@@ -102,8 +102,8 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
             name = "KAFKA_USERNAME"
             value_from {
               secret_key_ref {
-                name = "eventpipeline-leaf-broker"
-                key  = "kafka.username"
+                name = "kafka"
+                key  = "username"
               }
             }
           }
@@ -111,8 +111,8 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
             name = "KAFKA_PASSWORD"
             value_from {
               secret_key_ref {
-                name = "eventpipeline-leaf-broker"
-                key  = "kafka.password"
+                name = "kafka"
+                key  = "password"
               }
             }
           }

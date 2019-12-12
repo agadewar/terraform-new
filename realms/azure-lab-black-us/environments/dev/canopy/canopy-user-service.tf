@@ -66,7 +66,7 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-user-service:1.3.4.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-user-service:1.3.5.docker-SNAPSHOT"
           name  = "canopy-user-service"
 
           image_pull_policy = "Always"
