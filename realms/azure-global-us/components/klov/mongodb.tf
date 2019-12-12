@@ -18,3 +18,9 @@ resource "azurerm_cosmosdb_account" "klov" {
     failover_priority = 0
   }
 }
+
+resource "azurerm_cosmosdb_mongo_database" "klov" {
+  name                = "klov"
+  resource_group_name = var.resource_group_name
+  account_name        = "${azurerm_cosmosdb_account.klov.name}"
+}
