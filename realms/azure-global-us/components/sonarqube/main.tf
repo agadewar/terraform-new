@@ -64,7 +64,7 @@ resource "helm_release" "sonarqube" {
   name      = "sonarqube"
   namespace = "${local.namespace}"
   chart     = "stable/sonarqube"
-
+  
   timeout = 600
 
   set {
@@ -72,6 +72,11 @@ resource "helm_release" "sonarqube" {
     value = "ClusterIP"
   }
 
+  set {
+    name  = "image.tag"
+    value = "8.0-developer-beta"
+  }
+  #nginx.ingress.kubernetes.io/whitelist-source-range : ${join(", ", concat([data.terraform_remote_state.ingress-controller.outputs.nginx_ingress_controller_ip], var.sonarqube_source_ranges_allowed,var.azure_devops_source_ranges_allowed))}
   values = [<<EOF
 ingress:
   enabled: true
@@ -82,7 +87,7 @@ ingress:
     kubernetes.io/ingress.class                        : nginx
     kubernetes.io/tls-acme                             : true
     nginx.ingress.kubernetes.io/ssl-redirect           : true
-    nginx.ingress.kubernetes.io/whitelist-source-range : ${join(", ", concat([data.terraform_remote_state.ingress-controller.outputs.nginx_ingress_controller_ip], var.sonarqube_source_ranges_allowed))}
+    nginx.ingress.kubernetes.io/proxy-body-size        : "20M"
   hosts:
     - name: sonarqube.sapienceanalytics.com
       path: /

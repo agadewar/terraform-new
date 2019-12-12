@@ -21,3 +21,6 @@ variable "sonarqube_source_ranges_allowed" {
   type = list(string)
 }
 
+variable "azure_devops_source_ranges_allowed"{
+  type = list(string)
+}
