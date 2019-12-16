@@ -95,8 +95,23 @@ resource "kubernetes_ingress" "api" {
       }
     }
 
+    rule {
+      host = "api.sapienceanalytics.com"
+      http {
+        path {
+          backend {
+            service_name = "ambassador"
+            service_port = 80
+          }
+
+          path = "/"
+        }
+      }
+    }
+
     tls {
       hosts = [
+        "api.sapienceanalytics.com",
         "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
         "api.${var.environment}.sapienceanalytics.com",
       ]
