@@ -9,6 +9,7 @@ provider "kubernetes" {
   config_path = local.config_path
 }
 
+
 locals {
   namespace = var.environment
 
