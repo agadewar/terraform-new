@@ -337,7 +337,7 @@ resource "helm_release" "spinnaker" {
     "${data.template_file.custom_values.rendered}"
   ]
 
-  timeout = 600
+  timeout = 1800
 }
 
 # resource "null_resource" "nginx_ingress_controller_ip" {

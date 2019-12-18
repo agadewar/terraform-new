@@ -3,19 +3,34 @@ halyard:
   image:
     repository: gcr.io/spinnaker-marketplace/halyard
     tag: 1.23.2
+    # tag: 1.28.0
   # Set to false to disable persistence data volume for halyard
   persistence:
     enabled: true
   # Provide a config map with Hal commands that will be run the core config (storage)
   # The config map should contain a script in the config.sh key
   additionalScripts:
-    enabled: false
-    configMapName: my-halyard-config
-    configMapKey: config.sh
+    # enabled: false
+    #configMapName: my-halyard-config
+    #configMapKey: config.sh
     # If you'd rather do an inline script, set create to true and put the content in the data dict like you would a configmap
     # The content will be passed through `tpl`, so value interpolation is supported.
-    create: false
-    data: {}
+    create: true
+    #data: {}
+    data:
+      # enable_artifact_feature: |-
+      #   echo "Enabling artifacts feature"
+      #   $HAL_COMMAND config features edit --artifacts true
+      # enable_gitrepo_artifact.sh: |-
+      #   echo "Enabling gitrepo artifact"
+      #   $HAL_COMMAND config artifact gitrepo enable
+      #   $HAL_COMMAND config artifact gitrepo account add azure-devops --token dia5u5yrqba6k2hik3r4bb5njg7ulvltp4lsjw5ysebqza4ssp4a
+      enable_http_artifact.sh: |-
+        echo "Enabling http artifact"
+        $HAL_COMMAND config artifact http enable
+      # apply.sh: |-
+      #   echo "Apply changes"
+      #   $HAL_COMMAND deploy apply
   additionalSecrets:
     create: false
     data: {}
