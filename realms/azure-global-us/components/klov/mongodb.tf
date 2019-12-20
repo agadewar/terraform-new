@@ -9,6 +9,10 @@ resource "azurerm_cosmosdb_account" "klov" {
   offer_type          = "Standard"
   kind                = "MongoDB"
 
+  capabilities {
+    name = "EnableAggregationPipeline"
+  }
+
   consistency_policy {
     consistency_level = "Strong"
   }
@@ -21,6 +25,6 @@ resource "azurerm_cosmosdb_account" "klov" {
 
 resource "azurerm_cosmosdb_mongo_database" "klov" {
   name                = "klov"
-  resource_group_name = var.resource_group_name
-  account_name        = "${azurerm_cosmosdb_account.klov.name}"
+  resource_group_name = azurerm_cosmosdb_account.klov.resource_group_name
+  account_name        = azurerm_cosmosdb_account.klov.name
 }

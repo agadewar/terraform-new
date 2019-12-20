@@ -85,7 +85,7 @@ data "template_file" "sapience_container_registry_credential" {
 resource "kubernetes_secret" "sapience_container_registry_credential" {
   metadata {
     name      = "${local.sapience_container_registry_image_pull_secret_name}"
-    namespace = "${local.namespace}"
+    namespace = kubernetes_namespace.klov.metadata.0.name
   }
 
   data = {
@@ -110,8 +110,9 @@ resource "kubernetes_deployment" "klov" {
     )}"
 
     name = "klov"
-    namespace = "${local.namespace}"
+    namespace = kubernetes_namespace.klov.metadata.0.name
   }
+
   spec {
     replicas = 1
     selector {
@@ -132,6 +133,7 @@ resource "kubernetes_deployment" "klov" {
             fs_group = 1000
             run_as_user = 1000
         }
+
         container {
           name = "klov"
           image = "${data.terraform_remote_state.container_registry.outputs.login_server}/klov-reporting-server:latest"
@@ -139,21 +141,56 @@ resource "kubernetes_deployment" "klov" {
 
           resources {
             requests {
-              cpu    = "250m"
-              memory = "2000Mi"
+              cpu    = "100m"
+              memory = "1000Mi"
             }
           }
 
           env {
-            name = "JAVA_OPTS"
-            value = "-server -Dspring.config.location=/opt/appConfig/application.properties"
-          } 
+            name  = "JAVA_OPTS"
+            value = "-server"
+          }
+
+          env {
+            name = "spring.data.mongodb.uri"
+            value_from {
+              secret_key_ref {
+                name = kubernetes_secret.klov_mongodb.metadata.0.name
+                key = "uri"
+              }
+            }
+          }
+
+          env {
+            name = "server.admin.name"
+            value_from {
+              secret_key_ref {
+                name = kubernetes_secret.klov_server_admin.metadata.0.name
+                key = "name"
+              }
+            }
+          }
+
+          env {
+            name = "server.admin.key"
+            value_from {
+              secret_key_ref {
+                name = kubernetes_secret.klov_server_admin.metadata.0.name
+                key = "key"
+              }
+            }
+          }
+
+          env_from {
+            config_map_ref {
+              name = kubernetes_config_map.klov_server.metadata.0.name
+            }
+          }
 
           port {
             name = "http-port"
             container_port = 8080
           }
-
         }
         
         image_pull_secrets {
@@ -164,19 +201,49 @@ resource "kubernetes_deployment" "klov" {
   }
 }
 
-resource "kubernetes_config_map" "klov" {
+resource "kubernetes_config_map" "klov_server" {
   metadata {
-    name = "klov"
+    name = "klov-server"
+    namespace = kubernetes_namespace.klov.metadata.0.name
   }
 
   data = {
-    "spring.data.mongodb.host"     = "klov-reporting-server.documents.azure.com"
-    "spring.data.mongodb.port"     = "10255"
-    "spring.data.mongodb.database" = "klov"
-    "spring.data.mongodb.username" = var.mongodb_klov_user
-    "spring.data.mongodb.password" = var.mongodb_klov_password
+    "extent.api.version"                 = "community"
+    "application.name"                   = "klov"
+    "server.port"                        = 8080
+    "spring.data.mongodb.database"       = "klov"
+    "spring.data.rest.basePath"          = "/rest"
+    "spring.data.rest.default-page-size" = 10
+    "spring.autoconfigure.exclude"       = "org.springframework.boot.autoconfigure.session.SessionAutoConfiguration"
+    "file.storage.location"              = "./upload/reports/"
+  }
+}
+
+resource "kubernetes_secret" "klov_mongodb" {
+  metadata {
+    name      = "klov-mongodb"
+    namespace = kubernetes_namespace.klov.metadata.0.name
   }
 
+  data = {
+    "uri" = azurerm_cosmosdb_account.klov.connection_strings.0
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "klov_server_admin" {
+  metadata {
+    name      = "klov-server-admin"
+    namespace = kubernetes_namespace.klov.metadata.0.name
+  }
+
+  data = {
+    "name" = var.klov_server_admin_name
+    "key"  = var.klov_server_admin_key
+  }
+
+  type = "Opaque"
 }
 
 resource "kubernetes_service" "klov" {
@@ -186,7 +253,7 @@ resource "kubernetes_service" "klov" {
     )}"
     
     name = "klov"
-    namespace = "${local.namespace}"
+    namespace = kubernetes_namespace.klov.metadata.0.name
   }
 
   spec {
@@ -200,13 +267,6 @@ resource "kubernetes_service" "klov" {
       port = 8080
       target_port = 8080
     }
-
-    /* port {
-      name = "jnlp"
-      port = 50000
-      target_port = 50000
-    } */
-
   }
 }
 
@@ -238,7 +298,7 @@ resource "kubernetes_cluster_role_binding" "klov" {
     subject {
         kind = "ServiceAccount"
         name = "klov"
-        namespace = local.namespace
+        namespace = kubernetes_namespace.klov.metadata.0.name
         api_group = ""
     }
 }
@@ -254,7 +314,7 @@ resource "azurerm_dns_a_record" "klov" {
 resource "kubernetes_ingress" "klov" {
   metadata {
     name = "klov"
-    namespace = "${local.namespace}"
+    namespace = kubernetes_namespace.klov.metadata.0.name
 
     annotations = {
       "certmanager.k8s.io/acme-challenge-type"             = "dns01"
@@ -274,7 +334,7 @@ resource "kubernetes_ingress" "klov" {
         path {
           backend {
             service_name = "klov"
-            service_port = 80
+            service_port = 8080
           }
 
           path = "/"
@@ -288,7 +348,7 @@ resource "kubernetes_ingress" "klov" {
         path {
           backend {
             service_name = "klov"
-            service_port = 80
+            service_port = 8080
           }
 
           path = "/"
