@@ -44,7 +44,7 @@ resource "kubernetes_secret" "sapience_app_alerts" {
   }
 
   data = {
-      CosmosDb__Key = var.cosmosdb_key_alerts
+      NotificationsDb__Key = var.cosmosdb_key_alerts
       ApplicationInsights__InstrumentationKey = [data.terraform_remote_state.app_insights.outputs.instrumentation_key]
   }
 }
