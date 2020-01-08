@@ -9,6 +9,16 @@ provider "kubernetes" {
   config_path = local.config_path
 }
 
+data "terraform_remote_state" "app_insights" {
+  backend = "azurerm"
+  config = {
+    access_key           = var.realm_backend_access_key
+    storage_account_name = var.realm_backend_storage_account_name
+	  container_name       = var.realm_backend_container_name
+    key                  = "app-insights.tfstate"
+  }
+}
+
 locals {
   namespace = var.environment
 
@@ -34,7 +44,7 @@ resource "kubernetes_secret" "sapience_app_dashboard" {
   }
 
   data = {
-      CosmosDb__Key = var.cosmosdb_key
-      ApplicationInsights__InstrumentationKey = var.appinsights_key
+      CosmosDb__Key = var.cosmosdb_key_dashboard
+      ApplicationInsights__InstrumentationKey = data.terraform_remote_state.app_insights.outputs.instrumentation_key
   }
 }
