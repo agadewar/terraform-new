@@ -19,6 +19,16 @@ data "terraform_remote_state" "app_insights" {
   }
 }
 
+data "terraform_remote_state" "cosmos_db" {
+  backend = "azurerm"
+  config = {
+    access_key           = var.env_backend_access_key
+    storage_account_name = var.env_backend_storage_account_name
+	  container_name       = var.env_backend_container_name
+    key                  = "database.tfstate"
+  }
+}
+
 locals {
   namespace = var.environment
 
@@ -44,7 +54,7 @@ resource "kubernetes_secret" "sapience_app_alerts" {
   }
 
   data = {
-      NotificationsDb__Key = var.cosmosdb_key_alerts
+      NotificationsDb__Key = data.terraform_remote_state.cosmos_db.outputs.lab_us_qa_alerts_cosmos_password
       ApplicationInsights__InstrumentationKey = data.terraform_remote_state.app_insights.outputs.instrumentation_key
   }
 }

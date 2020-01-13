@@ -208,6 +208,23 @@ resource "azurerm_cosmosdb_account" "lab_us_qa" {
   }
 }
 
+resource "azurerm_cosmosdb_account" "lab_us_qa_alerts" {
+  name                = "sapience-app-alerts-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+  offer_type          = "Standard"
+  kind                = "GlobalDocumentDB"
+
+  consistency_policy {
+    consistency_level = "Strong"
+  }
+
+  geo_location {
+    location          = local.cosmos_failover_location
+    failover_priority = 0
+  }
+}
+
 resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
   name                = "sapience-canopy-hierarchy-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name

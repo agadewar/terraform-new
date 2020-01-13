@@ -204,6 +204,16 @@ service: eventpipeline-service
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  sapience_app_alerts_mapping
+prefix: /alerts/
+service: sapience-app-alerts
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  sapience_app_dashboard_mapping
 prefix: /dashboard/
 service: sapience-app-dashboard
