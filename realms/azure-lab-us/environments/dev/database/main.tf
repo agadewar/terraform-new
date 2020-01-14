@@ -309,3 +309,58 @@ resource "azurerm_cosmosdb_account" "lab_us_dev_alerts" {
 #   }
 # }
 
+resource "azurerm_mysql_server" "sapience" {
+  name                = "sapience-mysql-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+
+  sku {
+    name     = var.mysql_server_sku_name
+    capacity = var.mysql_server_sku_capacity
+    tier     = var.mysql_server_sku_tier
+    family   = var.mysql_server_sku_family
+  }
+
+  storage_profile {
+    storage_mb            = var.mysql_server_storage_profile_storage_mb
+    backup_retention_days = 14
+    geo_redundant_backup  = "Disabled"
+  }
+
+  administrator_login          = var.mysql_server_administrator_login
+  administrator_login_password = var.mysql_server_administrator_password
+  version                      = var.mysql_server_version
+  ssl_enforcement              = "Enabled"
+}
+
+resource "azurerm_mysql_database" "device" {
+  name                = "device"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  charset             = "utf8"
+  collation           = "utf8_unicode_ci"
+}
+
+resource "azurerm_mysql_database" "eventpipeline" {
+  name                = "eventpipeline"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  charset             = "utf8"
+  collation           = "utf8_unicode_ci"
+}
+
+resource "azurerm_mysql_database" "leafbroker" {
+  name                = "leafbroker"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  charset             = "utf8"
+  collation           = "utf8_unicode_ci"
+}
+
+resource "azurerm_mysql_database" "user" {
+  name                = "user"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  charset             = "latin1"
+  collation           = "latin1_swedish_ci"
+}
