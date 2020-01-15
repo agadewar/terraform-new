@@ -30,12 +30,27 @@ resource "helm_release" "redis" {
   chart     = "stable/redis"
 
   set {
-  name  = "usePassword"
-  value = "true"
+    name  = "usePassword"
+    value = "true"
   }
 
   set {
-  name  = "password"
-  value = var.redis_password
+    name  = "password"
+    value = var.redis_password
+  }
+
+  set {
+    name = "cluster.enabled"
+    value = var.redis_cluster_enabled
+  }
+
+  set {
+    name = "cluster.slaveCount"
+    value = var.redis_cluster_slavecount
+  }
+
+  set {
+    name = "sentinels.enabled"
+    value = "true"
   }
 }
