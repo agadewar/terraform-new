@@ -68,6 +68,22 @@ resource "azurerm_dns_a_record" "portal_black" {
 //   record              = azurerm_dns_a_record.api_black.name
 // }
 
+resource "azurerm_dns_a_record" "kubernetes_black" {
+  name                = "kubernetes.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}"
+  zone_name           = "sapienceanalytics.com"
+  resource_group_name = "global-us"
+  ttl                 = 30
+  # TF-UPGRADE-TODO: In Terraform v0.10 and earlier, it was sometimes necessary to
+  # force an interpolation expression to be interpreted as a list by wrapping it
+  # in an extra set of list brackets. That form was supported for compatibilty in
+  # v0.11, but is no longer supported in Terraform v0.12.
+  #
+  # If the expression in the following list itself returns a list, remove the
+  # brackets to avoid interpretation as a list of lists. If the expression
+  # returns a single list item then leave it as-is and remove this TODO comment.
+  records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
+}
+
 resource "azurerm_dns_a_record" "api_black" {
   name                = "api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
@@ -83,3 +99,29 @@ resource "azurerm_dns_a_record" "api_black" {
   # returns a single list item then leave it as-is and remove this TODO comment.
   records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
 }
+
+resource "azurerm_dns_a_record" "storybook_black" {
+  name                = "storybook.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}"
+  zone_name           = "sapienceanalytics.com"
+  resource_group_name = "global-us"
+  ttl                 = 300
+  # TF-UPGRADE-TODO: In Terraform v0.10 and earlier, it was sometimes necessary to
+  # force an interpolation expression to be interpreted as a list by wrapping it
+  # in an extra set of list brackets. That form was supported for compatibilty in
+  # v0.11, but is no longer supported in Terraform v0.12.
+  #
+  # If the expression in the following list itself returns a list, remove the
+  # brackets to avoid interpretation as a list of lists. If the expression
+  # returns a single list item then leave it as-is and remove this TODO comment.
+  records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
+}
+
+resource "azurerm_dns_cname_record" "storybook" {
+     depends_on = [ azurerm_dns_a_record.storybook_black ]
+     name                = "storybook.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
+     zone_name           = "sapienceanalytics.com"
+     resource_group_name = "global-us"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+     ttl                 = 300
+     record              = "storybook.dev.lab-black.us.azure.sapienceanalytics.com"
+ }
+
