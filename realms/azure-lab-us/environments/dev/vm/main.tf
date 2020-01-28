@@ -111,6 +111,18 @@ resource "azurerm_network_security_group" "sisense_appquery" {
   }
 
   security_rule {
+    name                       = "Allow-443-Open-To-The-World"
+    priority                   = 104
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "TCP"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
     name                       = "Allow-AllTraffic-BenjaminJohn-Home"
     priority                   = 201
     direction                  = "Inbound"
