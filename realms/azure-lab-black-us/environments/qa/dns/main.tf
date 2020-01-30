@@ -43,7 +43,7 @@ data "terraform_remote_state" "ingress_controller" {
 //   record              = azurerm_dns_a_record.portal_black.name
 // }
 
-resource "azurerm_dns_a_record" "portal_black" {
+/* resource "azurerm_dns_a_record" "portal_black" {
   name                = "portal.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "global-us"
@@ -57,7 +57,7 @@ resource "azurerm_dns_a_record" "portal_black" {
   # brackets to avoid interpretation as a list of lists. If the expression
   # returns a single list item then leave it as-is and remove this TODO comment.
   records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
-}
+} */
 
 resource "azurerm_dns_a_record" "app_black" {
   name                = "app.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}"
