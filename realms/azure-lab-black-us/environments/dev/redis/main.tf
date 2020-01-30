@@ -25,7 +25,7 @@ locals {
 }
 
 resource "helm_release" "redis" {
-  name      = "redis"
+  name      = "redis-${var.environment}"
   namespace = var.environment
   chart     = "stable/redis"
 
