@@ -60,12 +60,20 @@ data "terraform_remote_state" "vm" {
 #   records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
 # }
 
-resource "azurerm_dns_cname_record" "portal" {
+/* resource "azurerm_dns_cname_record" "portal" {
   name                = "portal.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "global-us"
   ttl                 = 300
   record              = "portal.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
+} */
+
+resource "azurerm_dns_cname_record" "app" {
+  name                = "app.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
+  zone_name           = "sapienceanalytics.com"
+  resource_group_name = "global-us"
+  ttl                 = 300
+  record              = "app.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
 }
 
 resource "azurerm_dns_cname_record" "api" {
@@ -89,7 +97,14 @@ resource "azurerm_dns_a_record" "sisense_appquery" {
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "global-us"
   ttl                 = 300
-  records = [data.terraform_remote_state.vm.outputs.public_ip_sisense_appquery_001,
-             data.terraform_remote_state.vm.outputs.public_ip_sisense_appquery_002]
+  records = ["40.90.250.17"]
+}
+
+resource "azurerm_dns_cname_record" "kubernetes" {
+  name                = "kubernetes.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
+  zone_name           = "sapienceanalytics.com"
+  resource_group_name = "global-us"
+  ttl                 = 300
+  record              = "kubernetes.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
 }
 

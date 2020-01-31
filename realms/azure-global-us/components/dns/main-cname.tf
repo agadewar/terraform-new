@@ -233,7 +233,31 @@ resource "azurerm_dns_cname_record" "portal_dev" {
   zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
   resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
-  record              = "portal.dev.lab.us.azure.sapienceanalytics.com"
+  record              = "app.dev.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "portal_dev_lab_us" {
+  name                = "portal.dev.lab.us.azure"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "app.dev.lab.us.azure.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "portal_dev_black" {
+  name                = "portal.dev.lab-black.us.azure"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "app.dev.lab-black.us.azure.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "app_dev" {
+  name                = "app.dev"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "app.dev.lab.us.azure.sapienceanalytics.com"
 }
 
 resource "azurerm_dns_cname_record" "kubernetes_dev" {
@@ -290,7 +314,31 @@ resource "azurerm_dns_cname_record" "portal_qa" {
   zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
   resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
-  record              = "portal.qa.lab.us.azure.sapienceanalytics.com"
+  record              = "app.qa.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "portal_qa_lab_us" {
+  name                = "portal.qa.lab.us.azure"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "app.qa.lab.us.azure.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "portal_qa_black" {
+  name                = "portal.qa.lab-black.us.azure"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "app.qa.lab-black.us.azure.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "app_qa" {
+  name                = "app.qa"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "app.qa.lab.us.azure.sapienceanalytics.com"
 }
 
 resource "azurerm_dns_cname_record" "sisense_qa" {
@@ -324,7 +372,31 @@ resource "azurerm_dns_cname_record" "portal_demo" {
   zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
   resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
-  record              = "portal.demo.lab.us.azure.sapienceanalytics.com"
+  record              = "app.demo.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "portal_demo_lab_us" {
+  name                = "portal.demo.lab.us.azure"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "app.demo.lab.us.azure.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "portal_demo_black" {
+  name                = "portal.demo.lab-black.us.azure"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "app.demo.lab-black.us.azure.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "app_demo" {
+  name                = "app.demo"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "app.demo.lab.us.azure.sapienceanalytics.com"
 }
 
 resource "azurerm_dns_cname_record" "sisense_demo" {
@@ -349,7 +421,7 @@ resource "azurerm_dns_cname_record" "portal_load" {
   zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
   resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
-  record              = "portal.load.load.us.azure.sapienceanalytics.com"
+  record              = "app.load.load.us.azure.sapienceanalytics.com"
 }
 
 resource "azurerm_dns_cname_record" "sisense_load" {
@@ -390,7 +462,23 @@ resource "azurerm_dns_cname_record" "portal_prod" {
   zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
   resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
-  record              = "portal.prod.prod.us.azure.sapienceanalytics.com"
+  record              = "app.prod.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "portal_prod_prod_us" {
+  name                = "portal.prod.prod.us.azure"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "app.prod.prod.us.azure.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "app_prod" {
+  name                = "app.prod"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "app.prod.prod.us.azure.sapienceanalytics.com"
 }
 
 resource "azurerm_dns_cname_record" "sisense_prod" {
@@ -431,8 +519,17 @@ resource "azurerm_dns_cname_record" "portal" {
   zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
   resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
-  record              = "portal.prod.prod.us.azure.sapienceanalytics.com"
+  record              = "app.prod.prod.us.azure.sapienceanalytics.com"
 }
+
+resource "azurerm_dns_cname_record" "app" {
+  name                = "app"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "app.prod.prod.us.azure.sapienceanalytics.com"
+}
+
 
 # resource "azurerm_dns_cname_record" "spinnaker" {
 #   name                = "spinnaker"

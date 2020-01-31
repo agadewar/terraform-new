@@ -60,13 +60,22 @@ data "terraform_remote_state" "vm" {
 #   records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
 # }
 
-resource "azurerm_dns_cname_record" "portal" {
+/* resource "azurerm_dns_cname_record" "portal" {
   name                = "portal.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "global-us"
   ttl                 = 300
   record              = "portal.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
+} */
+
+resource "azurerm_dns_cname_record" "app" {
+  name                = "app.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
+  zone_name           = "sapienceanalytics.com"
+  resource_group_name = "global-us"
+  ttl                 = 300
+  record              = "app.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
 }
+
 
 resource "azurerm_dns_cname_record" "api" {
   name                = "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
