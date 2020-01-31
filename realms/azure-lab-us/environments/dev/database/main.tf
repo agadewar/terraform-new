@@ -343,6 +343,30 @@ resource "azurerm_cosmosdb_account" "lab_us_dev_alerts_mongodb" {
 #   }
 # }
 
+resource "azurerm_mysql_firewall_rule" "sapience_dallas_office" {
+  name                = "Sapience-Dallas-Office"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  start_ip_address    = var.ip_sapience_dallas_office
+  end_ip_address      = var.ip_sapience_dallas_office
+}
+
+resource "azurerm_mysql_firewall_rule" "sapience-pune-office" {
+  name                = "Sapience-Pune-Office"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  start_ip_address    = var.ip_sapience_pune_office
+  end_ip_address      = var.ip_sapience_pune_office
+}
+
+resource "azurerm_mysql_firewall_rule" "banyan-office" {
+  name                = "Banyan-Office"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  start_ip_address    = var.ip_banyan_office
+  end_ip_address      = var.ip_banyan_office
+}
+
 resource "azurerm_mysql_server" "sapience" {
   name                = "sapience-mysql-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name

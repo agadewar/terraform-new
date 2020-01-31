@@ -48,6 +48,7 @@ variable "environment_common_tags" {
 
 variable "ip_banyan_office" {}
 variable "ip_benjamin_john_home" {}
+variable "ip_benjamin_john_home2" {}
 variable "ip_sapience_dallas_office" {}
 variable "ip_sapience_pune_office" {}
 variable "ip_steve_ardis_home" {}
