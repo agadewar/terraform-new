@@ -145,7 +145,18 @@ resource "azurerm_network_security_group" "sisense_appquery" {
     source_address_prefix      = var.ip_milind_kadbane_home
     destination_address_prefix = "*"
   }
-  
+
+  security_rule {
+    name                       = "Allow-AllTraffic-BenjaminJohn-Home2"
+    priority                   = 204
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = var.ip_benjamin_john_home2
+    destination_address_prefix = "*"
+  }
 }
 
 resource "azurerm_network_security_group" "sisense_build" {
@@ -225,6 +236,17 @@ resource "azurerm_network_security_group" "sisense_build" {
     destination_address_prefix = "*"
   }
 
+  security_rule {
+    name                       = "Allow-AllTraffic-BenjaminJohn-Home2"
+    priority                   = 204
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = var.ip_benjamin_john_home2
+    destination_address_prefix = "*"
+  }
 }
 
 
