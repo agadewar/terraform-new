@@ -44,8 +44,24 @@ data "terraform_remote_state" "vm" {
 #   )}"
 # }
 
-resource "azurerm_dns_a_record" "portal" {
+/* resource "azurerm_dns_a_record" "portal" {
   name                = "portal.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
+  zone_name           = "sapienceanalytics.com"
+  resource_group_name = "global-us"
+  ttl                 = 300
+  # TF-UPGRADE-TODO: In Terraform v0.10 and earlier, it was sometimes necessary to
+  # force an interpolation expression to be interpreted as a list by wrapping it
+  # in an extra set of list brackets. That form was supported for compatibilty in
+  # v0.11, but is no longer supported in Terraform v0.12.
+  #
+  # If the expression in the following list itself returns a list, remove the
+  # brackets to avoid interpretation as a list of lists. If the expression
+  # returns a single list item then leave it as-is and remove this TODO comment.
+  records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
+} */
+
+resource "azurerm_dns_a_record" "app" {
+  name                = "app.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "global-us"
   ttl                 = 300
@@ -60,8 +76,8 @@ resource "azurerm_dns_a_record" "portal" {
   records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
 }
 
-resource "azurerm_dns_a_record" "app" {
-  name                = "app.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
+resource "azurerm_dns_a_record" "manage" {
+  name                = "manage.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "global-us"
   ttl                 = 300
