@@ -76,12 +76,12 @@ resource "azurerm_dns_cname_record" "app" {
   record              = "app.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
 }
 
-resource "azurerm_dns_cname_record" "hello-world" {
-  name                = "hello-world.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
+resource "azurerm_dns_cname_record" "manage" {
+  name                = "manage.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "global-us"
   ttl                 = 300
-  record              = "app.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
+  record              = "manage.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
 }
 
 resource "azurerm_dns_cname_record" "api" {
