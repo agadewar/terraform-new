@@ -26,6 +26,8 @@ variable "sql_database_mad_edition" {}
 variable "sql_database_mad_requested_service_objective_name" {}
 variable "sql_database_staging_edition" {}
 variable "sql_database_staging_requested_service_objective_name" {}
+variable "sql_database_edw_edition" {}
+variable "sql_database_edw_requested_service_objective_name" {}
 
 variable "realm_common_tags" {
   type = map(string)
