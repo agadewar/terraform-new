@@ -97,10 +97,10 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   }
 
   addon_profile {
-    oms_agent {
-      enabled = true
-      log_analytics_workspace_id = data.terraform_remote_state.log_analytics_workspace.outputs.log_analytics_workspace_id   # https://github.com/terraform-providers/terraform-provider-azurerm/issues/3457
-    }
+    # oms_agent {
+      # enabled = true
+      # log_analytics_workspace_id = data.terraform_remote_state.log_analytics_workspace.outputs.log_analytics_workspace_id   # https://github.com/terraform-providers/terraform-provider-azurerm/issues/3457
+    # }
   }
 
   service_principal {
