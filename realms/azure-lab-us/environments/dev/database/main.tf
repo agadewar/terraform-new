@@ -416,12 +416,19 @@ resource "azurerm_mysql_server" "sapience" {
   ssl_enforcement              = "Enabled"
 }
 
+resource "azurerm_mysql_configuration" "sapience_log_bin_trust_function_creators" {
+  name                = "log_bin_trust_function_creators"
+  resource_group_name = var.resource_group_name
+  server_name         = "${azurerm_mysql_server.sapience.name}"
+  value               = "ON"
+}
+
 resource "azurerm_mysql_database" "device" {
   name                = "device"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_mysql_server.sapience.name
-  charset             = "utf8"
-  collation           = "utf8_unicode_ci"
+  charset             = "latin1"
+  collation           = "latin1_swedish_ci"
 }
 
 resource "azurerm_mysql_database" "eventpipeline" {
