@@ -23,7 +23,7 @@ locals {
 }
 
 resource "azurerm_virtual_network" "realm" {
-  name                = "${var.resource_group_name}"
+  name                = var.resource_group_name
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
   address_space       = var.virtual_network_address_space
@@ -37,15 +37,24 @@ resource "azurerm_subnet" "default" {
   service_endpoints    = var.subnet_service_endpoints
 }
 
+resource "azurerm_subnet" "aks-pool" {
+  name                 = "aks-pool"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.realm.name
+  address_prefix       = var.subnet_address_prefix_aks-pool
+  service_endpoints    = var.subnet_service_endpoints
+}
+
 resource "azurerm_subnet" "aks-pool01" {
   name                 = "aks-pool01"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.realm.name
   address_prefix       = var.subnet_address_prefix_aks-pool01
   service_endpoints    = var.subnet_service_endpoints
+  route_table_id       = "/subscriptions/b78a61e7-f2ed-4cb0-8f48-6548408935e9/resourceGroups/MC_lab-us_lab-us-black_eastus/providers/Microsoft.Network/routeTables/aks-agentpool-34839511-routetable"
 }
 
-resource "azurerm_subnet" "aks-pool02" {
+/* resource "azurerm_subnet" "aks-pool02" {
   name                 = "aks-pool02"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.realm.name
@@ -68,3 +77,4 @@ resource "azurerm_subnet" "aks-pool04" {
   address_prefix       = var.subnet_address_prefix_aks-pool04
   service_endpoints    = var.subnet_service_endpoints
 }
+ */

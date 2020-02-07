@@ -25,7 +25,7 @@ provider "template" {
   version = "2.1.2"
 }
 
-data "terraform_remote_state" "log_analytics_workspace" {
+/* data "terraform_remote_state" "log_analytics_workspace" {
   backend = "azurerm"
 
   config = {
@@ -34,7 +34,7 @@ data "terraform_remote_state" "log_analytics_workspace" {
     container_name       = var.realm_backend_container_name
     key                  = "log-analytics-workspace.tfstate"
   }
-}
+} */
 
 data "terraform_remote_state" "network" {
   backend = "azurerm"
@@ -96,12 +96,12 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     vnet_subnet_id = data.terraform_remote_state.network.outputs.aks-pool01_subnet_id
   }
 
-  addon_profile {
+  /* addon_profile {
     oms_agent {
       enabled = true
       log_analytics_workspace_id = data.terraform_remote_state.log_analytics_workspace.outputs.log_analytics_workspace_id   # https://github.com/terraform-providers/terraform-provider-azurerm/issues/3457
     }
-  }
+  } */
 
   service_principal {
     client_id     = var.service_principal_app_id

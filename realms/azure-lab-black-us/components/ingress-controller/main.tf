@@ -19,7 +19,7 @@ provider "helm" {
   }
 
   #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
-  service_account = "tiller"
+  #service_account = "tiller"
 }
 
 # data "terraform_remote_state" "dns" {

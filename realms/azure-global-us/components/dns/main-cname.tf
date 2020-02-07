@@ -570,13 +570,21 @@ resource "azurerm_dns_cname_record" "manage" {
   record              = "manage.prod.prod.us.azure.sapienceanalytics.com"
 }
 
-# resource "azurerm_dns_cname_record" "spinnaker" {
-#   name                = "spinnaker"
-#   zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
-#   resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
-#   ttl                 = 300
-#   record              = "spinnaker.global.sapienceanalytics.com"
-# }
+resource "azurerm_dns_cname_record" "spinnaker_global" {
+  name                = "spinnaker"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "spinnaker.global.sapienceanalytics.com"
+}
+
+resource "azurerm_dns_cname_record" "spinnaker" {
+  name                = "spinnaker.global"
+  zone_name           = "${azurerm_dns_zone.sapienceanalytics_public.name}"
+  resource_group_name = "${var.resource_group_name}"   # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "spinnaker.global.us.azure.sapienceanalytics.com"
+}
 
 ### sapiencu.com
 resource "azurerm_dns_cname_record" "sapienceu_www_public" {
