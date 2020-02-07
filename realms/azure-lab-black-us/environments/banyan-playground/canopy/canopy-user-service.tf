@@ -18,8 +18,8 @@ resource "kubernetes_secret" "canopy_user_service" {
 
   data = {
     "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
-    "canopy.database.username" = var.sql_server_canopy_username
-    "canopy.database.password" = var.sql_server_canopy_password
+    "canopy.database.username" = var.mysql_canopy_username
+    "canopy.database.password" = var.mysql_canopy_password
     "kafka.username"           = var.kafka_username
     "kafka.password"           = var.kafka_password
   }
@@ -113,6 +113,15 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
               secret_key_ref {
                 name = "canopy-user-service"
                 key  = "kafka.password"
+              }
+            }
+          }
+          env {
+            name = "REDIS_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "redis-${var.environment}"   ### TODO - ideally, the secret name wouldn't need to include the environment name, since we have namespaces; but, helm (pre version 3) requires helm release names to be cluster unique and we had to add the enviornment to the name of the release; therefore, the helm-generated secret name also has the environmet name in it
+                key  = "redis-password"
               }
             }
           }

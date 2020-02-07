@@ -1,42 +1,35 @@
-resource "kubernetes_config_map" "canopy_device_service" {
+resource "kubernetes_config_map" "canopy_settings_service" {
   metadata {
-    name      = "canopy-device-service"
+    name      = "canopy-settings-service"
     namespace = local.namespace
   }
 
   data = {
     "global.properties"      = data.template_file.global_properties.rendered
-    "application.properties" = file("files/canopy-device-service.properties")
+    "application.properties" = file("files/canopy-settings-service.properties")
   }
 }
 
-resource "kubernetes_secret" "canopy_device_service" {
+resource "kubernetes_secret" "canopy_settings_service" {
   metadata {
-    name      = "canopy-device-service"
+    name      = "canopy-settings-service"
     namespace = local.namespace
   }
 
-  data = {
-    "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
-    "canopy.database.username" = var.mysql_canopy_username
-    "canopy.database.password" = var.mysql_canopy_password
-    "kafka.username"           = var.kafka_username
-    "kafka.password"           = var.kafka_password
-    "google.api.key"           = var.google_api_key
-  }
+  data = {}
 
   type = "Opaque"
 }
 
-resource "kubernetes_deployment" "canopy_device_service_deployment" {
+resource "kubernetes_deployment" "canopy_settings_service_deployment" {
   metadata {
-    name = "canopy-device-service"
+    name = "canopy-settings-service"
     namespace = local.namespace
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     labels = merge(local.common_labels, {
-      "sapienceanalytics.com/name" = "canopy-device-service"
+      "sapienceanalytics.com/name" = "canopy-settings-service"
     })
     
     annotations = {}
@@ -49,7 +42,7 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     selector {
       match_labels = {
-        "sapienceanalytics.com/name" = "canopy-device-service"
+        "sapienceanalytics.com/name" = "canopy-settings-service"
       }
     }
 
@@ -58,7 +51,7 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
         // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
         //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
         labels = merge(local.common_labels, {
-          "sapienceanalytics.com/name" = "canopy-device-service"
+          "sapienceanalytics.com/name" = "canopy-settings-service"
         })
         
         annotations = {}
@@ -67,64 +60,59 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.7.4.docker-SNAPSHOT"
-          name  = "canopy-device-service"
+          image = "${var.canopy_container_registry_hostname}/canopy-settings-service:1.1.5-SNAPSHOT"
+          name  = "canopy-settings-service"
 
           image_pull_policy = "Always"
 
-          env { 
-            name = "CANOPY_DATABASE_USERNAME"
-            value_from {
-              secret_key_ref {
-                name = "canopy-device-service"
-                key  = "canopy.database.username"
-              }
-            }
+          # env {
+          #   name = "spring.data.mongodb.host"
+          #   # value = "canopy-settings-mongodb-${var.realm}-${var.environment}.documents.azure.com"
+          #   value = "canopy-settings-mongodb-${var.realm}-dev.documents.azure.com"                          ### TODO - make sure to replace "dev" with ${var.environment}
+          # }
+          # env {
+          #   name = "spring.data.mongodb.port"
+          #   value = "27017"
+          # }
+          # env {
+          #   name = "spring.data.mongodb.database"
+          #   value = "settings"
+          # }
+
+          # env {
+          #   name  = "canopy.security.ignores"
+          #   value = "/ping"
+          # }
+          env {
+            name  = "canopy.security.service.auhtenticationTokenName"
+            value = "canopy-security-token"
           }
           env {
-            name = "CANOPY_DATABASE_PASSWORD"
-            value_from {
-              secret_key_ref {
-                name = "canopy-device-service"
-                key  = "canopy.database.password"
-              }
-            }
+            name  = "canopy.security.service.url"
+            value = "http://canopy-user-service/security/"
           }
           env {
-            name = "CANOPY_AMQP_PASSWORD"
-            value_from {
-              secret_key_ref {
-                name = "canopy-device-service"
-                key  = "canopy.amqp.password"
-              }
-            }
+            name  = "ignoreBootstrap"
+            value = "false"
           }
           env {
-            name = "KAFKA_USERNAME"
-            value_from {
-              secret_key_ref {
-                name = "canopy-device-service"
-                key  = "kafka.username"
-              }
-            }
+            name  = "management.add-application-context-header"
+            value = "false"
           }
           env {
-            name = "KAFKA_PASSWORD"
-            value_from {
-              secret_key_ref {
-                name = "canopy-device-service"
-                key  = "kafka.password"
-              }
-            }
+            name  = "rootName"
+            value = "Sapience"
           }
           env {
-            name = "GOOGLE_API_KEY"
-            value_from {
-              secret_key_ref {
-                name = "canopy-device-service"
-                key  = "google.api.key"
-              }
-            }
+            name  = "spring.application.name"
+            value = "canopy-settings"
+          }
+          env {
+            name  = "spring.data.mongodb.uri"
+            # value = "mongodb://canopy-settings-mongodb-lab-us-dev:CLTt4kbosUmeVqWc3DRl3Ktcah02czJksjQDsoRB7DvZzLJmZvRuo5KqGZRS6cE8YSc0HxmHNFncaxNMHqStiw==@canopy-settings-mongodb-lab-us-dev.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
+            ### TODO : read the password in the mongodb.uri from Terraform remote state (CosmosDB)
+            ### TODO : remove hardcoded "dev" to "${var.environment}"
+            value = "mongodb://canopy-settings-mongodb-${var.realm}-dev:CLTt4kbosUmeVqWc3DRl3Ktcah02czJksjQDsoRB7DvZzLJmZvRuo5KqGZRS6cE8YSc0HxmHNFncaxNMHqStiw==@canopy-settings-mongodb-${var.realm}-dev.documents.azure.com:10255/settings?ssl=true"
           }
 
           readiness_probe {
@@ -153,7 +141,7 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
 
           resources {
             requests {
-              memory = "1536M"
+              memory = "256M"
               cpu    = "150m"
             }
           }
@@ -164,36 +152,36 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             read_only = true
           }
           
-          # needed by the user-service for Hazelcast
-          # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
-          volume_mount {
-            name = "default-token"
-            read_only = true
-            mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
-          }
+          # # needed by the user-service for Hazelcast
+          # # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
+          # volume_mount {
+          #   name = "default-token"
+          #   read_only = true
+          #   mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
+          # }
         }
 
-        # needed by the user-service for Hazelcast
-        # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
-        volume {
-		      name = "default-token"
-		      secret {
-            secret_name = data.local_file.default_token_secret_name.content
-		        default_mode = "0420"
-		      }
-        }
+        # # needed by the user-service for Hazelcast
+        # # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
+        # volume {
+		    #   name = "default-token"
+		    #   secret {
+        #     secret_name = data.local_file.default_token_secret_name.content
+		    #     default_mode = "0420"
+		    #   }
+        # }
 
         volume {
           name = "application-config"
           config_map {
-            name = "canopy-device-service"
+            name = "canopy-settings-service"
           }
         }
 
         volume {
           name = "application-secrets"
           secret {
-            secret_name = "canopy-device-service"
+            secret_name = "canopy-settings-service"
           }
         }
         
@@ -206,17 +194,17 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
   }
 }
 
-resource "kubernetes_service" "canopy_device_service_service" {
+resource "kubernetes_service" "canopy_settings_service_service" {
   metadata {
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     labels = merge(local.common_labels, {
-      "sapienceanalytics.com/name" = "canopy-device-service"
+      "sapienceanalytics.com/name" = "canopy-settings-service"
     })
     
     annotations = {}
     
-    name = "canopy-device-service"
+    name = "canopy-settings-service"
     namespace = local.namespace
   }
 
@@ -224,7 +212,7 @@ resource "kubernetes_service" "canopy_device_service_service" {
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     selector = {
-      "sapienceanalytics.com/name" = "canopy-device-service"
+      "sapienceanalytics.com/name" = "canopy-settings-service"
     }
 
     port {

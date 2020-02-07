@@ -17,14 +17,20 @@ canopy.portal.url=dummy
 email.enabled = false
 email.fromAddress=steve.ardis@banyanhills.com
 
-spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
-spring.datasource.url=jdbc:sqlserver://sapience-$${realm}-$${environment}.database.windows.net:1433;databaseName=canopy-$${database.name};
-spring.datasource.username=$${CANOPY_DATABASE_USERNAME}
+#spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+#spring.datasource.url=jdbc:sqlserver://sapience-$${realm}-$${environment}.database.windows.net:1433;databaseName=canopy-$${database.name};
+# TODO - hardcoded to "dev" environment database, as we don't have one specific to "banyan-playground"
+spring.datasource.url=jdbc:mysql://sapience-mysql-$${realm}-dev.mysql.database.azure.com:$${database.port:3306}/$${database.name}?verifyServerCertificate=false&useSSL=true
+#spring.datasource.url=jdbc:mysql://sapience-mysql-lab-us-dev.mysql.database.azure.com:
+# TODO - hardcoded to "dev" environment database, as we don't have one specific to "banyan-playground"3306/user?verifyServerCertificate=false&useSSL=true
+spring.datasource.username=$${CANOPY_DATABASE_USERNAME}@sapience-mysql-$${realm}-dev.mysql.database.azure.com
 spring.datasource.password=$${CANOPY_DATABASE_PASSWORD}
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.SQLServerDialect
+#spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.SQLServerDialect
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 #spring.jpa.properties.hibernate.globally_quoted_identifiers=true
 
-flyway.enabled=false
+flyway.enabled=true
 
 amqp.url=amqps://sapience-$${realm}-$${environment}.servicebus.windows.net?amqp.idleTimeout=120000&amqp.traceFrames=true
 amqp.username=RootManageSharedAccessKey

@@ -39,3 +39,17 @@ resource "azurerm_storage_account" "storage_account" {
     prevent_destroy = "true"
   }
 }
+
+resource "azurerm_storage_container" "leaf_uploads" {
+  name                  = "leaf-uploads"
+  resource_group_name   = var.resource_group_name
+  storage_account_name  = "${azurerm_storage_account.storage_account.name}"
+  container_access_type = "blob"
+}
+
+resource "azurerm_storage_container" "leaf_downloads" {
+  name                  = "leaf-downloads"
+  resource_group_name   = var.resource_group_name
+  storage_account_name  = "${azurerm_storage_account.storage_account.name}"
+  container_access_type = "blob"
+}

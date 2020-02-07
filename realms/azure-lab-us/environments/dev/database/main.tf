@@ -302,6 +302,23 @@ resource "azurerm_cosmosdb_account" "lab_us_dev_alerts_mongodb" {
   }
 }
 
+resource "azurerm_cosmosdb_account" "lab_us_dev_canopy_settings_mongodb" {
+  name                = "canopy-settings-mongodb-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+  offer_type          = "Standard"
+  kind                = "MongoDB"
+
+  consistency_policy {
+    consistency_level = "Strong"
+  }
+
+  geo_location {
+    location          = local.cosmos_failover_location
+    failover_priority = 0
+  }
+}
+
 # resource "azurerm_cosmosdb_account" "sapience_graph" {
 #   name                = "sapience-graph-${var.environment}"
 #   resource_group_name = var.resource_group_name
@@ -342,6 +359,14 @@ resource "azurerm_cosmosdb_account" "lab_us_dev_alerts_mongodb" {
 #     failover_priority = 0
 #   }
 # }
+
+resource "azurerm_mysql_firewall_rule" "aks_egress" {
+  name                = "aks-egress"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  start_ip_address    = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
+  end_ip_address      = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
+}
 
 resource "azurerm_mysql_firewall_rule" "sapience_dallas_office" {
   name                = "Sapience-Dallas-Office"

@@ -186,6 +186,18 @@ service: canopy-hierarchy-service
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  canopy_setting_service_mapping
+prefix: /setting/
+service: canopy-setting-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  canopy_settings_service_mapping
+prefix: /settings/
+service: canopy-settings-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  canopy_user_service_mapping
 prefix: /user/
 service: canopy-user-service

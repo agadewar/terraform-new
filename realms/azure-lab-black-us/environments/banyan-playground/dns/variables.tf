@@ -7,7 +7,7 @@ variable "env_backend_storage_account_name" {}
 variable "env_backend_container_name" {}
 
 variable "cloud" {}
-# variable "realm" {}
+variable "realm" {}
 variable "region" {}
 variable "dns_realm" {}
 variable "environment" {}

@@ -80,7 +80,7 @@ resource "kubernetes_deployment" "canopy_hierarchy_service_deployment" {
             name = "REDIS_PASSWORD"
             value_from {
               secret_key_ref {
-                name = "redis"
+                name = "redis-${var.environment}"
                 key  = "redis-password"
               }
             }

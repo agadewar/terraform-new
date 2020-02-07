@@ -102,12 +102,22 @@ data "terraform_remote_state" "data_lake" {
   }
 }
 
+# data "terraform_remote_state" "ingress_controller" {
+#   backend = "azurerm"
+#   config = {
+#     access_key           = "${var.realm_backend_access_key}"
+#     storage_account_name = "${var.realm_backend_storage_account_name}"
+# 	  container_name       = "${var.realm_backend_container_name}"
+#     key                  = "black/ingress-controller.tfstate"
+#   }
+# }
+
 data "template_file" "global_properties" {
   template = file("templates/global.properties.tpl")
 
   vars = {
     realm                   = var.realm
-    environment             = "dev"                      ### !!!!! using "dev" for all Azure resources (databases, etc.)
+    environment             = var.environment
     kafka_bootstrap_servers = var.kafka_bootstrap_servers
   }
 }

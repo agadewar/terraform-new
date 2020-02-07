@@ -96,12 +96,21 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     vnet_subnet_id = data.terraform_remote_state.network.outputs.aks-pool01_subnet_id
   }
 
-  /* addon_profile {
+<<<<<<< HEAD
+  addon_profile {
     oms_agent {
       enabled = true
       log_analytics_workspace_id = data.terraform_remote_state.log_analytics_workspace.outputs.log_analytics_workspace_id   # https://github.com/terraform-providers/terraform-provider-azurerm/issues/3457
     }
-  } */
+  }
+=======
+  addon_profile {
+    # oms_agent {
+      # enabled = true
+      # log_analytics_workspace_id = data.terraform_remote_state.log_analytics_workspace.outputs.log_analytics_workspace_id   # https://github.com/terraform-providers/terraform-provider-azurerm/issues/3457
+    # }
+  }
+>>>>>>> af13a1441f6e15c98516e17233da76a7ef1803ac
 
   service_principal {
     client_id     = var.service_principal_app_id
