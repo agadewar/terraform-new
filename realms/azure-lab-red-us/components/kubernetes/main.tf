@@ -145,7 +145,7 @@ resource "null_resource" "kubeconfig" {
 }
 
 data "template_file" "node_resource_group" {
-  template = file(".local/node_resource_group.tpl")
+  template = file("templates/node_resource_group.tpl")
 
   vars = {
     resource_group = azurerm_kubernetes_cluster.kubernetes.resource_group_name
