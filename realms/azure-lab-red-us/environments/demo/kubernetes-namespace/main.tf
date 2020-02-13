@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "black/kubernetes-namespace.tfstate"
+    key = "red/kubernetes-namespace.tfstate"
   }
 }
 
@@ -34,7 +34,7 @@ data "terraform_remote_state" "kubernetes" {
     access_key           = "${var.realm_backend_access_key}"
     storage_account_name = "${var.realm_backend_storage_account_name}"
 	  container_name       = "${var.realm_backend_container_name}"
-    key                  = "black/kubernetes.tfstate"
+    key                  = "red/kubernetes.tfstate"
   }
 }
 

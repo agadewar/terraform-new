@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "black/logging.tfstate"
+    key = "red/logging.tfstate"
   }
 }
 

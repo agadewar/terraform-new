@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "black/etl-staging-database.tfstate"
+    key = "red/etl-staging-database.tfstate"
   }
 }
 

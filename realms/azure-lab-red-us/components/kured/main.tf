@@ -1,10 +1,11 @@
 terraform {
   backend "azurerm" {
-    key = "black/kured.tfstate"
+    key = "red/kured.tfstate"
   }
 }
 
 provider "helm" {
+  version = "0.10.4"
   kubernetes {
     config_path = local.config_path
   }

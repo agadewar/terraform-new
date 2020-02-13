@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "sapience-app-dashboard.tfstate"
+    key = "red/sapience-app-dashboard.tfstate"
   }
 }
 

@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "black/ambassador.tfstate"
+    key = "qa/ambassador.tfstate"
   }
 }
 
@@ -47,7 +47,7 @@ data "terraform_remote_state" "ingress_controller" {
     access_key           = "${var.realm_backend_access_key}"
     storage_account_name = "${var.realm_backend_storage_account_name}"
 	  container_name       = "${var.realm_backend_container_name}"
-    key                  = "black/ingress-controller.tfstate"
+    key                  = "red/ingress-controller.tfstate"
   }
 }
 
@@ -68,7 +68,7 @@ resource "kubernetes_ingress" "api" {
 
   spec {
     rule {
-      host = "api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
+      host = "api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com"
       http {
         path {
           backend {
@@ -111,7 +111,7 @@ resource "kubernetes_ingress" "api" {
 
     tls {
       hosts = [
-        "api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com",
+        "api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com",
         "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
         "api.${var.environment}.sapienceanalytics.com"
       ]

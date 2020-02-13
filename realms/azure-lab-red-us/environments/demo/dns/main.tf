@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "black/dns.tfstate"
+    key = "red/dns.tfstate"
   }
 }
 
@@ -19,7 +19,7 @@ data "terraform_remote_state" "ingress_controller" {
     access_key           = var.realm_backend_access_key
     storage_account_name = var.realm_backend_storage_account_name
 	  container_name       = var.realm_backend_container_name
-    key                  = "black/ingress-controller.tfstate"
+    key                  = "red/ingress-controller.tfstate"
   }
 }
 
@@ -59,8 +59,8 @@ data "terraform_remote_state" "ingress_controller" {
   records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
 } */
 
-resource "azurerm_dns_a_record" "app_black" {
-  name                = "app.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}"
+resource "azurerm_dns_a_record" "app_red" {
+  name                = "app.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "global-us"
   ttl                 = 300
@@ -75,8 +75,8 @@ resource "azurerm_dns_a_record" "app_black" {
   records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
 }
 
-resource "azurerm_dns_a_record" "manage_black" {
-  name                = "manage.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}"
+resource "azurerm_dns_a_record" "manage_red" {
+  name                = "manage.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "global-us"
   ttl                 = 300
@@ -100,8 +100,8 @@ resource "azurerm_dns_a_record" "manage_black" {
 //   record              = azurerm_dns_a_record.api_black.name
 // }
 
-resource "azurerm_dns_a_record" "api_black" {
-  name                = "api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}"
+resource "azurerm_dns_a_record" "api_red" {
+  name                = "api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"
   resource_group_name = "global-us"
   ttl                 = 30

@@ -25,13 +25,8 @@ data "terraform_remote_state" "helm" {
   }
 } */
 
-resource "null_resource" "helm_init" {
-  provisioner "local-exec" {
-    command = "helm --kubeconfig ${local.config_path} init --service-account tiller --wait"
-  }
-}
-
 provider "helm" {
+  version = "0.10.4"
   kubernetes {
     config_path = local.config_path
   }
@@ -65,7 +60,6 @@ locals {
 }
 
 resource "helm_release" "nginx_ingress" {
-  depends_on = [null_resource.helm_init]
   name      = "nginx-ingress"
   namespace = local.namespace
   chart     = "stable/nginx-ingress"

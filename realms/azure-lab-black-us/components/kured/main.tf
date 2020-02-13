@@ -5,6 +5,7 @@ terraform {
 }
 
 provider "helm" {
+  version = "0.10.4"
   kubernetes {
     config_path = local.config_path
   }
