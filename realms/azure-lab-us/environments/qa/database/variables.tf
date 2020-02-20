@@ -22,6 +22,8 @@ variable "sql_database_canopy_leafbroker_edition" {}
 variable "sql_database_canopy_leafbroker_requested_service_objective_name" {}
 variable "sql_database_canopy_user_edition" {}
 variable "sql_database_canopy_user_requested_service_objective_name" {}
+variable "sql_database_automation_edition" {}
+variable "sql_database_automation_requested_service_objective_name" {}
 variable "sql_database_mad_edition" {}
 variable "sql_database_mad_requested_service_objective_name" {}
 variable "sql_database_staging_edition" {}
