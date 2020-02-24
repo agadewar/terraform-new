@@ -151,6 +151,10 @@ resource "azurerm_virtual_machine" "talend" {
 
   os_profile_linux_config {
     disable_password_authentication = false
+    ssh_keys {
+        path     = "/home/talendadmin/.ssh/authorized_keys"
+        key_data = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDNsGPZfbYrIs1T6OFO3FKpR1vO6G9t288gjIi8SnxLCkugfk3HDmhMH9BU69h+E4sn7M9puTmPnLDOTgKeP3VZDFXqfiAxMS/h08DkwC7EB9Puu5v/mj4DLNnarL5zRUJ8HKdAwwBShUHOt1FJfGSy1n3MoobG9kHqaxAeO9fMbmU+0geuOatzQfnC/1wyzUV41mANFI2e1e7bmpr/fojAJDFWs4YJnDtLCkUo5UOf7HijGnoinXwzPjTiLSot7/buQ6MogctJwf+lalsGdrBTED2RIo4V/xuC7NU5tDrK7P1Qpv2xo3bwmdAJrPdBw95teazQeEmCWTMkIFeaFM8V"
+    }
   }
 
   storage_data_disk {
