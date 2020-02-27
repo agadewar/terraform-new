@@ -204,6 +204,36 @@ service: eventpipeline-service
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  admin_users_api_mapping
+prefix: /users/
+service: admin-users-api
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  admin_settings_api_mapping
+prefix: /settings/
+service: admin-settings-api
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  admin_app_activity_api_mapping
+prefix: /activity/
+service: admin-app-activity-api
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  sapience_app_dashboard_mapping
 prefix: /dashboard/
 service: sapience-app-dashboard
