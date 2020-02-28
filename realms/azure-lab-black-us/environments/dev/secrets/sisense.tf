@@ -5,6 +5,6 @@ resource "kubernetes_secret" "sisense" {
   }
 
   data = {
-      Sisense__Secret = var.sisense_secret
+      secret = var.sisense_secret
   }
 }

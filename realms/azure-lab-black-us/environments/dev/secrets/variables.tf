@@ -15,3 +15,4 @@ variable "connectionstring_staging" {}
 variable "cosmosdb_key_dashboard" {}
 variable "cosmosdb_key_alerts" {}
 variable "sisense_secret" {}
+variable "auth0_secret" {}
