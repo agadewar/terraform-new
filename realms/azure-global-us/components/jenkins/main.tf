@@ -9,14 +9,14 @@ terraform {
 provider "azurerm" {
   version = "1.31.0"
   
-  subscription_id = "${var.subscription_id}"
-  client_id       = "${var.service_principal_app_id}"
-  client_secret   = "${var.service_principal_password}"
-  tenant_id       = "${var.service_principal_tenant}"
+  subscription_id = var.subscription_id
+  client_id       = var.service_principal_app_id
+  client_secret   = var.service_principal_password
+  tenant_id       = var.service_principal_tenant
 }
 
 provider "kubernetes" {
-  config_path = "${local.config_path}"
+  config_path = local.config_path
 }
 
 data "terraform_remote_state" "container_registry" {
@@ -83,17 +83,28 @@ data "terraform_remote_state" "storage_account" {
   }
 }
 
+data "terraform_remote_state" "network" {
+  backend = "azurerm"
+
+  config = {
+    access_key            = var.realm_backend_access_key
+    storage_account_name  = var.realm_backend_storage_account_name
+	  container_name        = var.realm_backend_container_name
+    key                   = "network.tfstate"
+  }
+}
+
 locals {
   config_path = "../kubernetes/.local/kubeconfig"
   namespace = "jenkins"
   sapience_container_registry_image_pull_secret_name = "sapience-container-registry-credential"
 
-  common_tags = "${merge(
+  common_tags = merge(
     var.realm_common_tags,
     map(
       "Component", "Jenkins"
     )
-  )}"
+  )
 }
 
 data "template_file" "sapience_container_registry_credential" {
@@ -108,12 +119,12 @@ data "template_file" "sapience_container_registry_credential" {
 
 resource "kubernetes_secret" "sapience_container_registry_credential" {
   metadata {
-    name      = "${local.sapience_container_registry_image_pull_secret_name}"
-    namespace = "${local.namespace}"
+    name      = local.sapience_container_registry_image_pull_secret_name
+    namespace = local.namespace
   }
 
   data = {
-    ".dockerconfigjson" = "${data.template_file.sapience_container_registry_credential.rendered}"
+    ".dockerconfigjson" = data.template_file.sapience_container_registry_credential.rendered
   }
 
   type = "kubernetes.io/dockerconfigjson"
@@ -121,20 +132,20 @@ resource "kubernetes_secret" "sapience_container_registry_credential" {
 
 resource "kubernetes_namespace" "jenkins" {
   metadata {
-    name = "${local.namespace}"
+    name = local.namespace
   }
 }
 
 resource "kubernetes_deployment" "jenkins" {
-  depends_on = [ "kubernetes_service_account.jenkins", "kubernetes_persistent_volume_claim.jenkins_home" ]
+  depends_on = [ kubernetes_service_account.jenkins, kubernetes_persistent_volume_claim.jenkins_home ]
 
   metadata {
-    annotations = "${merge(
+    annotations = merge(
       local.common_tags
-    )}"
+    )
 
     name = "jenkins"
-    namespace = "${local.namespace}"
+    namespace = local.namespace
   }
   spec {
     replicas = 1
@@ -190,12 +201,12 @@ resource "kubernetes_deployment" "jenkins" {
         volume {
           name = "jenkins-home"
           persistent_volume_claim { 
-            claim_name = "${kubernetes_persistent_volume_claim.jenkins_home.metadata.0.name}"
+            claim_name = kubernetes_persistent_volume_claim.jenkins_home.metadata.0.name
           }
         }
 
         image_pull_secrets {
-          name = "${kubernetes_secret.sapience_container_registry_credential.metadata.0.name}"
+          name = kubernetes_secret.sapience_container_registry_credential.metadata.0.name
         }
       }
     }
@@ -204,12 +215,12 @@ resource "kubernetes_deployment" "jenkins" {
 
 resource "kubernetes_service" "jenkins" {
   metadata {
-    annotations = "${merge(
+    annotations = merge(
       local.common_tags
-    )}"
+    )
     
     name = "jenkins"
-    namespace = "${local.namespace}"
+    namespace = local.namespace
   }
 
   spec {
@@ -232,26 +243,26 @@ resource "kubernetes_service" "jenkins" {
 }
 
 resource "kubernetes_persistent_volume_claim" "jenkins_home" {
-  depends_on = [ "null_resource.jenkins_home_pv" ]
+  depends_on = [ null_resource.jenkins_home_pv ]
   
   metadata {
-    annotations = "${merge(
+    annotations = merge(
       local.common_tags
-    )}"
+    )
     
     name = "jenkins-home"
-    namespace = "${local.namespace}"
+    namespace = local.namespace
   }
 
   spec {
     access_modes = ["ReadWriteOnce"]
     resources {
       requests = {
-        storage = "10G"
+        storage = "20Gi"
       }
     }
     volume_name = "jenkins-home"  // This is what it should be when PV is created under TF: "${null_resource.jenkins_home.metadata.0.name}"
-    storage_class_name = "${kubernetes_storage_class.jenkins_home.metadata.0.name}"
+    storage_class_name = kubernetes_storage_class.jenkins_home.metadata.0.name
   }
 }
 
@@ -259,16 +270,16 @@ data "template_file" "jenkins_home_pv" {
   template = "${file("templates/jenkins-home-pv.yaml.tpl")}"
 
   vars = {
-    # realm = "${var.realm}"
-    subscription_id = "${var.subscription_id}"
-    resource_group_name = "${var.resource_group_name}"
+    # realm = "${var.realm}
+    subscription_id = var.subscription_id
+    resource_group_name = var.resource_group_name
     # secret_name = "${kubernetes_secret.maven_repo_azure_file.metadata.0.name}"
   }
 }
 
 resource "null_resource" "jenkins_home_pv" {
   triggers = {
-    template_changed = "${data.template_file.jenkins_home_pv.rendered}"
+    template_changed = data.template_file.jenkins_home_pv.rendered
   }
 
   provisioner "local-exec" {
@@ -276,7 +287,7 @@ resource "null_resource" "jenkins_home_pv" {
   }
 
   provisioner "local-exec" {
-    when = "destroy"
+    when = destroy
 
     command = "kubectl delete --kubeconfig=${local.config_path} persistentvolume jenkins-home"
   }  
@@ -284,15 +295,16 @@ resource "null_resource" "jenkins_home_pv" {
 
 resource "kubernetes_storage_class" "jenkins_home" {
   metadata {
-    annotations = "${merge(
+    annotations = merge(
       local.common_tags
-    )}"
+    )
     
     name = "jenkins"
   }
 
   storage_provisioner = "kubernetes.io/azure-disk"
   reclaim_policy = "Retain"
+  allow_volume_expansion = "true"
   parameters = {
     storageaccounttype = "Standard_LRS"
   }
@@ -300,12 +312,12 @@ resource "kubernetes_storage_class" "jenkins_home" {
 
 resource "kubernetes_secret" "maven_repo_azure_file" {
   metadata {
-    annotations = "${merge(
+    annotations = merge(
       local.common_tags
-    )}"
+    )
     
     name = "maven-repo-azure-file"
-    namespace = "${local.namespace}"
+    namespace = local.namespace
   }
 
   data = {
@@ -317,15 +329,15 @@ resource "kubernetes_secret" "maven_repo_azure_file" {
 }
 
 resource "kubernetes_persistent_volume_claim" "maven_repo" {
-  depends_on = [ "null_resource.maven_repo_storage_class", "null_resource.maven_repo_pv" ]
+  depends_on = [ null_resource.maven_repo_storage_class, null_resource.maven_repo_pv ]
   
   metadata {
-    annotations = "${merge(
+    annotations = merge(
       local.common_tags
-    )}"
+    )
     
     name = "maven-repo"
-    namespace = "${local.namespace}"
+    namespace = local.namespace
   }
 
   spec {
@@ -345,19 +357,19 @@ data "template_file" "maven_repo_pv" {
 
   vars = {
     # realm = "${var.realm}"
-    subscription_id = "${var.subscription_id}"
-    resource_group_name = "${var.resource_group_name}"
-    secret_name = "${kubernetes_secret.maven_repo_azure_file.metadata.0.name}"
+    subscription_id = var.subscription_id
+    resource_group_name = var.resource_group_name
+    secret_name = kubernetes_secret.maven_repo_azure_file.metadata.0.name
     # share_name = "${data.terraform_remote_state.jenkins_storage.outputs.maven_repo_storage_account_name}"
     share_name = data.terraform_remote_state.storage_account.outputs.storage_account_file_name
   }
 }
 
 resource "null_resource" "maven_repo_pv" {
-  depends_on = [ "null_resource.maven_repo_storage_class" ]
+  depends_on = [ null_resource.maven_repo_storage_class ]
 
   triggers = {
-    template_changed = "${data.template_file.maven_repo_pv.rendered}"
+    template_changed = data.template_file.maven_repo_pv.rendered
   }
 
   provisioner "local-exec" {
@@ -365,7 +377,7 @@ resource "null_resource" "maven_repo_pv" {
   }
 
   provisioner "local-exec" {
-    when = "destroy"
+    when = destroy
     command = "kubectl delete --kubeconfig=${local.config_path} persistentvolume maven-repo"
   }
 }
@@ -376,7 +388,7 @@ data "template_file" "maven_repo_storage_class" {
 
 resource "null_resource" "maven_repo_storage_class" {
   triggers = {
-    template_changed = "${data.template_file.maven_repo_storage_class.rendered}"
+    template_changed = data.template_file.maven_repo_storage_class.rendered
   }
 
   provisioner "local-exec" {
@@ -386,20 +398,20 @@ resource "null_resource" "maven_repo_storage_class" {
 
 resource "kubernetes_service_account" "jenkins" {
   metadata {
-    annotations = "${merge(
+    annotations = merge(
       local.common_tags
-    )}"
+    )
     
     name = "jenkins"
-    namespace = "${kubernetes_namespace.jenkins.metadata.0.name}"
+    namespace = kubernetes_namespace.jenkins.metadata.0.name
   }
 }
 
 resource "kubernetes_cluster_role_binding" "jenkins" {
   metadata {
-    annotations = "${merge(
+    annotations = merge(
       local.common_tags
-    )}"
+    )
     
     name = "jenkins"
   }
@@ -417,104 +429,104 @@ resource "kubernetes_cluster_role_binding" "jenkins" {
     }
 }
 
+
 // data "azurerm_subnet" "default" {
 //   name                 = "default"
 //   virtual_network_name = "${var.resource_group_name}-vnet"
 //   resource_group_name  = "${var.resource_group_name}"
 // }
 
-// resource "azurerm_public_ip" "jenkins_windows_slave" {
-//   name                = "jenkins-windows-slave"
-//   location            = "East US"
-//   resource_group_name = "${var.resource_group_name}"
-//   public_ip_address_allocation   = "Static"
-// }
+resource "azurerm_public_ip" "jenkins_windows_slave" {
+  name                = "jenkins-win-slv-ip"
+  location            = "East US"
+  resource_group_name = var.resource_group_name
+  allocation_method  = "Dynamic"
+}
 
-// resource "azurerm_network_interface" "jenkins_windows_slave" {
-//   depends_on          = [ "azurerm_public_ip.jenkins_windows_slave", "azurerm_network_security_group.jenkins_windows_slave" ]
-//   name                = "jenkins-windows-slave"
-//   resource_group_name   = "${var.resource_group_name}"
-//   location              = "${var.resource_group_location}"
-//   network_security_group_id = "${azurerm_network_security_group.jenkins_windows_slave.id}"
+resource "azurerm_network_interface" "jenkins_windows_slave" {
+  depends_on          = [ azurerm_public_ip.jenkins_windows_slave, azurerm_network_security_group.jenkins_windows_slave ]
+  name                = "jenkins-win-slv2"
+  resource_group_name   = var.resource_group_name
+  location              = var.resource_group_location
+  network_security_group_id = azurerm_network_security_group.jenkins_windows_slave.id
 
-//   ip_configuration {
-//     name                          = "jenkins-windows-slave"
-//     subnet_id                     = "${data.azurerm_subnet.default.id}"
-//     public_ip_address_id          = "${azurerm_public_ip.jenkins_windows_slave.id}"
-//     private_ip_address_allocation = "Dynamic"
-//   }
-// }
+  ip_configuration {
+    name                          = "ipconfig1"
+    subnet_id                     = data.terraform_remote_state.network.outputs.default_subnet_id
+    public_ip_address_id          = azurerm_public_ip.jenkins_windows_slave.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
 
-// resource "azurerm_network_security_group" "jenkins_windows_slave" {
-//   name = "jenkins-windows-slave"
-//   location              = "${var.resource_group_location}"
-//   resource_group_name   = "${var.resource_group_name}"
+resource "azurerm_network_security_group" "jenkins_windows_slave" {
+  name = "jenkins-win-slv-nsg"
+  location              = var.resource_group_location
+  resource_group_name   = var.resource_group_name
 
-//   # security_rule {
-//   #   name = "Allow-AllTraffic-BanyanOffice"
-//   #   priority = 100
-//   #   direction = "Inbound"
-//   #   access = "Allow"
-//   #   protocol = "*"
-//   #   source_port_range = "*"
-//   #   destination_port_range = "*"
-//   #   source_address_prefix = "50.20.0.62/32"
-//   #   destination_address_prefix = "*"
-//   # }
-// }
+  security_rule {
+    name = "RDP"
+    priority = 300
+    direction = "Inbound"
+    access = "Allow"
+    protocol = "TCP"
+    source_port_range = "*"
+    destination_port_range = "3389"
+    source_address_prefix = "*"
+    destination_address_prefix = "*"
+  }
+}
 
-// resource "azurerm_virtual_machine" "jenkins_windows_slave" {
-//   depends_on            = [ "azurerm_network_interface.jenkins_windows_slave" ]
-//   name                  = "jenkins-windows-slave"
-//   resource_group_name   = "${var.resource_group_name}"
-//   location              = "${var.resource_group_location}"
-//   network_interface_ids = ["${azurerm_network_interface.jenkins_windows_slave.id}"]
-//   vm_size               = "Standard_D2_v3"
+resource "azurerm_virtual_machine" "jenkins_windows_slave" {
+  depends_on            = [ azurerm_network_interface.jenkins_windows_slave ]
+  name                  = "jenkins-win-slv"
+  resource_group_name   = var.resource_group_name
+  location              = var.resource_group_location
+  network_interface_ids = [azurerm_network_interface.jenkins_windows_slave.id]
+  vm_size               = "Standard_D2s_v3"
 
-//   # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
-//   # NOTE: This may not be optimal in all cases.
-//   delete_os_disk_on_termination = false
+  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  # delete_os_disk_on_termination = false
 
-//   # This means the Data Disk will be deleted when Terraform destroys the Virtual Machine
-//   # NOTE: This may not be optimal in all cases.
-//   delete_data_disks_on_termination = true
+  # This means the Data Disk will be deleted when Terraform destroys the Virtual Machine
+  # NOTE: This may not be optimal in all cases.
+  # delete_data_disks_on_termination = true
 
-//   storage_image_reference {
+  # storage_image_reference {
+  #   publisher = "MicrosoftWindowsDesktop"
+  #   offer     = "Windows-10"
+  #   sku       = "RS3-Pro"
+  #   version   = "latest"
+  # }
 
-//     publisher = "MicrosoftWindowsDesktop"
-//     offer     = "Windows-10"
-//     sku       = "RS3-Pro"
-//     version   = "latest"
-//   }
+  storage_os_disk {
+    name              = "jenkins-windows-slave-os"
+    caching           = "ReadWrite"
+    create_option     = "Attach"
+    managed_disk_type = "StandardSSD_LRS"
+  }
 
-//   storage_os_disk {
-//     name              = "jenkins-windows-slave-os"
-//     caching           = "ReadWrite"
-//     create_option     = "FromImage"
-//     managed_disk_type = "Standard_LRS"
-//   }
+  # os_profile {
+  #   computer_name  = "Sandbox-MarkW2"
+  #   admin_username = "testadmin2"
+  #   admin_password = "Password1234!"
+  # }
 
-//   os_profile {
-//     computer_name  = "jenkins-win-slv"
-//     admin_username = "testadmin2"
-//     admin_password = "Password1234!"
-//   }
-
-//   os_profile_windows_config {}
-// }
+  # os_profile_windows_config {}
+}
 
 resource "azurerm_dns_a_record" "jenkins" {
   name                = "jenkins.${var.dns_realm}.${var.region}.${var.cloud}"
-  zone_name           = "${data.terraform_remote_state.dns.outputs.sapienceanalytics_public_zone_name}"
-  resource_group_name = "${var.resource_group_name}"
+  zone_name           = data.terraform_remote_state.dns.outputs.sapienceanalytics_public_zone_name
+  resource_group_name = var.resource_group_name
   ttl                 = 30
-  records             = [ "${data.terraform_remote_state.ingress-controller.outputs.nginx_ingress_controller_ip}" ]
+  records             = [ data.terraform_remote_state.ingress-controller.outputs.nginx_ingress_controller_ip ]
 }
 
 resource "kubernetes_ingress" "jenkins" {
   metadata {
     name = "jenkins"
-    namespace = "${local.namespace}"
+    namespace = local.namespace
 
     annotations = {
       "certmanager.k8s.io/acme-challenge-type"             = "dns01"
@@ -570,10 +582,10 @@ resource "kubernetes_ingress" "jenkins" {
 # ###        is not able to get to the master.
 # resource "kubernetes_service" "jenkins_jnlp" {
 #   metadata {
-#     annotations = "${merge(
+#     annotations = merge(
 #       local.common_tags,
 #       map()
-#     )}"
+#     )
     
 #     name = "jenkins"
 #     namespace = "${local.namespace}"

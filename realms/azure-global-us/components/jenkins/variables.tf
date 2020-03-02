@@ -18,8 +18,8 @@ variable "resource_group_name" {}
 variable "resource_group_location" {}
 
 variable "jenkins_source_ranges_allowed" {
-    type = "list" 
+    type = list 
 }
 variable "realm_common_tags" {
-    type = "map"
+    type = map
 }
