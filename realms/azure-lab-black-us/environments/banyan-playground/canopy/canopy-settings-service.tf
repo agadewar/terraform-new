@@ -112,7 +112,7 @@ resource "kubernetes_deployment" "canopy_settings_service_deployment" {
             # value = "mongodb://canopy-settings-mongodb-lab-us-dev:CLTt4kbosUmeVqWc3DRl3Ktcah02czJksjQDsoRB7DvZzLJmZvRuo5KqGZRS6cE8YSc0HxmHNFncaxNMHqStiw==@canopy-settings-mongodb-lab-us-dev.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
             ### TODO : read the password in the mongodb.uri from Terraform remote state (CosmosDB)
             ### TODO : remove hardcoded "dev" to "${var.environment}"
-            value = "mongodb://canopy-settings-mongodb-${var.realm}-dev:CLTt4kbosUmeVqWc3DRl3Ktcah02czJksjQDsoRB7DvZzLJmZvRuo5KqGZRS6cE8YSc0HxmHNFncaxNMHqStiw==@canopy-settings-mongodb-${var.realm}-dev.documents.azure.com:10255/settings?ssl=true"
+            value = "mongodb://canopy-settings-mongodb-${var.realm}-dev:CLTt4kbosUmeVqWc3DRl3Ktcah02czJksjQDsoRB7DvZzLJmZvRuo5KqGZRS6cE8YSc0HxmHNFncaxNMHqStiw==@canopy-settings-mongodb-${var.realm}-dev.documents.azure.com:10255/settings?ssl=true&maxIdleTimeMS=900000"
           }
 
           readiness_probe {

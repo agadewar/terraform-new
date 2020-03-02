@@ -73,8 +73,24 @@ resource "kubernetes_deployment" "canopy_v2_deployment" {
           image_pull_policy = "Always"
 
           env { 
+            name = "ENVIRONMENT_DEVICE_SERVICE_BASE_URL"
+            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/device"
+          }
+          env { 
             name = "ENVIRONMENT_HIERARCHY_SERVICE_BASE_URL"
             value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/hierarchy"
+          }
+          env { 
+            name = "ENVIRONMENT_KPI_SERVICE_BASE_URL"
+            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/kpi"
+          }
+          env { 
+            name = "ENVIRONMENT_LOCATION_SERVICE_BASE_URL"
+            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/location"
+          }
+          env { 
+            name = "ENVIRONMENT_NOTIFICATION_SERVICE_BASE_URL"
+            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/notification"
           }
           env { 
             name = "ENVIRONMENT_SETTING_SERVICE_BASE_URL"
@@ -87,6 +103,10 @@ resource "kubernetes_deployment" "canopy_v2_deployment" {
           env { 
             name = "ENVIRONMENT_USER_SERVICE_BASE_URL"
             value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/user"
+          }
+          env { 
+            name  = "ENVIRONMENT_APPEND_PATH_PREFIX_ON_MODALS"
+            value = "true"
           }
 
           # env {
