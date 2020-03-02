@@ -4,7 +4,7 @@ metadata:
   name: jenkins-home
 spec:
   capacity:
-    storage: 10Gi
+    storage: 20Gi
   storageClassName: jenkins
   azureDisk:
     kind: Managed
