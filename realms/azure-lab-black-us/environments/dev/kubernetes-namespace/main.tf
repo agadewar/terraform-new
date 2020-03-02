@@ -95,7 +95,7 @@ resource "kubernetes_resource_quota" "resource_quota" {
   spec {
     hard = {
       "requests.memory" = "10Gi"
-      "requests.cpu" = "4"
+      "requests.cpu" = "6"
     }
   }
 }

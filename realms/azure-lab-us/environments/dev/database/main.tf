@@ -403,6 +403,14 @@ resource "azurerm_mysql_firewall_rule" "banyan-office" {
   end_ip_address      = var.ip_banyan_office
 }
 
+resource "azurerm_mysql_firewall_rule" "ip_steve_ardis_home" {
+  name                = "Steve-Ardis-Home"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  start_ip_address    = var.ip_steve_ardis_home
+  end_ip_address      = var.ip_steve_ardis_home
+}
+
 resource "azurerm_mysql_server" "sapience" {
   name                = "sapience-mysql-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name

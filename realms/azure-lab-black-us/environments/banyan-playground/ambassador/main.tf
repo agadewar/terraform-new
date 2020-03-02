@@ -186,6 +186,24 @@ service: canopy-hierarchy-service
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  kpi_service_mapping
+prefix: /kpi/
+service: kpi-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  canopy_location_service_mapping
+prefix: /location/
+service: canopy-location-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  canopy_notification_service_mapping
+prefix: /notification/
+service: canopy-notification-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  canopy_setting_service_mapping
 prefix: /setting/
 service: canopy-setting-service

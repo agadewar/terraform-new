@@ -2,6 +2,10 @@ terraform {
   backend "azurerm" {
     key = "black/logging.tfstate"
   }
+
+  required_providers {
+    helm = "= 0.10.4"
+  }
 }
 
 # See: https://akomljen.com/get-kubernetes-logs-with-efk-stack-in-5-minutes/
@@ -40,7 +44,7 @@ locals {
   )
 }
 
-/* resource "kubernetes_namespace" "namespace" {
+resource "kubernetes_namespace" "namespace" {
   metadata {
     name = local.namespace
   }
@@ -65,12 +69,12 @@ resource "helm_release" "efk" {
   namespace  = local.namespace
   repository = data.helm_repository.akomljen_charts.name
   chart      = "akomljen-charts/efk"
-} */
-
-resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
-  name                = "sapience-${var.realm}"
-  resource_group_name = var.resource_group_name
-  location            = var.resource_group_location
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
 }
+
+# resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
+#   name                = "sapience-${var.realm}"
+#   resource_group_name = var.resource_group_name
+#   location            = var.resource_group_location
+#   sku                 = "PerGB2018"
+#   retention_in_days   = 30
+# }

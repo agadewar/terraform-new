@@ -38,14 +38,6 @@ resource "azurerm_servicebus_namespace" "namespace" {
   tags = merge(local.common_tags, {})
 }
 
-# resource "azurerm_servicebus_queue" "canopy_eventpipeline" {
-#   name                = "sapience-canopy-eventpipeline"
-#   resource_group_name = var.resource_group_name
-#   namespace_name      = azurerm_servicebus_namespace.namespace.name
-
-#   enable_partitioning = true
-# }
-
 resource "azurerm_servicebus_queue" "device_registration" {
   name                = "device-registration"
   resource_group_name = var.resource_group_name
@@ -53,12 +45,4 @@ resource "azurerm_servicebus_queue" "device_registration" {
 
   enable_partitioning = true
 }
-
-# resource "azurerm_servicebus_queue" "event_archive" {
-#   name                = "event-archive"
-#   resource_group_name = var.resource_group_name
-#   namespace_name      = azurerm_servicebus_namespace.namespace.name
-
-#   enable_partitioning = true
-# }
 

@@ -3,14 +3,20 @@ environment=${environment}
 
 config_folder=/opt/canopy/config
 
+canopy.customer.service.url=dummy
 canopy.device.service.url=http://canopy-device-service/
 canopy.fs.service.url=dummy
 canopy.hierarchy.service.url=http://canopy-hierarchy-service/
+canopy.inventory.service.url=dummy
 canopy.leafbroker.service.url=http://eventpipeline-leaf-broker/
-canopy.location.service.url=dummy
+canopy.location.service.url=http://canopy-location-service/
+canopy.mdm.service.url=dummy
 canopy.notification.service.url=http://canopy-notification-service/
 canopy.rm.service.url=dummy
 canopy.security.service.url=http://canopy-user-service/
+canopy.setting.service.url=http://canopy-setting-service/
+canopy.settings.service.url=http://canopy-settings-service/
+eventpipeline.service.url=http://eventpipeline-service
 
 canopy.portal.url=dummy
 
