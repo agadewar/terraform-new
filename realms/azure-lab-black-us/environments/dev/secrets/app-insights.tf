@@ -15,6 +15,6 @@ resource "kubernetes_secret" "app-insights" {
   }
 
   data = {
-      ApplicationInsights__InstrumentationKey = data.terraform_remote_state.app_insights.outputs.instrumentation_key
+      key = data.terraform_remote_state.app_insights.outputs.instrumentation_key
   }
 }

@@ -304,6 +304,7 @@ resource "kubernetes_storage_class" "jenkins_home" {
 
   storage_provisioner = "kubernetes.io/azure-disk"
   reclaim_policy = "Retain"
+  allow_volume_expansion = "true"
   parameters = {
     storageaccounttype = "Standard_LRS"
   }
