@@ -205,6 +205,13 @@ resource "kubernetes_deployment" "jenkins" {
           }
         }
 
+        volume {
+          name = "maven-repo"
+          persistent_volume_claim { 
+            claim_name = kubernetes_persistent_volume_claim.maven_repo.metadata.0.name
+          }
+        }
+
         image_pull_secrets {
           name = kubernetes_secret.sapience_container_registry_credential.metadata.0.name
         }
@@ -258,7 +265,7 @@ resource "kubernetes_persistent_volume_claim" "jenkins_home" {
     access_modes = ["ReadWriteOnce"]
     resources {
       requests = {
-        storage = "20Gi"
+        storage = "50Gi"
       }
     }
     volume_name = "jenkins-home"  // This is what it should be when PV is created under TF: "${null_resource.jenkins_home.metadata.0.name}"
@@ -353,7 +360,7 @@ resource "kubernetes_persistent_volume_claim" "maven_repo" {
 }
 
 data "template_file" "maven_repo_pv" {
-  template = "${file("templates/maven-repo-pv.yaml.tpl")}"
+  template = file("templates/maven-repo-pv.yaml.tpl")
 
   vars = {
     # realm = "${var.realm}"
@@ -368,18 +375,18 @@ data "template_file" "maven_repo_pv" {
 resource "null_resource" "maven_repo_pv" {
   depends_on = [ null_resource.maven_repo_storage_class ]
 
-  triggers = {
+  /* triggers = {
     template_changed = data.template_file.maven_repo_pv.rendered
-  }
+  } */
 
   provisioner "local-exec" {
     command = "kubectl apply --kubeconfig=${local.config_path} -f - <<EOF\n${data.template_file.maven_repo_pv.rendered}\nEOF"
   }
 
-  provisioner "local-exec" {
+  /* provisioner "local-exec" {
     when = destroy
     command = "kubectl delete --kubeconfig=${local.config_path} persistentvolume maven-repo"
-  }
+  } */
 }
 
 data "template_file" "maven_repo_storage_class" {
@@ -440,7 +447,7 @@ resource "azurerm_public_ip" "jenkins_windows_slave" {
   name                = "jenkins-win-slv-ip"
   location            = "East US"
   resource_group_name = var.resource_group_name
-  allocation_method  = "Dynamic"
+  allocation_method  = "Static"
 }
 
 resource "azurerm_network_interface" "jenkins_windows_slave" {
@@ -482,7 +489,7 @@ resource "azurerm_virtual_machine" "jenkins_windows_slave" {
   resource_group_name   = var.resource_group_name
   location              = var.resource_group_location
   network_interface_ids = [azurerm_network_interface.jenkins_windows_slave.id]
-  vm_size               = "Standard_D2s_v3"
+  vm_size               = "Standard_D4s_v3"
 
   # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
   # NOTE: This may not be optimal in all cases.

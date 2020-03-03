@@ -6,5 +6,7 @@ resource "kubernetes_config_map" "aspnetcore" {
 
   data = {
       "ASPNETCORE_ENVIRONMENT" = "Development"
+      "ENVIRONMENT_API_URL" = "https://api.dev.lab.us.azure.sapienceanalytics.com"
+      "LocalSwagger" = "false"
   }
 }

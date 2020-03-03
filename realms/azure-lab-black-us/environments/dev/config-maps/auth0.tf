@@ -11,6 +11,12 @@ resource "kubernetes_config_map" "auth0" {
       "Auth0__ClientId" = "gEurUe965S21CvJyQtArQ3z8TahgC20K"
       "Auth0__Connection" = "Username-Password-Authentication"
 
+      #UI AUTH0
+      "ENVIRONMENT_AUTH_AUTHORITY" = "https://login.dev.lab.sapienceanalytics.com/"
+      "ENVIRONMENT_AUTH_AUDIENCE" = "https://api.sapienceanalytics.com"
+      "ENVIRONMENT_AUTH_CLIENT_ID" = "gEurUe965S21CvJyQtArQ3z8TahgC20K"
+      "ENVIRONMENT_AUTH_SCOPE" = "openid email profile"
+
       #AUTH0 URI
       "Auth0__PingUri" = "https://login.dev.lab.sapienceanalytics.com/test"
 
