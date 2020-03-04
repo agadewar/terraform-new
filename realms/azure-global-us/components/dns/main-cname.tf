@@ -228,6 +228,14 @@ resource "azurerm_dns_cname_record" "api_dev" {
   record              = "api.dev.lab.us.azure.sapienceanalytics.com"
 }
 
+resource "azurerm_dns_cname_record" "openfaas_dev" {
+  name                = "openfaas.dev"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 300
+  record              = "openfaas.dev.lab.us.azure.sapienceanalytics.com"
+}
+
 resource "azurerm_dns_cname_record" "portal_dev" {
   name                = "portal.dev"
   zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
