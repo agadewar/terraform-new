@@ -7,21 +7,21 @@ terraform {
 provider "azurerm" {
   version = "1.35.0"
   
-  subscription_id = "${var.subscription_id}"
-  client_id       = "${var.service_principal_app_id}"
-  client_secret   = "${var.service_principal_password}"
-  tenant_id       = "${var.service_principal_tenant}"
+  subscription_id = var.subscription_id
+  client_id       = var.service_principal_app_id
+  client_secret   = var.service_principal_password
+  tenant_id       = var.service_principal_tenant
 }
 
 locals {
-  realm = "${var.realm}"
+  realm = var.realm
 
-  common_tags = "${merge(
+  common_tags = merge(
     var.realm_common_tags,
     map(
       "Component", "Jenkins Storage"
     )
-  )}"
+  )
 }
 
 data "terraform_remote_state" "storage_account" {
@@ -37,15 +37,15 @@ data "terraform_remote_state" "storage_account" {
 
 resource "azurerm_managed_disk" "jenkins_home" {
   name                 = "jenkins-home"
-  location             = "${var.resource_group_location}"
-  resource_group_name  = "${var.resource_group_name}"
+  location             = var.resource_group_location
+  resource_group_name  = var.resource_group_name
   storage_account_type = "Standard_LRS"
   create_option        = "Empty"
-  disk_size_gb         = "10"
+  disk_size_gb         = "50"
 
-  tags = "${merge(
+  tags = merge(
     local.common_tags
-  )}"
+  )
   
   lifecycle{
     prevent_destroy = "true"
@@ -55,19 +55,19 @@ resource "azurerm_managed_disk" "jenkins_home" {
 
 # // STORAGE ACCOUNT IN PLACE OF MANAGED DISK TO ALLOW READ/WRITE-MANY
 # // SET UP WITH TERRAFORM KUBERNETES_SECRET
-# resource "azurerm_storage_account" "maven_repo" {
-#   name                      = "mavenrepo${var.realm}"
-#   resource_group_name       = "${var.resource_group_name}"
-#   location                  = "${var.resource_group_location}"
-#   account_tier              = "Standard"
-#   account_replication_type  = "LRS"
-#   account_kind              = "StorageV2"
+/* resource "azurerm_storage_account" "maven_repo" {
+  name                      = "sapfileglobalus"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  account_tier              = "Standard"
+  account_replication_type  = "LRS"
+  account_kind              = "StorageV2"
 
-#   tags = "${merge(
-#     local.common_tags
-#   )}"
-# }
-
+  tags = merge(
+    local.common_tags
+  )
+}
+ */
 # resource "azurerm_storage_share" "jenkins_home" {
 #   name = "jenkins-home"
 

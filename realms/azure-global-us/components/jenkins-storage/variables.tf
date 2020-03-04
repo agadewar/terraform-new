@@ -13,5 +13,5 @@ variable "realm_backend_storage_account_name" {}
 variable "realm_backend_container_name" {}
 
 variable "realm_common_tags" {
-  type = "map"
+  type = map
 }
