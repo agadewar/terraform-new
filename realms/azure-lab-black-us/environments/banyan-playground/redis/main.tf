@@ -2,6 +2,10 @@ terraform {
   backend "azurerm" {
     key = "black/redis.tfstate"
   }
+
+  required_providers {
+    helm = "= 1.0.0"
+  }
 }
 
 provider "helm" {
