@@ -205,8 +205,9 @@ service: eventpipeline-service
 apiVersion: ambassador/v1
 kind:  Mapping
 name:  admin_users_api_mapping
-prefix: /users/
+prefix: /admin/users/
 service: admin-users-api
+rewrite: /admin/users/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -215,7 +216,7 @@ cors:
 apiVersion: ambassador/v1
 kind:  Mapping
 name:  admin_settings_api_mapping
-prefix: /settings/
+prefix: /admin/settings/
 service: admin-settings-api
 cors:
   origins: "*"
@@ -225,7 +226,7 @@ cors:
 apiVersion: ambassador/v1
 kind:  Mapping
 name:  admin_app_activity_api_mapping
-prefix: /activity/
+prefix: /admin/activity/
 service: admin-app-activity-api
 cors:
   origins: "*"
