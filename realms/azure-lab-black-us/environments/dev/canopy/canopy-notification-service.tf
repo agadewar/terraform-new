@@ -1,41 +1,38 @@
-resource "kubernetes_config_map" "canopy_user_service" {
+resource "kubernetes_config_map" "canopy_notification_service" {
   metadata {
-    name      = "canopy-user-service"
+    name      = "canopy-notification-service"
     namespace = local.namespace
   }
 
   data = {
     "global.properties"      = data.template_file.global_properties.rendered
-    "application.properties" = file("files/canopy-user-service.properties")
+    "application.properties" = file("files/canopy-notification-service.properties")
   }
 }
 
-resource "kubernetes_secret" "canopy_user_service" {
+resource "kubernetes_secret" "canopy_notification_service" {
   metadata {
-    name      = "canopy-user-service"
+    name      = "canopy-notification-service"
     namespace = local.namespace
   }
 
   data = {
-    "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
     "canopy.database.username" = var.mysql_canopy_username
     "canopy.database.password" = var.mysql_canopy_password
-    "kafka.username"           = var.kafka_username
-    "kafka.password"           = var.kafka_password
   }
 
   type = "Opaque"
 }
 
-resource "kubernetes_deployment" "canopy_user_service_deployment" {
+resource "kubernetes_deployment" "canopy_notification_service_deployment" {
   metadata {
-    name = "canopy-user-service"
+    name = "canopy-notification-service"
     namespace = local.namespace
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     labels = merge(local.common_labels, {
-      "sapienceanalytics.com/name" = "canopy-user-service"
+      "sapienceanalytics.com/name" = "canopy-notification-service"
     })
     
     annotations = {}
@@ -48,7 +45,7 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     selector {
       match_labels = {
-        "sapienceanalytics.com/name" = "canopy-user-service"
+        "sapienceanalytics.com/name" = "canopy-notification-service"
       }
     }
 
@@ -57,7 +54,7 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
         // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
         //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
         labels = merge(local.common_labels, {
-          "sapienceanalytics.com/name" = "canopy-user-service"
+          "sapienceanalytics.com/name" = "canopy-notification-service"
         })
         
         annotations = {}
@@ -66,8 +63,8 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-user-service:1.3.5.docker-SNAPSHOT"
-          name  = "canopy-user-service"
+          image = "${var.canopy_container_registry_hostname}/canopy-notification-service:1.3.0.docker-SNAPSHOT"
+          name  = "canopy-notification-service"
 
           image_pull_policy = "Always"
 
@@ -75,7 +72,7 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
             name = "CANOPY_DATABASE_USERNAME"
             value_from {
               secret_key_ref {
-                name = "canopy-user-service"
+                name = "canopy-notification-service"
                 key  = "canopy.database.username"
               }
             }
@@ -84,46 +81,64 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
             name = "CANOPY_DATABASE_PASSWORD"
             value_from {
               secret_key_ref {
-                name = "canopy-user-service"
+                name = "canopy-notification-service"
                 key  = "canopy.database.password"
               }
             }
           }
+
           env {
-            name = "CANOPY_AMQP_PASSWORD"
-            value_from {
-              secret_key_ref {
-                name = "canopy-user-service"
-                key  = "canopy.amqp.password"
-              }
-            }
+            name  = "notification.sms.amazonsns.topicarn"
+            value = "dummy"
           }
           env {
-            name = "KAFKA_USERNAME"
-            value_from {
-              secret_key_ref {
-                name = "canopy-user-service"
-                key  = "kafka.username"
-              }
-            }
+            name  = "aws.accessKey"
+            value = "dummy"
           }
           env {
-            name = "KAFKA_PASSWORD"
-            value_from {
-              secret_key_ref {
-                name = "canopy-user-service"
-                key  = "kafka.password"
-              }
-            }
+            name  = "aws.secretKey"
+            value = "dummy"
+          }
+
+          env {
+            name  = "jms.queues"
+            value = "canopy-notification-email,canopy-notification-push-notification,canopy-notification-sms,canopy-notification-twilio"
           }
           env {
-            name = "REDIS_PASSWORD"
-            value_from {
-              secret_key_ref {
-                name = "redis"
-                key  = "redis-password"
-              }
-            }
+            name  = "jms.type"
+            value = "servicebus"
+          }
+
+          // servicebus settings
+          env { 
+            name  = "servicebus.host"
+            value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_hostname
+          }
+          env { 
+            name  = "servicebus.key"   // 
+            value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
+          }
+          env { 
+            name  = "servicebus.policy"
+            value = "RootManageSharedAccessKey"
+          }
+
+          // queues
+          env {
+            name  = "canopy.notification.email.queue"
+            value = "canopy-notification-email"
+          }
+          env {
+            name  = "canopy.notification.push-notification.queue"
+            value = "canopy-notification-push-notification"
+          }
+          env {
+            name  = "canopy.notification.sms.queue"
+            value = "canopy-notification-sms"
+          }
+          env {
+            name  = "canopy.notification.twilio.queue"
+            value = "canopy-notification-twilio"
           }
 
           readiness_probe {
@@ -152,7 +167,7 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
 
           resources {
             requests {
-              memory = "512M"
+              memory = "256M"
               cpu    = "150m"
             }
           }
@@ -163,36 +178,36 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
             read_only = true
           }
           
-          # needed by the user-service for Hazelcast
-          # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
-          volume_mount {
-            name = "default-token"
-            read_only = true
-            mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
-          }
+          # # needed by the user-service for Hazelcast
+          # # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
+          # volume_mount {
+          #   name = "default-token"
+          #   read_only = true
+          #   mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
+          # }
         }
 
-        # needed by the user-service for Hazelcast
-        # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
-        volume {
-		      name = "default-token"
-		      secret {
-            secret_name = data.local_file.default_token_secret_name.content
-		        default_mode = "0420"
-		      }
-        }
+        # # needed by the user-service for Hazelcast
+        # # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
+        # volume {
+		    #   name = "default-token"
+		    #   secret {
+        #     secret_name = data.local_file.default_token_secret_name.content
+		    #     default_mode = "0420"
+		    #   }
+        # }
 
         volume {
           name = "application-config"
           config_map {
-            name = "canopy-user-service"
+            name = "canopy-notification-service"
           }
         }
 
         volume {
           name = "application-secrets"
           secret {
-            secret_name = "canopy-user-service"
+            secret_name = "canopy-notification-service"
           }
         }
         
@@ -205,17 +220,17 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
   }
 }
 
-resource "kubernetes_service" "canopy_user_service_service" {
+resource "kubernetes_service" "canopy_notification_service_service" {
   metadata {
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     labels = merge(local.common_labels, {
-      "sapienceanalytics.com/name" = "canopy-user-service"
+      "sapienceanalytics.com/name" = "canopy-notification-service"
     })
     
     annotations = {}
     
-    name = "canopy-user-service"
+    name = "canopy-notification-service"
     namespace = local.namespace
   }
 
@@ -223,18 +238,13 @@ resource "kubernetes_service" "canopy_user_service_service" {
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     selector = {
-      "sapienceanalytics.com/name" = "canopy-user-service"
+      "sapienceanalytics.com/name" = "canopy-notification-service"
     }
 
     port {
       name        = "application"
       port        = 80
       target_port = 8080
-    }
-    
-    port {
-      name = "hazelcast"
-      port = 5701
     }
   }
 }
