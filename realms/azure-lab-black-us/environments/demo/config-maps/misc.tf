@@ -1,6 +1,6 @@
-resource "kubernetes_config_map" "aspnetcore" {
+resource "kubernetes_config_map" "misc" {
   metadata {
-    name      = "aspnetcore"
+    name      = "misc"
     namespace = local.namespace
   }
 

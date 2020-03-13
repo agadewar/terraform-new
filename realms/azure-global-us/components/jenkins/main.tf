@@ -265,7 +265,7 @@ resource "kubernetes_persistent_volume_claim" "jenkins_home" {
     access_modes = ["ReadWriteOnce"]
     resources {
       requests = {
-        storage = "50Gi"
+        storage = "51Gi"
       }
     }
     volume_name = "jenkins-home"  // This is what it should be when PV is created under TF: "${null_resource.jenkins_home.metadata.0.name}"

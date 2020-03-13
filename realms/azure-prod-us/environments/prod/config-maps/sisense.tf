@@ -6,7 +6,7 @@ resource "kubernetes_config_map" "sisense" {
 
   data = {
       #SISENSE ENVIRONMENT
-      "Sisense__Env" = "Dev"
+      "Sisense__Env" = "Prod"
 
       #SISENSE DATASOURCES
       "Sisense__DataSource" = "Sapience-Daily-CompanyId-Env"
@@ -20,17 +20,18 @@ resource "kubernetes_config_map" "sisense" {
       "Sisense_DeleteUserUri" = "api/v1/users/"
       "Sisense_ElasticubesUri" = "api/v1/elasticubes/getElasticubes"
       "Sisense_PingUri" = "api/test"
-      "Sisense__RequestUri" = "api/elasticubes/SapienceCube-Dev/jaql"
+      #UPDATE REQUEST URI (e.g. SapienceCube-[Env])
+      "Sisense__RequestUri" = "api/elasticubes/SapienceCube-Prod/jaql"
       "Sisense_SearchUserUri" = "api/users?search="
       "Sisense_SecurityUri" = "api/settings/security"
       "Sisense_UsersUri" = "api/users?notify=false"
 
       #SISENSE EXTERNAL ENDPOINTS
-      "ENVIRONMENT_SISENSE_URL" = "https://sisense.dev.lab.us.azure.sapienceanalytics.com"
+      "ENVIRONMENT_SISENSE_URL" = "https://sisense.sapienceanalytics.com"
 
       #SISENSE INTERNAL ENDPOINTS
-      "Sisense__BaseHost" = "http://sisense.dev.lab.us.azure.internal.sapienceanalytics.com:8081/"
-      "Sisense__SecurityEndpoint" = "http://sisense.dev.lab.us.azure.internal.sapienceanalytics.com:8081/api/settings/security"
-      "Sisense__UserSecurityEndpoint" = "http://sisense.dev.lab.us.azure.internal.sapienceanalytics.com:8081/api/v1/users"
+      "Sisense__BaseHost" = "https://sisense.sapienceanalytics.com/"
+      "Sisense__SecurityEndpoint" = "https://sisense.sapienceanalytics.com/api/settings/security"
+      "Sisense__UserSecurityEndpoint" = "https://sisense.sapienceanalytics.com/api/v1/users"
   }
 }

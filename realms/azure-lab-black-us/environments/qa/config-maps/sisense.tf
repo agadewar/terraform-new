@@ -20,6 +20,7 @@ resource "kubernetes_config_map" "sisense" {
       "Sisense_DeleteUserUri" = "api/v1/users/"
       "Sisense_ElasticubesUri" = "api/v1/elasticubes/getElasticubes"
       "Sisense_PingUri" = "api/test"
+      #UPDATE REQUEST URI (e.g. SapienceCube-[Env])
       "Sisense__RequestUri" = "api/elasticubes/SapienceCube-QA/jaql"
       "Sisense_SearchUserUri" = "api/users?search="
       "Sisense_SecurityUri" = "api/settings/security"

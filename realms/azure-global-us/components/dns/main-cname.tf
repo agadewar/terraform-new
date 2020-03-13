@@ -122,6 +122,30 @@ resource "azurerm_dns_cname_record" "sapience_support" {
 ####################
 
 ### sapienceanalytics.com
+resource "azurerm_dns_cname_record" "sapienceanalytics_email_public" {
+  name                = "email"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 3600
+  record              = "6869209.group9.sites.hubspot.net"
+}
+
+resource "azurerm_dns_cname_record" "sapienceanalytics_hs1_public" {
+  name                = "hs1._domainkey"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 3600
+  record              = "sapienceanalytics-com.hs01a.dkim.hubspotemail.net."
+}
+
+resource "azurerm_dns_cname_record" "sapienceanalytics_hs2_public" {
+  name                = "hs2._domainkey"
+  zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
+  resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
+  ttl                 = 3600
+  record              = "sapienceanalytics-com.hs01b.dkim.hubspotemail.net."
+}
+
 resource "azurerm_dns_cname_record" "sapienceanalytics_www_public" {
   name                = "www"
   zone_name           = azurerm_dns_zone.sapienceanalytics_public.name

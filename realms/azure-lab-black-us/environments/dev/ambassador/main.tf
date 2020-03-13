@@ -218,6 +218,7 @@ kind:  Mapping
 name:  admin_settings_api_mapping
 prefix: /admin/settings/
 service: admin-settings-api
+rewrite: /admin/settings/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -226,8 +227,9 @@ cors:
 apiVersion: ambassador/v1
 kind:  Mapping
 name:  admin_app_activity_api_mapping
-prefix: /admin/activity/
+prefix: /admin/specs/
 service: admin-app-activity-api
+rewrite: /admin/specs/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
