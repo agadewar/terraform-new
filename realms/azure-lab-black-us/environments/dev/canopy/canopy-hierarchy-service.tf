@@ -71,10 +71,20 @@ resource "kubernetes_deployment" "canopy_hierarchy_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.4.8.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.7.0.docker-SNAPSHOT"
           name  = "canopy-hierarchy-service"
 
           image_pull_policy = "Always"
+
+          env {
+            name = "REDIS_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "redis"
+                key  = "redis-password"
+              }
+            }
+          }
 
           readiness_probe {
             http_get {

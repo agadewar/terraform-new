@@ -186,6 +186,30 @@ service: canopy-hierarchy-service
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  canopy_location_service_mapping
+prefix: /location/
+service: canopy-location-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  canopy_notification_service_mapping
+prefix: /notification/
+service: canopy-notification-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  canopy_setting_service_mapping
+prefix: /setting/
+service: canopy-setting-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  canopy_settings_service_mapping
+prefix: /settings/
+service: canopy-settings-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  canopy_user_service_mapping
 prefix: /user/
 service: canopy-user-service
@@ -202,6 +226,13 @@ name:  eventpipeline_service_mapping
 prefix: /eventpipeline/
 service: eventpipeline-service
 ---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  kpi_service_mapping
+prefix: /kpi/
+service: kpi-service
+---
+
 apiVersion: ambassador/v1
 kind:  Mapping
 name:  admin_users_api_mapping
@@ -237,9 +268,10 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
-name:  sapience_app_dashboard_mapping
-prefix: /dashboard/
-service: sapience-app-dashboard
+name:  sapience_app_api_mapping
+prefix: /
+service: sapience-app-api
+timeout_ms: 10000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -257,16 +289,14 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
-name:  sapience_app_api_mapping
-prefix: /
-service: sapience-app-api
-timeout_ms: 10000
+name:  sapience_app_dashboard_mapping
+prefix: /dashboard/
+service: sapience-app-dashboard
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
   headers: Content-Type, Authorization
 EOF
-
     }
   }
 
