@@ -94,8 +94,8 @@ resource "kubernetes_resource_quota" "resource_quota" {
 
   spec {
     hard = {
-      "requests.memory" = "10Gi"
-      "requests.cpu" = "4"
+      "requests.memory" = "12Gi"
+      "requests.cpu" = "8"
     }
   }
 }
@@ -134,3 +134,37 @@ resource "kubernetes_resource_quota" "resource_quota" {
 #     }
 #   }
 # }
+
+resource "kubernetes_limit_range" "limit_range" {
+  metadata {
+    name      = "limit-range-${local.namespace}"
+    namespace = "${local.namespace}"
+  }
+
+  spec {
+    # limit {
+    #   type = "Pod"
+    #   max = {
+    #     cpu    = "500m"
+    #     memory = "1024M"
+    #   }
+    # }
+    # limit {
+    #   type = "PersistentVolumeClaim"
+    #   min = {
+    #     storage = "24M"
+    #   }
+    # }
+    limit {
+      type = "Container"
+      default_request = {
+        cpu    = "200m"
+        memory = "256M"
+      }
+      # max = {
+      #   cpu    = "1000m"
+      #   memory = "1024M"
+      # }
+    }
+  }
+}

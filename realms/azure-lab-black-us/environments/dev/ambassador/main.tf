@@ -57,12 +57,10 @@ resource "kubernetes_ingress" "api" {
     namespace = local.namespace
 
     annotations = {
-      "certmanager.k8s.io/acme-challenge-type" = "dns01"
-      "certmanager.k8s.io/acme-dns01-provider" = "azure-dns"
-      "certmanager.k8s.io/cluster-issuer"      = "letsencrypt-prod"
-      "ingress.kubernetes.io/ssl-redirect"     = "true"
-      "kubernetes.io/ingress.class"            = "nginx"
-      "kubernetes.io/tls-acme"                 = "true"
+      "cert-manager.io/cluster-issuer"     = "letsencrypt-prod"
+      "ingress.kubernetes.io/ssl-redirect" = "true"
+      "kubernetes.io/ingress.class"        = "nginx"
+      "kubernetes.io/tls-acme"             = "true"
     }
   }
 
@@ -232,7 +230,6 @@ name:  kpi_service_mapping
 prefix: /kpi/
 service: kpi-service
 ---
-
 apiVersion: ambassador/v1
 kind:  Mapping
 name:  admin_users_api_mapping

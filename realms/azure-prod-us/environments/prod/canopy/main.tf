@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "canopy.tfstate"
+    key = "black/canopy.tfstate"
   }
 }
 
@@ -59,6 +59,16 @@ data "local_file" "default_token_secret_name" {
 #   }
 # }
 
+data "terraform_remote_state" "container_registry" {
+  backend = "azurerm"
+  config = {
+    access_key           = var.global_realm_backend_access_key
+    storage_account_name = var.global_realm_backend_storage_account_name
+    container_name       = var.global_realm_backend_container_name
+    key                  = "container-registry.tfstate"
+  }
+}
+
 data "terraform_remote_state" "service_bus" {
   backend = "azurerm"
 
@@ -106,9 +116,12 @@ data "template_file" "sapience_container_registry_credential" {
   template = file("templates/dockerconfigjson.tpl")
 
   vars = {
-    server   = var.sapience_container_registry_hostname
-    username = var.sapience_container_registry_username
-    password = var.sapience_container_registry_password
+    # server   = var.sapience_container_registry_hostname
+    # username = var.sapience_container_registry_username
+    # password = var.sapience_container_registry_password
+    server   = data.terraform_remote_state.container_registry.outputs.login_server
+    username = data.terraform_remote_state.container_registry.outputs.admin_username
+    password = data.terraform_remote_state.container_registry.outputs.admin_password
   }
 }
 
