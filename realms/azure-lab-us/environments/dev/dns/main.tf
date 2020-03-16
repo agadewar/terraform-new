@@ -92,6 +92,14 @@ resource "azurerm_dns_cname_record" "api" {
   record              = "api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
 }
 
+resource "azurerm_dns_cname_record" "help" {
+  name                = "help.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
+  zone_name           = "sapienceanalytics.com"
+  resource_group_name = "global-us"
+  ttl                 = 300
+  record              = "help.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
+}
+
 resource "azurerm_dns_cname_record" "openfaas" {
   name                = "openfaas.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"

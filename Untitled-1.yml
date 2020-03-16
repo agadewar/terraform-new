@@ -1,0 +1,315 @@
+# -------------------------------------------------------------------------------
+# Name: azure-pipelines.yml
+# Purpose: Standard Templates for Maven Projects
+# Version: 1.0
+# Date: March 06, 2020
+# Author: Mason Huemmer
+# Email: mason.huemmer@sapienceanalytics.com
+# Copyright (C) 2020 by Sapience Analytics
+# License: Permission to use, copy, modify, and/or distribute this software for
+# any purpose with or without fee is hereby granted.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+# REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+# INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+# LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+# OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+# PERFORMANCE OF THIS SOFTWARE.
+# -------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
+# Pipeline Triggers
+# -------------------------------------------------------------------------------
+
+trigger:
+  - develop
+
+pr:
+  - develop
+
+# -------------------------------------------------------------------------------
+# Pipeline Variables
+# -------------------------------------------------------------------------------
+
+variables:
+
+  # --------------------------------------------------------------------------------------------------------------------
+  # Variable Groups
+  # Available For Pipeline: SHARED, DOTNET, IMAGES, SONARQUBE, ACR, [REPOSITORY NAME]
+  # URL: https://dev.azure.com/sapience-analytics/Sapience%20Analytics%20-%20Next%20Gen/_library?itemType=VariableGroups
+  # --------------------------------------------------------------------------------------------------------------------
+
+  - group: activity-collector-test-harness
+  - group: shared     
+  - group: maven
+  - group: images
+  - group: sonarqube
+  - group: acr
+
+  # -------------------------------------------------------------------------------
+  # SET TO TRUE, WILL SKIP ALL TESTING TASKS / JOBS (e.g. Sonarqube)
+  # -------------------------------------------------------------------------------
+  - name: skip
+    value: true
+
+  # -------------------------------------------------------------------------------
+  # SET TO TRUE, WILL SET VERBOSE LEVEL TO DEBUG
+  # -------------------------------------------------------------------------------
+  - name: System.Debug
+    value: true
+
+# -------------------------------------------------------------------------------
+# Pipeline Resources - Required for YAML Template Files from other Repositories
+# -------------------------------------------------------------------------------
+
+resources:
+  repositories:
+    - repository: azure-pipelines
+      type: git
+      name: azure-pipelines
+
+# -------------------------------------------------------------------------------
+# Pipeline Stages
+# -------------------------------------------------------------------------------
+
+stages:
+
+  # -------------------------------------------------------------------------------
+  # 'Build Stage' Stage
+  # -------------------------------------------------------------------------------
+
+  - stage: build_stage
+    displayName: Build Stage
+    jobs:
+
+      # -------------------------------------------------------------------------------
+      # 'Generate Build Version' Job
+      # -------------------------------------------------------------------------------
+  
+      - job: 'build_version'
+        displayName: 'Generate Build Version'
+        condition: succeeded()
+        timeoutInMinutes: 60
+        pool: 
+          vmImage: $(linux)
+        steps:
+
+          # -------------------------------------------------------------------------------
+          # 'Get Build Version' Template @ Azure-Pipelines Repository
+          # -------------------------------------------------------------------------------
+
+          - template: builds/scripts/yaml/get-build-version.yml@azure-pipelines
+            parameters:
+                arg: '--repository $(Build.Repository.Name) --debug'
+
+      # -------------------------------------------------------------------------------
+      # 'Deploy Build' Job
+      # -------------------------------------------------------------------------------
+
+      - job: 'build_job'
+        displayName: 'Deploy Build'
+        variables: 
+          version: '$(alpha)'
+        condition: succeeded()
+        timeoutInMinutes: 60
+        pool: 
+          vmImage: $(linux)  
+        steps:
+
+          # -------------------------------------------------------------------------------
+          # Checkout Required Repositories
+          # - self (PATH is required for this MAVEN Project)
+          # - azure-pipelines
+          # -------------------------------------------------------------------------------
+
+          - checkout: self
+            path: src/activitycollectortestharness
+          - checkout: azure-pipelines
+          
+          # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+          # Update Build Number for Job Run
+          # URL: https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/logging-commands?view=azure-devops&tabs=bash#updatebuildnumber-override-the-automatically-generated-build-number
+          # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+          - script: |
+                echo "##vso[build.updatebuildnumber]$(version)" 
+            displayName: Set Build Version to $(version)
+            condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI','Manual'))
+          - script: |
+                echo "##vso[build.updatebuildnumber]PR $(System.PullRequest.PullRequestId)" 
+            displayName: Set PR Build Version to $(System.PullRequest.PullRequestId)
+            condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+
+          # -------------------------------------------------------------------------------
+          # GO PROJECT
+          # - Use GO Version 1.13.1 (Default)
+          # - Install Dependencies
+          # - Install GoLint
+          # - Start Sonarscanner
+          # - GoLint
+          # - Go Test
+          # - Go Build
+          # - End Sonarscanner
+          # - Publish Results to SonarQube
+          # -------------------------------------------------------------------------------
+
+          # -------------------------------------------------------------------------------
+          # Use GO Version 1.13.1 (Default)
+          # -------------------------------------------------------------------------------
+
+          - task: GoTool@0
+            displayName: use GO Version $(golangVersion)
+            inputs:
+              version: $(golangVersion)
+              goPath: $(goPath)
+
+          # -------------------------------------------------------------------------------
+          # Install Dependencies
+          # -------------------------------------------------------------------------------
+
+          - task: Go@0
+            displayName: install dependencies
+            inputs:
+              command: 'get'
+              arguments: ./...
+
+          # -------------------------------------------------------------------------------
+          # Install GoLint
+          # -------------------------------------------------------------------------------
+
+          - task: Go@0
+            displayName: install golint
+            condition: |
+                or(
+                    eq(variables['Build.Reason'], 'PullRequest'),
+                    eq(variables['skip'],'false')
+                  )
+            inputs:
+              command: 'get'
+              arguments: '-u golang.org/x/lint/golint'
+
+          # -------------------------------------------------------------------------------
+          # Start Sonarscanner
+          # -------------------------------------------------------------------------------
+
+          - task: SonarQubePrepare@4
+            displayName: start sonarscaner
+            condition: |
+                or(
+                    eq(variables['Build.Reason'], 'PullRequest'),
+                    eq(variables['skip'],'false')
+                  )
+            inputs:
+              SonarQube: $(sonarqubeConnection)
+              cliProjectKey: $(Build.Repository.Name)
+              cliProjectName: $(Build.Repository.Name)
+              scannerMode: 'CLI'
+              configMode: 'manual'
+              cliSources: '.'
+
+          # -------------------------------------------------------------------------------
+          # GoLint
+          # -------------------------------------------------------------------------------
+
+          - task: Bash@3
+            displayName: golint
+            condition: |
+                or(
+                    eq(variables['Build.Reason'], 'PullRequest'),
+                    eq(variables['skip'],'false')
+                  )
+            inputs:
+              targetType: 'inline'
+              script: '/home/vsts/work/1/bin/golint ./...'
+
+          # -------------------------------------------------------------------------------
+          # Go Test
+          # -------------------------------------------------------------------------------
+
+          - task: Go@0
+            displayName: go test
+            condition: |
+                or(
+                    eq(variables['Build.Reason'], 'PullRequest'),
+                    eq(variables['skip'],'false')
+                  )
+            inputs:
+              command: 'test'
+              arguments: ./...
+
+          # -------------------------------------------------------------------------------
+          # Go Test
+          # -------------------------------------------------------------------------------
+
+          - task: Go@0
+            displayName: go build
+            inputs:
+              command: 'build'
+
+          # -------------------------------------------------------------------------------
+          # End Sonarscanner
+          # -------------------------------------------------------------------------------
+
+          - task: SonarQubeAnalyze@4
+            displayName: end sonarscanner
+            condition: |
+                or(
+                    eq(variables['Build.Reason'], 'PullRequest'),
+                    eq(variables['skip'],'false')
+                  )
+
+          # -------------------------------------------------------------------------------
+          # Publish Results to SonarQube
+          # -------------------------------------------------------------------------------
+
+          - task: SonarQubePublish@4
+            displayName: 'publish artifact for next stage'
+            condition: |
+                or(
+                    eq(variables['Build.Reason'], 'PullRequest'),
+                    eq(variables['skip'],'false')
+                  )
+            inputs:
+              pollingTimeoutSec: '300'
+
+          # -------------------------------------------------------------------------------
+          # DOCKER
+          # - Build
+          # - Push
+          # -------------------------------------------------------------------------------
+
+          # -------------------------------------------------------------------------------
+          # Docker Build
+          # -------------------------------------------------------------------------------
+
+          - task: Docker@2
+            displayName: 'docker build'
+            condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI','Manual')) 
+            inputs:
+              command: build
+              containerRegistry: $(acrConnection)
+              repository: $(Build.Repository.Name)
+              tags: '$(version)'
+              buildContext: $(Build.SourcesDirectory)
+              Dockerfile: $(Build.Repository.Name)/.pipeline/Dockerfile
+              arguments: |
+                  --build-arg EXECUTABLE=activitycollectortestharness
+                  --build-arg CONFIG=config/config.json
+                  --build-arg INI_LEAF_CUST_OVERRIDE=build/leaf_cust_override.ini
+                  --build-arg INI_LEAF_DEFAULTS=build/leaf_defaults.ini
+                  --build-arg INI_LEAF_DEVICE=build/leaf_device.ini
+                  --build-arg BANYAN_SAPIENCE_JENKINS_AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+                  --build-arg BANYAN_SAPIENCE_JENKINS_AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY)
+
+          # -------------------------------------------------------------------------------
+          # Docker Push
+          # -------------------------------------------------------------------------------
+
+          - task: Docker@2
+            displayName: 'docker push'
+            inputs:
+              command: push
+              containerRegistry: $(acrConnection)
+              repository: $(Build.Repository.Name)
+              tags: '$(version)'
