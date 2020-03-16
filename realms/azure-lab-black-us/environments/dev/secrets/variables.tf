@@ -9,10 +9,5 @@ variable "realm_common_tags" {
 variable "environment_common_tags" {
     type = "map"
 }
-variable "connectionstring_admin" {}
-variable "connectionstring_mad" {}
-variable "connectionstring_staging" {}
-variable "cosmosdb_key_dashboard" {}
-variable "cosmosdb_key_alerts" {}
-variable "sisense_secret" {}
-variable "auth0_secret" {}
+variable "etl_secret" {}
+variable "staging_password" {}
