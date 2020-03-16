@@ -2,6 +2,10 @@ terraform {
   backend "azurerm" {
     key = "certificates.tfstate"
   }
+
+  # required_providers {
+  #   helm = "= 0.10.4"
+  # }
 }
 
 provider "helm" {
@@ -41,38 +45,44 @@ resource "null_resource" "create_cert_manager_crd" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -f -<<EOF\n${file("files/cert-manager-crds.yaml")}\nEOF"
+    command = "kubectl apply --validate=false --kubeconfig=${local.config_path} -f files/cert-manager-crds.yaml"
   }
 
   provisioner "local-exec" {
     when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition challenges.certmanager.k8s.io --ignore-not-found"
+    command = "kubectl delete --kubeconfig=${local.config_path} -f files/cert-manager-crds.yaml --ignore-not-found"
   }
 
-  provisioner "local-exec" {
-    when = destroy
+  # provisioner "local-exec" {
+  #   when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition issuers.certmanager.k8s.io --ignore-not-found"
-  }
+  #   command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition challenges.certmanager.k8s.io --ignore-not-found"
+  # }
 
-  provisioner "local-exec" {
-    when = destroy
+  # provisioner "local-exec" {
+  #   when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition orders.certmanager.k8s.io --ignore-not-found"
-  }
+  #   command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition issuers.certmanager.k8s.io --ignore-not-found"
+  # }
 
-  provisioner "local-exec" {
-    when = destroy
+  # provisioner "local-exec" {
+  #   when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition certificates.certmanager.k8s.io --ignore-not-found"
-  }
+  #   command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition orders.certmanager.k8s.io --ignore-not-found"
+  # }
 
-  provisioner "local-exec" {
-    when = destroy
+  # provisioner "local-exec" {
+  #   when = destroy
 
-    command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition clusterissuers.certmanager.k8s.io --ignore-not-found"
-  }
+  #   command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition certificates.certmanager.k8s.io --ignore-not-found"
+  # }
+
+  # provisioner "local-exec" {
+  #   when = destroy
+
+  #   command = "kubectl --kubeconfig=${local.config_path} delete customresourcedefinition clusterissuers.certmanager.k8s.io --ignore-not-found"
+  # }
 }
 
 resource "kubernetes_namespace" "cert_manager" {
@@ -101,12 +111,22 @@ resource "helm_release" "cert_manager" {
   name       = "cert-manager"
   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
   chart      = "cert-manager"
-  version    = "v0.10.1"
+  version    = "v0.13.1"
   repository = data.helm_repository.jetstack.metadata[0].name
 
   set {
     name  = "webhook.enabled"
     value = "false"
+  }
+
+  set {
+    name  = "resources.requests.cpu"
+    value = "10m"
+  }
+
+  set {
+    name  = "resources.requests.memory"
+    value = "32Mi"
   }
 }
 
@@ -127,7 +147,7 @@ data "template_file" "letsencrypt_cluster_issuer_staging" {
 }
 
 resource "null_resource" "letsencrypt_cluster_issuer_staging" {
-  depends_on = [ kubernetes_secret.service_principal_password, null_resource.create_cert_manager_crd ]
+  depends_on = [ kubernetes_secret.service_principal_password ]
 
   triggers = {
     template_changed = data.template_file.letsencrypt_cluster_issuer_staging.rendered
@@ -155,7 +175,7 @@ data "template_file" "letsencrypt_cluster_issuer_prod" {
 }
 
 resource "null_resource" "letsencrypt_cluster_issuer_prod" {
-  depends_on = [ kubernetes_secret.service_principal_password, null_resource.create_cert_manager_crd ]
+  depends_on = [ kubernetes_secret.service_principal_password ]
 
   triggers = {
     template_changed = data.template_file.letsencrypt_cluster_issuer_prod.rendered
