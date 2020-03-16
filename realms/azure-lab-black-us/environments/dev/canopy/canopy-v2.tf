@@ -269,13 +269,17 @@ resource "kubernetes_ingress" "canopy_v2" {
     namespace = local.namespace
 
     annotations = {
-      "certmanager.k8s.io/acme-challenge-type" = "dns01"
-      "certmanager.k8s.io/acme-dns01-provider" = "azure-dns"
-      "certmanager.k8s.io/cluster-issuer"      = "letsencrypt-staging"
-      ###  TODO - set "true" on "ssl-redirect" after upgrade of cert-manager
-      "ingress.kubernetes.io/ssl-redirect"     = "false"
-      "kubernetes.io/ingress.class"            = "nginx"
-      "kubernetes.io/tls-acme"                 = "true"
+      # "certmanager.k8s.io/acme-challenge-type" = "dns01"
+      # "certmanager.k8s.io/acme-dns01-provider" = "azure-dns"
+      # "certmanager.k8s.io/cluster-issuer"      = "letsencrypt-staging"
+      # ###  TODO - set "true" on "ssl-redirect" after upgrade of cert-manager
+      # "ingress.kubernetes.io/ssl-redirect"     = "false"
+      # "kubernetes.io/ingress.class"            = "nginx"
+      # "kubernetes.io/tls-acme"                 = "true"
+      "cert-manager.io/cluster-issuer"     = "letsencrypt-prod"
+      "ingress.kubernetes.io/ssl-redirect" = "true"
+      "kubernetes.io/ingress.class"        = "nginx"
+      "kubernetes.io/tls-acme"             = "true"
     }
   }
 
@@ -322,13 +326,13 @@ resource "kubernetes_ingress" "canopy_v2" {
       }
     }
 
-    # tls {
-    #   hosts = [
-    #     "canopy.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com",
-    #     "canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
-    #     "canopy.${var.environment}.sapienceanalytics.com"
-    #   ]
-    #   secret_name = "canopy-v2-certs"
-    # }
+    tls {
+      hosts = [
+        "canopy.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com",
+        "canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
+        "canopy.${var.environment}.sapienceanalytics.com"
+      ]
+      secret_name = "canopy-v2-certs"
+    }
   }
 }
