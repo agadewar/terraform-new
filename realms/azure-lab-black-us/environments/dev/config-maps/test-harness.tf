@@ -1,4 +1,4 @@
-resource "kubernetes_config_map" "test-harness" {
+resource "kubernetes_config_map" "test_harness" {
   metadata {
     name      = "test-harness"
     namespace = local.namespace
