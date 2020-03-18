@@ -41,6 +41,9 @@ variables:
   # --------------------------------------------------------------------------------------------------------------------
 
   - group: terraform
+  - group: remote state connection
+  - group: non-production
+  - group: dev
   - group: shared     
   - group: images
 
@@ -138,12 +141,19 @@ stages:
             displayName: Set PR Build Version to $(System.PullRequest.PullRequestId)
             condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
 
-          - task: Terraform@2
+          #- task: Terraform@2
+          #  inputs:
+          #    TemplatePath: './$(Build.Repository.Name)/dev'
+          #    Arguments: 'plan'
+          #    InstallTerraform: true
+          #    UseAzureSub: true
+          #    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+          #    ConnectedServiceNameARM: 'Azure Prod Subscription'
+          #    ManageState: false
+
+          - task: TerraformCLI@0
             inputs:
-              TemplatePath: './$(Build.Repository.Name)/dev'
-              Arguments: 'plan'
-              InstallTerraform: true
-              UseAzureSub: true
-              ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
-              ConnectedServiceNameARM: 'Azure Prod Subscription'
-              ManageState: false
+              command: 'plan'
+              workingDirectory: './$(Build.Repository.Name)/dev'
+              environmentServiceName: 'Non-Production(b78a61e7-f2ed-4cb0-8f48-6548408935e9)'
+              secureVarsFile: 'dev.tfvars'
