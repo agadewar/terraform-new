@@ -115,7 +115,7 @@ stages:
         dependsOn: 'build_version'
         timeoutInMinutes: 60
         pool: 
-          vmImage: $(windows)  
+          vmImage: $(linux)  
         steps:
 
           # -------------------------------------------------------------------------------
@@ -133,38 +133,20 @@ stages:
           # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
           - pwsh: |
-                Write-Host "##vso[build.updatebuildnumber]$env:version" 
+                echo "##vso[build.updatebuildnumber]$(version)" 
             displayName: Set Build Version to $(version)
             condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI','Manual'))
           - pwsh: |
-                Write-Host "##vso[build.updatebuildnumber]PR $(System.PullRequest.PullRequestId)"
+                echo "##vso[build.updatebuildnumber]PR $(System.PullRequest.PullRequestId)"
             displayName: Set PR Build Version to $(System.PullRequest.PullRequestId)
             condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
-
-          #- task: Terraform@2
-          #  inputs:
-          #    TemplatePath: './$(Build.Repository.Name)/dev'
-          #    Arguments: 'plan'
-          #    InstallTerraform: true
-          #    UseAzureSub: true
-          #    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
-          #    ConnectedServiceNameARM: 'Azure Prod Subscription'
-          #    ManageState: false
 
           - task: DownloadSecureFile@1
             inputs:
               secureFile: 'dev.tfvars'
 
-          - bash: |
-              apt-get install wget
-              apt-get install unzip
+          - script: : |
               wget 'https://releases.hashicorp.com/terraform/0.12.23/terraform_0.12.23_linux_386.zip'
               unzip 'terraform_0.12.23_linux_386.zip'
               mv terraform /usr/local/bin
-
-          - task: TerraformCLI@0
-            inputs:
-              command: 'plan'
-              workingDirectory: './$(Build.Repository.Name)/dev'
-              environmentServiceName: 'Non-Production(b78a61e7-f2ed-4cb0-8f48-6548408935e9)'
-              secureVarsFile: 'dev.tfvars'
+            displayName: install dependencies
