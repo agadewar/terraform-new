@@ -138,6 +138,10 @@ stages:
             displayName: Set PR Build Version to $(System.PullRequest.PullRequestId)
             condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
 
+          - task: TerraformInstaller@0
+            inputs:
+              terraformVersion: '0.12.23'
+
           - task: TerraformCLI@0
             inputs:
               command: 'init'
