@@ -112,7 +112,7 @@ stages:
         dependsOn: 'build_version'
         timeoutInMinutes: 60
         pool: 
-          vmImage: $(linux)  
+          vmImage: $(windows)  
         steps:
 
           # -------------------------------------------------------------------------------
