@@ -132,17 +132,22 @@ stages:
           # URL: https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/logging-commands?view=azure-devops&tabs=bash#updatebuildnumber-override-the-automatically-generated-build-number
           # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-          - pwsh: |
+          - script: |
                 echo "##vso[build.updatebuildnumber]$(version)" 
             displayName: Set Build Version to $(version)
             condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI','Manual'))
-          - pwsh: |
+          - script: |
                 echo "##vso[build.updatebuildnumber]PR $(System.PullRequest.PullRequestId)"
             displayName: Set PR Build Version to $(System.PullRequest.PullRequestId)
             condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
 
-          - script: : |
-              wget 'https://releases.hashicorp.com/terraform/0.12.23/terraform_0.12.23_linux_386.zip'
-              unzip 'terraform_0.12.23_linux_386.zip'
-              mv terraform /usr/local/bin
-            displayName: install dependencies
+          # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+          # Install Dependencies
+          # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+          - script: |
+                wget 'https://releases.hashicorp.com/terraform/0.12.23/terraform_0.12.23_linux_386.zip'
+                unzip 'terraform_0.12.23_linux_386.zip'
+                mv terraform /usr/local/bin
+            displayName: Install Dependencies
+            condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI','Manual'))
