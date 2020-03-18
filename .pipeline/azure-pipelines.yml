@@ -140,7 +140,7 @@ stages:
 
           - task: Terraform@2
             inputs:
-              TemplatePath: './dev'
+              TemplatePath: './$(Build.Repository.Name)/dev'
               Arguments: 'plan'
               InstallTerraform: true
               UseAzureSub: true
