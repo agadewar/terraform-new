@@ -138,12 +138,12 @@ stages:
             displayName: Set PR Build Version to $(System.PullRequest.PullRequestId)
             condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
 
-          - task: TerraformInstaller@0
+          - task: Terraform@2
             inputs:
-              terraformVersion: '0.12.20'
-
-          - task: TerraformCLI@0
-            inputs:
-              command: 'init'
-              workingDirectory: '../dev'
-              secureVarsFile: 'dev.tfvars'
+              TemplatePath: './dev'
+              Arguments: 'plan'
+              InstallTerraform: true
+              UseAzureSub: true
+              ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+              ConnectedServiceNameARM: 'Azure Prod Subscription'
+              ManageState: false
