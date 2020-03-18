@@ -151,6 +151,10 @@ stages:
           #    ConnectedServiceNameARM: 'Azure Prod Subscription'
           #    ManageState: false
 
+          - task: TerraformInstaller@0
+            inputs:
+              terraformVersion: '0.12.23'
+
           - task: TerraformCLI@0
             inputs:
               command: 'plan'
