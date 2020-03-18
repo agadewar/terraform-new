@@ -54,7 +54,7 @@ variables:
   # SET TO TRUE, WILL SET VERBOSE LEVEL TO DEBUG
   # -------------------------------------------------------------------------------
   - name: System.Debug
-    value: false
+    value: true
 
 # -------------------------------------------------------------------------------
 # Pipeline Resources - Required for YAML Template Files from other Repositories
