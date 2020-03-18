@@ -130,11 +130,11 @@ stages:
           # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
           - script: |
-                echo "##vso[build.updatebuildnumber]$(version)" 
+                Write-Host "##vso[build.updatebuildnumber]$env:version" 
             displayName: Set Build Version to $(version)
             condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI','Manual'))
           - script: |
-                echo "##vso[build.updatebuildnumber]PR $(System.PullRequest.PullRequestId)" 
+                "Write-Host ##vso[build.updatebuildnumber]PR $(System.PullRequest.PullRequestId)"
             displayName: Set PR Build Version to $(System.PullRequest.PullRequestId)
             condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
 
