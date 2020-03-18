@@ -1,6 +1,5 @@
-
 # -------------------------------------------------------------------------------
-# REMOVE TFSTATE FILE
+# REMOTE TFSTATE FILE
 # -------------------------------------------------------------------------------
 
 terraform {
@@ -32,7 +31,7 @@ provider "azurerm" {
 # -------------------------------------------------------------------------------
 
 module "resource-group" {
-  source          = "./modules/resource-group"
+  source          = "../modules/resource-group"
 
   environment     = var.environment
   location        = var.location
