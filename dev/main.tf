@@ -1,9 +1,21 @@
 
+# -------------------------------------------------------------------------------
+# REMOVE TFSTATE FILE
+# -------------------------------------------------------------------------------
+
 terraform {
   backend "azurerm" {
-    key = "${var.environment}.tfstate"
+    resource_group_name  = var.tfstate_resource_group
+    storage_account_name = var.tfstate_storage_account
+    container_name       = var.tfstate_container_name
+    key                  = "${var.environment}.tfstate"
+    access_key           = tfstate_access_key
   }
 }
+
+# -------------------------------------------------------------------------------
+# Providers
+# -------------------------------------------------------------------------------
 
 provider "azurerm" {
   version         = "1.37.0"
@@ -13,6 +25,11 @@ provider "azurerm" {
   client_secret   = var.client_secret
   tenant_id       = var.tenant_id
 }
+
+# -------------------------------------------------------------------------------
+# MODULES
+# - Resource Group
+# -------------------------------------------------------------------------------
 
 module "resource-group" {
   source          = "./modules/resource-group"
