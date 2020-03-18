@@ -1,0 +1,170 @@
+# -------------------------------------------------------------------------------
+# Name: azure-pipelines.yml
+# Purpose: Standard Templates for Dotnet Projects
+# Version: 1.0
+# Date: March 06, 2020
+# Author: Mason Huemmer
+# Email: mason.huemmer@sapienceanalytics.com
+# Copyright (C) 2020 by Sapience Analytics
+# License: Permission to use, copy, modify, and/or distribute this software for
+# any purpose with or without fee is hereby granted.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+# REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+# INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+# LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+# OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+# PERFORMANCE OF THIS SOFTWARE.
+# -------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
+# Pipeline Triggers
+# -------------------------------------------------------------------------------
+
+trigger:
+  - master
+
+pr:
+  - master
+
+# -------------------------------------------------------------------------------
+# Pipeline Variables
+# -------------------------------------------------------------------------------
+
+variables:
+
+  # --------------------------------------------------------------------------------------------------------------------
+  # Variable Groups
+  # Available For Pipeline: SHARED, DOTNET, IMAGES, SONARQUBE, ACR, [REPOSITORY NAME]
+  # URL: https://dev.azure.com/sapience-analytics/Sapience%20Analytics%20-%20Next%20Gen/_library?itemType=VariableGroups
+  # --------------------------------------------------------------------------------------------------------------------
+
+  - group: terraform
+  - group: remote state connection
+  - group: non-production
+  - group: dev
+  - group: shared     
+  - group: images
+
+  # -------------------------------------------------------------------------------
+  # SET TO TRUE, WILL SKIP ALL TESTING TASKS / JOBS (e.g. Sonarqube)
+  # -------------------------------------------------------------------------------
+  - name: skip
+    value: true
+
+  # -------------------------------------------------------------------------------
+  # SET TO TRUE, WILL SET VERBOSE LEVEL TO DEBUG
+  # -------------------------------------------------------------------------------
+  - name: System.Debug
+    value: true
+
+# -------------------------------------------------------------------------------
+# Pipeline Resources - Required for YAML Template Files from other Repositories
+# -------------------------------------------------------------------------------
+
+resources:
+  repositories:
+    - repository: azure-pipelines
+      type: git
+      name: azure-pipelines
+
+# -------------------------------------------------------------------------------
+# Pipeline Stages
+# -------------------------------------------------------------------------------
+
+stages:
+
+  # -------------------------------------------------------------------------------
+  # 'Build Stage' Stage
+  # -------------------------------------------------------------------------------
+
+  - stage: build_stage
+    displayName: Build Stage
+    jobs:
+
+      # -------------------------------------------------------------------------------
+      # 'Generate Build Version' Job
+      # -------------------------------------------------------------------------------
+  
+      - job: 'build_version'
+        displayName: 'Generate Build Version'
+        condition: succeeded()
+        timeoutInMinutes: 60
+        pool: 
+          vmImage: $(linux)
+        steps:
+
+          # -------------------------------------------------------------------------------
+          # 'Get Build Version' Template @ Azure-Pipelines Repository
+          # -------------------------------------------------------------------------------
+
+          - template: builds/scripts/yaml/get-build-version.yml@azure-pipelines
+            parameters:
+                arg: '--repository $(Build.Repository.Name) --debug'
+
+      # -------------------------------------------------------------------------------
+      # 'Deploy Build' Job
+      # -------------------------------------------------------------------------------
+
+      - job: 'build_job'
+        displayName: 'Deploy Build'
+        variables: 
+          version: '$(alpha)'
+        condition: succeeded()
+        dependsOn: 'build_version'
+        timeoutInMinutes: 60
+        pool: 
+          vmImage: $(windows)  
+        steps:
+
+          # -------------------------------------------------------------------------------
+          # Checkout Required Repositories
+          # - self
+          # - azure-pipelines
+          # -------------------------------------------------------------------------------
+
+          - checkout: self
+          - checkout: azure-pipelines
+          
+          # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+          # Update Build Number for Job Run
+          # URL: https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/logging-commands?view=azure-devops&tabs=bash#updatebuildnumber-override-the-automatically-generated-build-number
+          # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+          - pwsh: |
+                Write-Host "##vso[build.updatebuildnumber]$env:version" 
+            displayName: Set Build Version to $(version)
+            condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI','Manual'))
+          - pwsh: |
+                Write-Host "##vso[build.updatebuildnumber]PR $(System.PullRequest.PullRequestId)"
+            displayName: Set PR Build Version to $(System.PullRequest.PullRequestId)
+            condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+
+          #- task: Terraform@2
+          #  inputs:
+          #    TemplatePath: './$(Build.Repository.Name)/dev'
+          #    Arguments: 'plan'
+          #    InstallTerraform: true
+          #    UseAzureSub: true
+          #    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+          #    ConnectedServiceNameARM: 'Azure Prod Subscription'
+          #    ManageState: false
+
+          - task: DownloadSecureFile@1
+            inputs:
+              secureFile: 'dev.tfvars'
+
+          - bash: |
+              apt-get install wget
+              apt-get install unzip
+              wget 'https://releases.hashicorp.com/terraform/0.12.23/terraform_0.12.23_linux_386.zip'
+              unzip 'terraform_0.12.23_linux_386.zip'
+              mv terraform /usr/local/bin
+
+          - task: TerraformCLI@0
+            inputs:
+              command: 'plan'
+              workingDirectory: './$(Build.Repository.Name)/dev'
+              environmentServiceName: 'Non-Production(b78a61e7-f2ed-4cb0-8f48-6548408935e9)'
+              secureVarsFile: 'dev.tfvars'
