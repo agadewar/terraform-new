@@ -112,7 +112,7 @@ stages:
         dependsOn: 'build_version'
         timeoutInMinutes: 60
         pool: 
-          vmImage: $(windows)  
+          vmImage: $(linux)  
         steps:
 
           # -------------------------------------------------------------------------------
@@ -130,11 +130,11 @@ stages:
           # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
           - script: |
-                Write-Host "##vso[build.updatebuildnumber]$(version)" 
+                echo "##vso[build.updatebuildnumber]$(version)" 
             displayName: Set Build Version to $(version)
             condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI','Manual'))
           - script: |
-                Write-Host "##vso[build.updatebuildnumber]PR $(System.PullRequest.PullRequestId)" 
+                echo "##vso[build.updatebuildnumber]PR $(System.PullRequest.PullRequestId)" 
             displayName: Set PR Build Version to $(System.PullRequest.PullRequestId)
             condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
 
