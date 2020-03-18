@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------------
 # Name: azure-pipelines.yml
-# Purpose: Stand up entire infrastructure
+# Purpose: Standard Templates for Dotnet Projects
 # Version: 1.0
 # Date: March 06, 2020
 # Author: Mason Huemmer
@@ -27,3 +27,116 @@ trigger:
 
 pr:
   - develop
+
+# -------------------------------------------------------------------------------
+# Pipeline Variables
+# -------------------------------------------------------------------------------
+
+variables:
+
+  # --------------------------------------------------------------------------------------------------------------------
+  # Variable Groups
+  # Available For Pipeline: SHARED, DOTNET, IMAGES, SONARQUBE, ACR, [REPOSITORY NAME]
+  # URL: https://dev.azure.com/sapience-analytics/Sapience%20Analytics%20-%20Next%20Gen/_library?itemType=VariableGroups
+  # --------------------------------------------------------------------------------------------------------------------
+
+  #- group: [repository-name]
+  - group: shared     
+  - group: dotnet
+  - group: images
+  - group: sonarqube
+  - group: acr
+
+  # -------------------------------------------------------------------------------
+  # SET TO TRUE, WILL SKIP ALL TESTING TASKS / JOBS (e.g. Sonarqube)
+  # -------------------------------------------------------------------------------
+  - name: skip
+    value: true
+
+  # -------------------------------------------------------------------------------
+  # SET TO TRUE, WILL SET VERBOSE LEVEL TO DEBUG
+  # -------------------------------------------------------------------------------
+  - name: System.Debug
+    value: true
+
+# -------------------------------------------------------------------------------
+# Pipeline Resources - Required for YAML Template Files from other Repositories
+# -------------------------------------------------------------------------------
+
+resources:
+  repositories:
+    - repository: azure-pipelines
+      type: git
+      name: azure-pipelines
+
+# -------------------------------------------------------------------------------
+# Pipeline Stages
+# -------------------------------------------------------------------------------
+
+stages:
+
+  # -------------------------------------------------------------------------------
+  # 'Build Stage' Stage
+  # -------------------------------------------------------------------------------
+
+  - stage: build_stage
+    displayName: Build Stage
+    jobs:
+
+      # -------------------------------------------------------------------------------
+      # 'Generate Build Version' Job
+      # -------------------------------------------------------------------------------
+  
+      - job: 'build_version'
+        displayName: 'Generate Build Version'
+        condition: succeeded()
+        timeoutInMinutes: 60
+        pool: 
+          vmImage: $(linux)
+        steps:
+
+          # -------------------------------------------------------------------------------
+          # 'Get Build Version' Template @ Azure-Pipelines Repository
+          # -------------------------------------------------------------------------------
+
+          - template: builds/scripts/yaml/get-build-version.yml@azure-pipelines
+            parameters:
+                arg: '--repository $(Build.Repository.Name) --debug'
+
+      # -------------------------------------------------------------------------------
+      # 'Deploy Build' Job
+      # -------------------------------------------------------------------------------
+
+      - job: 'build_job'
+        displayName: 'Deploy Build'
+        variables: 
+          version: '$(alpha)'
+        condition: succeeded()
+        dependsOn: 'build_version'
+        timeoutInMinutes: 60
+        pool: 
+          vmImage: $(linux)  
+        steps:
+
+          # -------------------------------------------------------------------------------
+          # Checkout Required Repositories
+          # - self
+          # - azure-pipelines
+          # -------------------------------------------------------------------------------
+
+          - checkout: self
+          - checkout: azure-pipelines
+          
+          # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+          # Update Build Number for Job Run
+          # URL: https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/logging-commands?view=azure-devops&tabs=bash#updatebuildnumber-override-the-automatically-generated-build-number
+          # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+          - script: |
+                echo "##vso[build.updatebuildnumber]$(version)" 
+            displayName: Set Build Version to $(version)
+            condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI','Manual'))
+          - script: |
+                echo "##vso[build.updatebuildnumber]PR $(System.PullRequest.PullRequestId)" 
+            displayName: Set PR Build Version to $(System.PullRequest.PullRequestId)
+            condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
