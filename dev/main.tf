@@ -4,11 +4,7 @@
 
 terraform {
   backend "azurerm" {
-    resource_group_name  = var.tfstate_resource_group
-    storage_account_name = var.tfstate_storage_account
-    container_name       = var.tfstate_container_name
-    key                  = "${var.environment}-${var.location}.tfstate"
-    access_key           = tfstate_access_key
+    key = "${var.environment}-${var.location}.tfstate"
   }
 }
 
