@@ -3,43 +3,33 @@
 # You must provide a value for each of these parameters.
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "tfstate_resource_group" {
-  description = "The environment the resource is deployed"
-  type        = string
-}
-
-variable "tfstate_storage_account" {
-  description = "The environment the resource is deployed"
-  type        = string
-}
-
 variable "tfstate_container_name" {
-  description = "The environment the resource is deployed"
+  description = "Create/Update Container in blob storage"
   type        = string
 }
 
 variable "tfstate_access_key" {
-  description = "The environment the resource is deployed"
+  description = "Access key to blob storage in production"
   type        = string
 }
 
 variable "subscription_id" {
-  description = "The environment the resource is deployed"
+  description = "Azure Subscription"
   type        = string
 }
 
 variable "client_id" {
-  description = "The environment the resource is deployed"
+  description = "Service Principal Account"
   type        = string
 }
 
 variable "client_secret" {
-  description = "The environment the resource is deployed"
+  description = "Service Principal Account"
   type        = string
 }
 
 variable "tenant_id" {
-  description = "The environment the resource is deployed"
+  description = "Azure Tenant ID"
   type        = string
 }
 
@@ -58,3 +48,14 @@ variable "location" {
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
 
+variable "tfstate_resource_group" {
+  description = "The environment the resource is deployed"
+  type        = string
+  default     = "devops"
+}
+
+variable "tfstate_storage_account" {
+  description = "Blob storage in production"
+  type        = string
+  default     = "sapienceremotestate"
+}
