@@ -156,8 +156,10 @@ stages:
               secureFile: 'dev.tfvars'
 
           - script: |
+              apt-get install wget
+              apt-get install unzip
               wget 'https://releases.hashicorp.com/terraform/0.12.23/terraform_0.12.23_linux_386.zip'
-              unzip terraform_0.12.23_linux_386.zip
+              unzip 'terraform_0.12.23_linux_386.zip'
               mv terraform /usr/local/bin
 
           - task: TerraformCLI@0
