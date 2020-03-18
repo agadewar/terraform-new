@@ -74,35 +74,35 @@ resource "kubernetes_deployment" "canopy_v2_deployment" {
 
           env { 
             name = "ENVIRONMENT_DEVICE_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/device"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/device"
           }
           env { 
             name = "ENVIRONMENT_HIERARCHY_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/hierarchy"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/hierarchy"
           }
           env { 
             name = "ENVIRONMENT_KPI_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/kpi"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/kpi"
           }
           env { 
             name = "ENVIRONMENT_LOCATION_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/location"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/location"
           }
           env { 
             name = "ENVIRONMENT_NOTIFICATION_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/notification"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/notification"
           }
           env { 
             name = "ENVIRONMENT_SETTING_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/setting"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/setting"
           }
           env { 
             name = "ENVIRONMENT_SETTINGS_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/settings"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/settings"
           }
           env { 
             name = "ENVIRONMENT_USER_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/user"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/user"
           }
           env { 
             name  = "ENVIRONMENT_APPEND_PATH_PREFIX_ON_MODALS"
@@ -269,31 +269,21 @@ resource "kubernetes_ingress" "canopy_v2" {
     namespace = local.namespace
 
     annotations = {
-      "certmanager.k8s.io/acme-challenge-type" = "dns01"
-      "certmanager.k8s.io/acme-dns01-provider" = "azure-dns"
-      "certmanager.k8s.io/cluster-issuer"      = "letsencrypt-staging"
-      ###  TODO - set "true" on "ssl-redirect" after upgrade of cert-manager
-      "ingress.kubernetes.io/ssl-redirect"     = "false"
-      "kubernetes.io/ingress.class"            = "nginx"
-      "kubernetes.io/tls-acme"                 = "true"
+      # "certmanager.k8s.io/acme-challenge-type" = "dns01"
+      # "certmanager.k8s.io/acme-dns01-provider" = "azure-dns"
+      # "certmanager.k8s.io/cluster-issuer"      = "letsencrypt-staging"
+      # ###  TODO - set "true" on "ssl-redirect" after upgrade of cert-manager
+      # "ingress.kubernetes.io/ssl-redirect"     = "false"
+      # "kubernetes.io/ingress.class"            = "nginx"
+      # "kubernetes.io/tls-acme"                 = "true"
+      "cert-manager.io/cluster-issuer"     = "letsencrypt-prod"
+      "ingress.kubernetes.io/ssl-redirect" = "true"
+      "kubernetes.io/ingress.class"        = "nginx"
+      "kubernetes.io/tls-acme"             = "true"
     }
   }
 
   spec {
-    rule {
-      host = "canopy.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
-      http {
-        path {
-          backend {
-            service_name = "canopy-v2"
-            service_port = 80
-          }
-
-          path = "/"
-        }
-      }
-    }
-
     rule {
       host = "canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
       http {
@@ -322,13 +312,12 @@ resource "kubernetes_ingress" "canopy_v2" {
       }
     }
 
-    # tls {
-    #   hosts = [
-    #     "canopy.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com",
-    #     "canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
-    #     "canopy.${var.environment}.sapienceanalytics.com"
-    #   ]
-    #   secret_name = "canopy-v2-certs"
-    # }
+    tls {
+      hosts = [
+        "canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
+        "canopy.${var.environment}.sapienceanalytics.com"
+      ]
+      secret_name = "canopy-v2-certs"
+    }
   }
 }
