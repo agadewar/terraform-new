@@ -40,12 +40,9 @@ variables:
   # URL: https://dev.azure.com/sapience-analytics/Sapience%20Analytics%20-%20Next%20Gen/_library?itemType=VariableGroups
   # --------------------------------------------------------------------------------------------------------------------
 
-  #- group: [repository-name]
+  - group: terraform
   - group: shared     
-  - group: dotnet
   - group: images
-  - group: sonarqube
-  - group: acr
 
   # -------------------------------------------------------------------------------
   # SET TO TRUE, WILL SKIP ALL TESTING TASKS / JOBS (e.g. Sonarqube)
@@ -140,3 +137,9 @@ stages:
                 echo "##vso[build.updatebuildnumber]PR $(System.PullRequest.PullRequestId)" 
             displayName: Set PR Build Version to $(System.PullRequest.PullRequestId)
             condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+
+          - task: TerraformCLI@0
+            inputs:
+              command: 'init'
+              workingDirectory: '../dev'
+              secureVarsFile: 'dev.tfvars'
