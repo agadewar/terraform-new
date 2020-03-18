@@ -129,12 +129,12 @@ stages:
           # URL: https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/logging-commands?view=azure-devops&tabs=bash#updatebuildnumber-override-the-automatically-generated-build-number
           # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-          - script: |
+          - pwsh: |
                 Write-Host "##vso[build.updatebuildnumber]$env:version" 
             displayName: Set Build Version to $(version)
             condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI','Manual'))
-          - script: |
-                "Write-Host ##vso[build.updatebuildnumber]PR $(System.PullRequest.PullRequestId)"
+          - pwsh: |
+                Write-Host "##vso[build.updatebuildnumber]PR $(System.PullRequest.PullRequestId)"
             displayName: Set PR Build Version to $(System.PullRequest.PullRequestId)
             condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
 
