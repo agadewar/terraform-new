@@ -45,7 +45,7 @@ module "blobstorage" {
 
   environment     = var.environment
   resource_group  = module.resourcegroup.name
-  name            = "vue${var.environment${var.location}"
+  name            = "vue${var.environment}${var.location}"
 }
 
 # -------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ module "datalake" {
 
   environment      = var.environment
   resource_group   = module.resourcegroup.name
-  name             = "vuedl${var.environment${var.location}"
+  name             = "vuedl${var.environment}${var.location}"
   replication_type = "LRS"
 }
 
