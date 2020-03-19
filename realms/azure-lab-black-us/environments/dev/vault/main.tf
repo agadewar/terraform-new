@@ -84,6 +84,10 @@ resource "local_file" "server_standalone_config" {
 resource "null_resource" "helm_vault" {
   depends_on = [azurerm_storage_container.vault, local_file.server_standalone_config]
 
+  triggers = {
+    server_standalone_config = "${sha1(data.template_file.server_standalone_config.rendered)}"
+  }
+
   provisioner "local-exec" {
     command = "helm --kubeconfig ${local.config_path} --set fullnameOverride=vault-${var.environment},environment=${var.environment} -n ${var.environment} install -f .local/server-standalone-config.yaml vault files/vault-helm/"
   }
@@ -91,6 +95,6 @@ resource "null_resource" "helm_vault" {
   provisioner "local-exec" {
      when = destroy
      
-     command = "helm --kubeconfig ${local.config_path} -n ${var.environment} uninstall vault"
+     command = "helm --kubeconfig ${local.config_path} -n ${var.environment} delete vault"
   }
 }
