@@ -25,7 +25,7 @@ provider "azurerm" {
 # Resource Group
 # -------------------------------------------------------------------------------
 
-module "resourcegroup" {
+/* module "resourcegroup" {
   source  = "app.terraform.io/sapience-analytics/resourcegroup/azurerm"
   version = "1.0.0"
 
@@ -91,6 +91,7 @@ module "kubernetes-stateless-black" {
 # -------------------------------------------------------------------------------
 
 module "kubernetes-stateful-black" {
+
   source  = "app.terraform.io/sapience-analytics/kubernetes/azurerm"
   version = "1.0.3"
 
@@ -99,4 +100,4 @@ module "kubernetes-stateful-black" {
   client_secret   = var.client_secret
   vnet_subnet_id  = module.network.aks_stateful_default_pool_subnet_id
   state           = "stateful"
-}
+} */
