@@ -49,15 +49,16 @@ module "storageaccount" {
 
 module "network" {
   source  = "app.terraform.io/sapience-analytics/network/azurerm"
-  version = "1.0.0"
+  version = "1.0.1"
 
-  environment                                = var.environment
-  virtual_network_address_space              = [ "10.0.0.0/16" ]
-  subnet_default_address_prefix              = "10.0.0.0/20"
-  subnet_application_address_prefix          = "10.0.16.0/20"
-  subnet_data_address_prefix                 = "10.0.32.0/20"
-  subnet_aks_default_pool_address_prefix     = "10.0.48.0/20"
-  subnet_bastion_address_prefix              = "10.0.240.0/20"
+  environment                                          = var.environment
+  virtual_network_address_space                        = [ "10.0.0.0/16" ]
+  subnet_default_address_prefix                        = "10.0.0.0/20"
+  subnet_application_address_prefix                    = "10.0.16.0/20"
+  subnet_data_address_prefix                           = "10.0.32.0/20"
+  subnet_aks_stateless_default_pool_address_prefix     = "10.0.48.0/20"
+  subnet_aks_stateful_default_pool_address_prefix      = "10.0.64.0/20"
+  subnet_bastion_address_prefix                        = "10.0.240.0/20"
 }
 
 # -------------------------------------------------------------------------------
@@ -82,7 +83,7 @@ module "kubernetes-stateless-black" {
   environment     = var.environment
   client_id       = var.client_id
   client_secret   = var.client_secret
-  vnet_subnet_id  = module.network.aks_default_pool_subnet_id
+  vnet_subnet_id  = module.network.aks_stateless_default_pool_subnet_id
 }
 
 # -------------------------------------------------------------------------------
@@ -96,6 +97,6 @@ module "kubernetes-stateful-black" {
   environment     = var.environment
   client_id       = var.client_id
   client_secret   = var.client_secret
-  vnet_subnet_id  = module.network.aks_default_pool_subnet_id
+  vnet_subnet_id  = module.network.aks_stateful_default_pool_subnet_id
   state           = "stateful"
 }
