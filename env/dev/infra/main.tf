@@ -77,7 +77,7 @@ module "loganalyticsworkspace" {
 
 module "kubernetes-stateless-black" {
   source  = "app.terraform.io/sapience-analytics/kubernetes/azurerm"
-  version = "1.0.2"
+  version = "1.0.3"
 
   environment     = var.environment
   client_id       = var.client_id
@@ -91,7 +91,7 @@ module "kubernetes-stateless-black" {
 
 module "kubernetes-stateful-black" {
   source  = "app.terraform.io/sapience-analytics/kubernetes/azurerm"
-  version = "1.0.2"
+  version = "1.0.3"
 
   environment     = var.environment
   client_id       = var.client_id
