@@ -38,7 +38,7 @@ module "resourcegroup" {
 
 module "storageaccount" {
   source  = "app.terraform.io/sapience-analytics/storageaccount/azurerm"
-  version = "1.0.1"
+  version = "1.0.2"
 
   environment     = var.environment
 }
