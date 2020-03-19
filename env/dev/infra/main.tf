@@ -17,6 +17,8 @@ provider "azurerm" {
 # MODULES
 # - Resource Group
 # - Blob Storage Account
+# - Virtual Network
+# - Log Analytics Workspace
 # -------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------
@@ -41,6 +43,10 @@ module "storageaccount" {
   environment     = var.environment
 }
 
+# -------------------------------------------------------------------------------
+# Virtual Network
+# -------------------------------------------------------------------------------
+
 module "network" {
   source  = "app.terraform.io/sapience-analytics/network/azurerm"
   version = "1.0.0"
@@ -52,4 +58,15 @@ module "network" {
   subnet_data_address_prefix                 = "10.0.32.0/20"
   subnet_aks_default_pool_address_prefix     = "10.0.48.0/20"
   subnet_bastion_address_prefix              = "10.0.240.0/20"
+}
+
+# -------------------------------------------------------------------------------
+# Log Analytics Workspace
+# -------------------------------------------------------------------------------
+
+module "loganalyticsworkspace" {
+  source  = "app.terraform.io/sapience-analytics/loganalyticsworkspace/azurerm"
+  version = "1.0.0"
+
+  environment     = var.environment
 }
