@@ -25,7 +25,7 @@ provider "azurerm" {
 # Resource Group
 # -------------------------------------------------------------------------------
 
-/* module "resourcegroup" {
+module "resourcegroup" {
   source  = "app.terraform.io/sapience-analytics/resourcegroup/azurerm"
   version = "1.0.0"
 
@@ -52,13 +52,13 @@ module "network" {
   version = "1.0.1"
 
   environment                                          = var.environment
-  virtual_network_address_space                        = [ "10.0.0.0/16" ]
-  subnet_default_address_prefix                        = "10.0.0.0/20"
-  subnet_application_address_prefix                    = "10.0.16.0/20"
-  subnet_data_address_prefix                           = "10.0.32.0/20"
-  subnet_aks_stateless_default_pool_address_prefix     = "10.0.48.0/20"
-  subnet_aks_stateful_default_pool_address_prefix      = "10.0.64.0/20"
-  subnet_bastion_address_prefix                        = "10.0.240.0/20"
+  virtual_network_address_space                        = [ "10.1.0.0/16" ]
+  subnet_default_address_prefix                        = "10.1.0.0/20"
+  subnet_application_address_prefix                    = "10.1.16.0/20"
+  subnet_data_address_prefix                           = "10.1.32.0/20"
+  subnet_aks_stateless_default_pool_address_prefix     = "10.1.48.0/20"
+  subnet_aks_stateful_default_pool_address_prefix      = "10.1.64.0/20"
+  subnet_bastion_address_prefix                        = "10.1.240.0/20"
 }
 
 # -------------------------------------------------------------------------------
@@ -100,4 +100,4 @@ module "kubernetes-stateful-black" {
   client_secret   = var.client_secret
   vnet_subnet_id  = module.network.aks_stateful_default_pool_subnet_id
   state           = "stateful"
-} */
+}
