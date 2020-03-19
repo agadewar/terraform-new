@@ -19,6 +19,9 @@ provider "azurerm" {
 # - Blob Storage Account
 # - Virtual Network
 # - Log Analytics Workspace
+# - Kubernetes Cluster (Stateless)
+# - Kubernetes Cluster (Stateful)
+# - Service Bus
 # -------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------
@@ -33,16 +36,74 @@ module "resourcegroup" {
 }
 
 # -------------------------------------------------------------------------------
-# Blob Storage Account
+# Storage Account - Blob Storage
 # -------------------------------------------------------------------------------
 
-module "storageaccount" {
+module "blobstorage" {
   source  = "app.terraform.io/sapience-analytics/storageaccount/azurerm"
-  version = "1.0.3"
+  version = "1.0.6"
 
   environment     = var.environment
   resource_group  = module.resourcegroup.name
+  name            = "vue${var.environment${var.location}"
 }
+
+# -------------------------------------------------------------------------------
+# Blob Containers
+# -------------------------------------------------------------------------------
+
+module "leaf_uploads" {
+  source  = "app.terraform.io/sapience-analytics/storagecontainer/azurerm"
+  version = "1.0.0"
+
+  name                 = "leaf_uploads"
+  environment          = var.environment
+  resource_group       = module.resourcegroup.name
+  storage_account_name = module.blobstorage.name
+  access_type          = "blob"
+}
+
+
+module "leaf_downloads" {
+  source  = "app.terraform.io/sapience-analytics/storagecontainer/azurerm"
+  version = "1.0.0"
+
+  name                 = "leaf_downloads"
+  environment          = var.environment
+  resource_group       = module.resourcegroup.name
+  storage_account_name = module.blobstorage.name
+  access_type          = "blob"
+}
+
+# -------------------------------------------------------------------------------
+# Storage Account - Data Lake
+# -------------------------------------------------------------------------------
+
+module "datalake" {
+  source  = "app.terraform.io/sapience-analytics/storageaccount/azurerm"
+  version = "1.0.6"
+
+  environment      = var.environment
+  resource_group   = module.resourcegroup.name
+  name             = "vuedl${var.environment${var.location}"
+  replication_type = "LRS"
+}
+
+# -------------------------------------------------------------------------------
+# Datalake Private Containers
+# -------------------------------------------------------------------------------
+
+module "datalake_container" {
+  source  = "app.terraform.io/sapience-analytics/storagecontainer/azurerm"
+  version = "1.0.0"
+
+  name                 = "vue-adls"
+  environment          = var.environment
+  resource_group       = module.resourcegroup.name
+  storage_account_name = module.datalake.name
+  access_type          = "private"
+}
+
 # -------------------------------------------------------------------------------
 # Virtual Network
 # -------------------------------------------------------------------------------
@@ -105,3 +166,15 @@ module "kubernetes-stateful-black" {
   vnet_subnet_id  = module.network.aks_stateful_default_pool_subnet_id
   state           = "stateful"
 } 
+
+# -------------------------------------------------------------------------------
+# Resource Group
+# -------------------------------------------------------------------------------
+
+module "servicebus" {
+  source  = "app.terraform.io/sapience-analytics/servicebus/azurerm"
+  version = "1.0.0"
+
+  environment     = var.environment
+  resource_group  = module.resourcegroup.name
+}
