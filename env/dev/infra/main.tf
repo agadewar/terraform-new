@@ -56,7 +56,7 @@ module "leaf_uploads" {
   source  = "app.terraform.io/sapience-analytics/storagecontainer/azurerm"
   version = "1.0.0"
 
-  name                 = "leaf_uploads"
+  name                 = "leaf-uploads"
   environment          = var.environment
   resource_group       = module.resourcegroup.name
   storage_account_name = module.blobstorage.name
@@ -68,7 +68,7 @@ module "leaf_downloads" {
   source  = "app.terraform.io/sapience-analytics/storagecontainer/azurerm"
   version = "1.0.0"
 
-  name                 = "leaf_downloads"
+  name                 = "leaf-downloads"
   environment          = var.environment
   resource_group       = module.resourcegroup.name
   storage_account_name = module.blobstorage.name
