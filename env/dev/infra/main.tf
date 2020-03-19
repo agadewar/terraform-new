@@ -16,10 +16,27 @@ provider "azurerm" {
 # -------------------------------------------------------------------------------
 # MODULES
 # - Resource Group
+# - Blob Storage Account
+# -------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
+# Resource Group
 # -------------------------------------------------------------------------------
 
 module "resourcegroup" {
   source  = "app.terraform.io/sapience-analytics/resourcegroup/azurerm"
+  version = "1.0.0"
+
+  environment     = var.environment
+}
+
+# -------------------------------------------------------------------------------
+# Blob Storage Account
+# -------------------------------------------------------------------------------
+
+module "storageaccount" {
+  source  = "app.terraform.io/sapience-analytics/storageaccount/azurerm"
+  version = "1.0.0"
 
   environment     = var.environment
 }
