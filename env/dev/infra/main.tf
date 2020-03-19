@@ -27,7 +27,7 @@ provider "azurerm" {
 
 module "resourcegroup" {
   source  = "app.terraform.io/sapience-analytics/resourcegroup/azurerm"
-  version = "1.0.2"
+  version = "1.0.3"
 
   environment     = var.environment
 }
