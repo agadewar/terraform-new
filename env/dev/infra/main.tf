@@ -139,9 +139,9 @@ module "loganalyticsworkspace" {
 # Kubernetes - Stateless - Black
 # -------------------------------------------------------------------------------
 
-module "kubernetes-stateless-black" {
+module "kubernetes" {
   source  = "app.terraform.io/sapience-analytics/kubernetes/azurerm"
-  version = "1.0.4"
+  version = "1.0.5"
 
   environment     = var.environment
   resource_group  = module.resourcegroup.name
@@ -149,23 +149,6 @@ module "kubernetes-stateless-black" {
   client_secret   = var.client_secret
   vnet_subnet_id  = module.network.aks_stateless_default_pool_subnet_id
 }
-
-# -------------------------------------------------------------------------------
-# Kubernetes - Stateful - Black
-# -------------------------------------------------------------------------------
-
-module "kubernetes-stateful-black" {
-
-  source  = "app.terraform.io/sapience-analytics/kubernetes/azurerm"
-  version = "1.0.4"
-
-  environment     = var.environment
-  resource_group  = module.resourcegroup.name
-  client_id       = var.client_id
-  client_secret   = var.client_secret
-  vnet_subnet_id  = module.network.aks_stateful_default_pool_subnet_id
-  state           = "stateful"
-} 
 
 # -------------------------------------------------------------------------------
 # Resource Group
