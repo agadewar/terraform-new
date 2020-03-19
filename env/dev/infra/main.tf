@@ -75,7 +75,7 @@ module "loganalyticsworkspace" {
 # Kubernetes - Stateless - Black
 # -------------------------------------------------------------------------------
 
-module "kubernetes" {
+module "kubernetes-stateless-black" {
   source  = "app.terraform.io/sapience-analytics/kubernetes/azurerm"
   version = "1.0.0"
 
@@ -87,7 +87,7 @@ module "kubernetes" {
 # Kubernetes - Stateful - Black
 # -------------------------------------------------------------------------------
 
-module "kubernetes" {
+module "kubernetes-stateful-black" {
   source  = "app.terraform.io/sapience-analytics/kubernetes/azurerm"
   version = "1.0.0"
 
