@@ -42,7 +42,7 @@ module "storageaccount" {
 
   environment     = var.environment
   resource_group  = module.resourcegroup.name
-
+}
 # -------------------------------------------------------------------------------
 # Virtual Network
 # -------------------------------------------------------------------------------
