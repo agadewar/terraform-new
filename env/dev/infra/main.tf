@@ -80,7 +80,7 @@ module "kubernetes-stateless-black" {
   version = "1.0.0"
 
   environment     = var.environment
-  vnet_subnet_id  = module.network.subnet_aks_default_pool_address_prefix.id
+  vnet_subnet_id  = module.network.aks_default_pool_subnet_id
 }
 
 # -------------------------------------------------------------------------------
@@ -92,6 +92,6 @@ module "kubernetes-stateful-black" {
   version = "1.0.0"
 
   environment     = var.environment
-  vnet_subnet_id  = module.network.subnet_aks_default_pool_address_prefix.id
+  vnet_subnet_id  = module.network.aks_default_pool_subnet_id
   state           = "stateful"
 }
