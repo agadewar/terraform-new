@@ -70,3 +70,28 @@ module "loganalyticsworkspace" {
 
   environment     = var.environment
 }
+
+# -------------------------------------------------------------------------------
+# Kubernetes - Stateless - Black
+# -------------------------------------------------------------------------------
+
+module "kubernetes" {
+  source  = "app.terraform.io/sapience-analytics/kubernetes/azurerm"
+  version = "1.0.0"
+
+  environment     = var.environment
+  vnet_subnet_id  = module.network.subnet_aks_default_pool_address_prefix.id
+}
+
+# -------------------------------------------------------------------------------
+# Kubernetes - Stateful - Black
+# -------------------------------------------------------------------------------
+
+module "kubernetes" {
+  source  = "app.terraform.io/sapience-analytics/kubernetes/azurerm"
+  version = "1.0.0"
+
+  environment     = var.environment
+  vnet_subnet_id  = module.network.subnet_aks_default_pool_address_prefix.id
+  state           = "stateful"
+}
