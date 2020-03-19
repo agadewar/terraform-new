@@ -30,7 +30,7 @@ resource "null_resource" "azure_data_lake_storage_gen2" {
   # !!! To interact with Data Lake Storage Gen2 by using the CLI, you'll have to add an extension to your shell... "az extension add --name storage-preview"
   provisioner "local-exec" {
     # command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f -<<EOF\n${file("files/ambassador-rbac.yaml")}\nEOF"
-    command = "az storage account create --name sapdl${replace(lower(var.realm), "-", "")}${var.environment} --subscription ${var.subscription_id} --resource-group ${var.resource_group_name} --location ${var.resource_group_location} --sku Standard_LRS --kind StorageV2 --hierarchical-namespace true"
+    command = "az storage account create --name sapdl${replace(lower(var.realm), "-", "")}${var.environment} --subscription ${var.subscription_id} --resource-group ${var.resource_group_name} --location ${var.resource_group_location} --sku Standard_ZRS --kind StorageV2 --hierarchical-namespace true"
   }
 
   provisioner "local-exec" {

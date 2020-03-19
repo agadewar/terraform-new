@@ -1,4 +1,4 @@
-apiVersion: certmanager.k8s.io/v1alpha1
+apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata:
   name: letsencrypt${suffix}
@@ -9,11 +9,10 @@ spec:
     privateKeySecretRef:
       name: letsencrypt${suffix}
     # use dns-01 challenges in order to support wildcard domain names
-    dns01:
-      providers:
-      - name: azure-dns
+    solvers:
+    - dns01:
         azuredns:
-          email: ${email}
+          # email: ${email}
           # service principal client id
           clientID: ${service_principal_client_id}
           # secret with the password
@@ -26,3 +25,4 @@ spec:
           resourceGroupName: ${resource_group_name}
           subscriptionID: ${subscription_id}
           tenantID: ${service_pricincipal_tenant_id}
+          environment: AzurePublicCloud

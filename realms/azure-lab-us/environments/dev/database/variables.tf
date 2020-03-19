@@ -24,12 +24,12 @@ variable "sql_database_canopy_user_edition" {}
 variable "sql_database_canopy_user_requested_service_objective_name" {}
 variable "sql_database_mad_edition" {}
 variable "sql_database_mad_requested_service_objective_name" {}
-variable "sql_database_admin_requested_service_objective_name" {}
 variable "sql_database_admin_edition" {}
+variable "sql_database_admin_requested_service_objective_name" {}
 variable "sql_database_staging_edition" {}
 variable "sql_database_staging_requested_service_objective_name" {}
-variable "sql_database_edw_requested_service_objective_name" {}
 variable "sql_database_edw_edition" {}
+variable "sql_database_edw_requested_service_objective_name" {}
 
 variable "mysql_server_version" {}
 variable "mysql_server_sku_name" {}
@@ -49,8 +49,6 @@ variable "environment_common_tags" {
 }
 
 variable "ip_banyan_office" {}
-variable "ip_benjamin_john_home" {}
-variable "ip_benjamin_john_home2" {}
 variable "ip_sapience_dallas_office" {}
 variable "ip_sapience_pune_office" {}
 variable "ip_steve_ardis_home" {}
