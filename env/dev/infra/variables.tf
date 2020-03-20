@@ -28,10 +28,9 @@ variable "environment" {
   type        = string
 }
 
-variables "sql_server_admin_password" {
+variable "sql_server_admin_password" {
   type        = string
 }
-
 
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
