@@ -208,7 +208,7 @@ module "sql" {
 
 module "mysql" {
   source  = "app.terraform.io/sapience-analytics/mysql/azurerm"
-  version = "1.0.3"
+  version = "1.0.4"
 
   environment               = var.environment
   resource_group            = module.resourcegroup.name
