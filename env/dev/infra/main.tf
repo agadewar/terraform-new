@@ -10,7 +10,6 @@ provider "azurerm" {
   client_id       = var.client_id
   client_secret   = var.client_secret
   tenant_id       = var.tenant_id
-
 }
 
 # -------------------------------------------------------------------------------
@@ -24,6 +23,7 @@ provider "azurerm" {
 # - Service Bus
 # - Internal Private DNS Zone
 # - Application Insights
+# - SQL Server / Databases / Firewall Rules
 # -------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------
@@ -138,7 +138,7 @@ module "loganalyticsworkspace" {
 }
 
 # -------------------------------------------------------------------------------
-# Kubernetes - Stateless - Black
+# Kubernetes Black Cluster
 # -------------------------------------------------------------------------------
 
 module "kubernetes" {
@@ -153,7 +153,7 @@ module "kubernetes" {
 }
 
 # -------------------------------------------------------------------------------
-# Resource Group
+# Service Bus
 # -------------------------------------------------------------------------------
 
 module "servicebus" {
@@ -187,4 +187,18 @@ module "app-insights" {
 
   environment        = var.environment
   resource_group     = module.resourcegroup.name
+}
+
+# -------------------------------------------------------------------------------
+# SQL Server / Databases / Firewall Rules
+# -------------------------------------------------------------------------------
+
+module "sql" {
+  source  = "app.terraform.io/sapience-analytics/appinsights/azurerm"
+  version = "1.0.1"
+
+  environment               = var.environment
+  resource_group            = module.resourcegroup.name
+  sql_server_version        = "12.0"
+  sql_server_admin_password = var.sql_server_admin_password
 }
