@@ -22,6 +22,7 @@ provider "azurerm" {
 # - Kubernetes Cluster (Stateless)
 # - Kubernetes Cluster (Stateful)
 # - Service Bus
+# - Internal Private DNS Zone
 # -------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------
@@ -160,4 +161,18 @@ module "servicebus" {
 
   environment     = var.environment
   resource_group  = module.resourcegroup.name
+}
+
+# -------------------------------------------------------------------------------
+# Internal Private DNS Zone
+# -------------------------------------------------------------------------------
+
+module "privatednszone" {
+  source  = "app.terraform.io/sapience-analytics/privatednszone/azurerm"
+  version = "1.0.0"
+
+  environment        = var.environment
+  resource_group     = module.resourcegroup.name
+  virtual_network_id = module.network.virtual_network_id
+  
 }
