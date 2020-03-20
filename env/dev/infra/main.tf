@@ -194,8 +194,8 @@ module "app-insights" {
 # -------------------------------------------------------------------------------
 
 module "sql" {
-  source  = "app.terraform.io/sapience-analytics/appinsights/azurerm"
-  version = "1.0.1"
+  source  = "app.terraform.io/sapience-analytics/sql/azurerm"
+  version = "1.0.0"
 
   environment               = var.environment
   resource_group            = module.resourcegroup.name
