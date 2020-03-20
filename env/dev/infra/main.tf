@@ -199,6 +199,5 @@ module "sql" {
 
   environment               = var.environment
   resource_group            = module.resourcegroup.name
-  sql_server_version        = "12.0"
   sql_server_admin_password = var.sql_server_admin_password
 }
