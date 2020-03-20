@@ -201,3 +201,16 @@ module "sql" {
   resource_group            = module.resourcegroup.name
   sql_server_admin_password = var.sql_server_admin_password
 }
+
+# -------------------------------------------------------------------------------
+# MySql Server / Databases / Firewall Rules
+# -------------------------------------------------------------------------------
+
+module "mysql" {
+  source  = "app.terraform.io/sapience-analytics/sql/azurerm"
+  version = "1.0.0"
+
+  environment               = var.environment
+  resource_group            = module.resourcegroup.name
+  mysql_server_admin_password = var.sql_server_admin_password
+}
