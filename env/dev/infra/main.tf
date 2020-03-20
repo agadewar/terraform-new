@@ -210,91 +210,19 @@ module "mysql" {
   source  = "app.terraform.io/sapience-analytics/mysql/azurerm"
   version = "1.0.5"
 
-  environment               = var.environment
-  resource_group            = module.resourcegroup.name
+  environment                 = var.environment
+  resource_group              = module.resourcegroup.name
   mysql_server_admin_password = var.sql_server_admin_password
 }
 
 # -------------------------------------------------------------------------------
-# Cosmos DB
-# - canopy-hierarchy
-# - canopy-settings
-# - vue-integrations
-# - sapience-app-dashboard
-# - sapience-app-alerts
+# Cosmos DB instances
 # -------------------------------------------------------------------------------
 
-# -------------------------------------------------------------------------------
-# canopy-hierarchy
-# -------------------------------------------------------------------------------
-
-module "canopy-hierarchy" {
+module "cosmosdb" {
   source  = "app.terraform.io/sapience-analytics/cosmosdb/azurerm"
-  version = "1.0.0"
+  version = "1.0.3"
 
   environment               = var.environment
   resource_group            = module.resourcegroup.name
-  name                      = "canopy-hierarchy-${var.environment}-${var.location}"
-  kind                      = "GlobalDocumentDB"
-  capabilities              = "EnableGremlin"
-}
-
-# -------------------------------------------------------------------------------
-# canopy-settings
-# -------------------------------------------------------------------------------
-
-module "canopy-settings" {
-  source  = "app.terraform.io/sapience-analytics/cosmosdb/azurerm"
-  version = "1.0.0"
-
-  environment               = var.environment
-  resource_group            = module.resourcegroup.name
-  name                      = "canopy-settings-${var.environment}-${var.location}"
-  kind                      = "MongoDB"
-  capabilities              = "MongoDBv3.4"
-}
-
-# -------------------------------------------------------------------------------
-# vue-integrations
-# -------------------------------------------------------------------------------
-
-module "vue-integrations" {
-  source  = "app.terraform.io/sapience-analytics/cosmosdb/azurerm"
-  version = "1.0.0"
-
-  environment               = var.environment
-  resource_group            = module.resourcegroup.name
-  name                      = "vue-integrations-${var.environment}-${var.location}"
-  kind                      = "MongoDB"
-  capabilities              = "MongoDBv3.4"
-}
-
-# -------------------------------------------------------------------------------
-# sapience-app-dashboard
-# -------------------------------------------------------------------------------
-
-module "sapience-app-dashboard" {
-  source  = "app.terraform.io/sapience-analytics/cosmosdb/azurerm"
-  version = "1.0.0"
-
-  environment               = var.environment
-  resource_group            = module.resourcegroup.name
-  name                      = "sapience-app-dashboard-${var.environment}-${var.location}"
-  kind                      = "GlobalDocumentDB"
-  capabilities              = "EnableTable"
-}
-
-# -------------------------------------------------------------------------------
-# sapience-app-alerts
-# -------------------------------------------------------------------------------
-
-module "sapience-app-alerts" {
-  source  = "app.terraform.io/sapience-analytics/cosmosdb/azurerm"
-  version = "1.0.0"
-
-  environment               = var.environment
-  resource_group            = module.resourcegroup.name
-  name                      = "sapience-app-alerts-${var.environment}-${var.location}"
-  kind                      = "GlobalDocumentDB"
-  capabilities              = "EnableTable"
 }
