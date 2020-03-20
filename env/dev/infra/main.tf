@@ -169,10 +169,10 @@ module "servicebus" {
 
 module "privatednszone" {
   source  = "app.terraform.io/sapience-analytics/privatednszone/azurerm"
-  version = "1.0.0"
+  version = "1.0.1"
 
   environment        = var.environment
   resource_group     = module.resourcegroup.name
   virtual_network_id = module.network.virtual_network_id
-  
+
 }
