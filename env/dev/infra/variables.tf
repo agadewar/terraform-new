@@ -23,6 +23,16 @@ variable "client_secret" {
   type        = string
 }
 
+variable "application_uri" {
+  description = "Service Principal Account"
+  type        = string
+}
+
+variable "application_password" {
+  description = "Service Principal Account"
+  type        = string
+}
+
 variable "environment" {
   description = "The environment the resource is deployed"
   type        = string
