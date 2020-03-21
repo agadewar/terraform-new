@@ -225,7 +225,7 @@ module "mysql" {
 
 module "cosmosdb" {
   source  = "app.terraform.io/sapience-analytics/cosmosdb/azurerm"
-  version = "1.0.9"
+  version = "1.1.0"
 
   environment               = var.environment
   resource_group            = module.resourcegroup.name
@@ -238,6 +238,6 @@ resource "null_resource" "kubeconfig" {
   }
 
   provisioner "local-exec" {
-    command = "./tools/az login --service-principal -u ${application_uri} -p ${application_password} --tenant ${tenant_id}"
+    command = "tools/az login --service-principal -u ${application_uri} -p ${application_password} --tenant ${tenant_id}"
   }
 }
