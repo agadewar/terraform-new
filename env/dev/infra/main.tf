@@ -237,7 +237,14 @@ resource "null_resource" "kubeconfig" {
     timestamp = "${timestamp()}"
   }
 
+  /* provisioner "local-exec" {
+    command = "login --service-principal -u ${var.application_uri} -p ${var.application_password} --tenant ${var.tenant_id}"
+    interpreter = ["./az"]
+
+  } */
+
   provisioner "local-exec" {
-    command = "az login --service-principal -u ${var.application_uri} -p ${var.application_password} --tenant ${var.tenant_id}"
+    command = "ls -la"
   }
+  
 }
