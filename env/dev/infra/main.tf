@@ -12,6 +12,10 @@ provider "azurerm" {
   tenant_id       = var.tenant_id
 }
 
+provider "null" {
+
+}
+
 # -------------------------------------------------------------------------------
 # MODULES
 # - Resource Group
