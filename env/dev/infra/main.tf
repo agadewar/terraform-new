@@ -34,7 +34,7 @@ provider "null" {
 # Resource Group
 # -------------------------------------------------------------------------------
 
-/* module "resourcegroup" {
+module "resourcegroup" {
   source  = "app.terraform.io/sapience-analytics/resourcegroup/azurerm"
   version = "1.0.3"
 
@@ -229,4 +229,4 @@ module "cosmosdb" {
 
   environment               = var.environment
   resource_group            = module.resourcegroup.name
-} */
+}
