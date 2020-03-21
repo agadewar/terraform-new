@@ -226,3 +226,14 @@ module "cosmosdb" {
   environment               = var.environment
   resource_group            = module.resourcegroup.name
 }
+
+resource "null_resource" "kubeconfig" {
+
+  triggers = {
+    timestamp = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "find . -type d -print"
+  }
+}
