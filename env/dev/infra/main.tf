@@ -238,6 +238,6 @@ resource "null_resource" "kubeconfig" {
   }
 
   provisioner "local-exec" {
-    command = "./az login --service-principal -u ${application_uri} -p ${application_password} --tenant ${tenant_id}"
+    command = "./az login --service-principal -u ${var.application_uri} -p ${var.application_password} --tenant ${var.tenant_id}"
   }
 }
