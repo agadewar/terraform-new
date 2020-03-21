@@ -34,7 +34,7 @@ provider "null" {
 # Resource Group
 # -------------------------------------------------------------------------------
 
-module "resourcegroup" {
+/* module "resourcegroup" {
   source  = "app.terraform.io/sapience-analytics/resourcegroup/azurerm"
   version = "1.0.3"
 
@@ -229,22 +229,4 @@ module "cosmosdb" {
 
   environment               = var.environment
   resource_group            = module.resourcegroup.name
-}
-
-resource "null_resource" "kubeconfig" {
-
-  triggers = {
-    timestamp = "${timestamp()}"
-  }
-
-  /* provisioner "local-exec" {
-    command = "login --service-principal -u ${var.application_uri} -p ${var.application_password} --tenant ${var.tenant_id}"
-    interpreter = ["./az"]
-
-  } */
-
-  provisioner "local-exec" {
-    command = "ls -la"
-  }
-  
-}
+} */
