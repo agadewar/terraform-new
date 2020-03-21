@@ -225,7 +225,7 @@ module "mysql" {
 
 module "cosmosdb" {
   source  = "app.terraform.io/sapience-analytics/cosmosdb/azurerm"
-  version = "1.1.4"
+  version = "1.1.5"
 
   environment               = var.environment
   resource_group            = module.resourcegroup.name
