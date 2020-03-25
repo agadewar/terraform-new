@@ -15,7 +15,7 @@ resource "kubernetes_config_map" "etl_staging_database" {
       "MIN_SLEEP_MS_ON_EMPTY_POLL": "3000"
       "STAGING_DATABASE_NAME": "Staging"
       "STAGING_DATABASE_PORT": "1433"
-      "STAGING_DATABASE_SERVER_NAME": "sapience-prod-us-prod.database.windows.net"
+      "STAGING_DATABASE_SERVER_NAME": "sapience-load-us-load.database.windows.net"
       "STAGING_DATABASE_USERNAME": "appsvc_etl_user"
       "THREAD_POOL_SIZE": "3"
   }

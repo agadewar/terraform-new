@@ -15,7 +15,6 @@ server:
         container   = "${container}"
         environment = "AzurePublicCloud"
       }
-
   resources:
     requests:
       memory: 256Mi
@@ -24,6 +23,10 @@ server:
       memory: 256Mi
       cpu: 250m
 injector:
+  logLevel: "trace"
+  namespaceSelector:
+    matchLabels:
+      vault-env: ${environment}
   resources:
     requests:
       memory: 256Mi

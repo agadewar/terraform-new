@@ -69,6 +69,7 @@ data "template_file" "server_standalone_config" {
     storage-account = data.terraform_remote_state.storage_account.outputs.storage_account_name
     account-key     = data.terraform_remote_state.storage_account.outputs.storage_account_access_key
     container       = azurerm_storage_container.vault.name
+    environment     = var.environment
   }
 }
 
@@ -89,7 +90,9 @@ resource "null_resource" "helm_vault" {
   }
 
   provisioner "local-exec" {
-    command = "helm --kubeconfig ${local.config_path} --set fullnameOverride=vault-${var.environment},environment=${var.environment} -n ${var.environment} install -f .local/server-standalone-config.yaml vault files/vault-helm/"
+    # command = "helm --kubeconfig ${local.config_path} --set fullnameOverride=vault-${var.environment},environment=${var.environment} -n ${var.environment} install -f .local/server-standalone-config.yaml vault files/vault-helm/"
+    command = "helm --kubeconfig ${local.config_path} --set fullnameOverride=vault-${var.environment} -n ${var.environment} install -f .local/server-standalone-config.yaml vault files/vault-helm/"
+    # command = "helm --kubeconfig ${local.config_path} -n ${var.environment} install -f .local/server-standalone-config.yaml vault files/vault-helm/"
   }
 
   provisioner "local-exec" {

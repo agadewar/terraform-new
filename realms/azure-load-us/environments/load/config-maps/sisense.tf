@@ -6,7 +6,7 @@ resource "kubernetes_config_map" "sisense" {
 
   data = {
       #SISENSE ENVIRONMENT
-      "Sisense__Env" = "Prod"
+      "Sisense__Env" = "Load"
 
       #SISENSE DATASOURCES
       "Sisense__DataSource" = "Sapience-Daily-CompanyId-Env"
@@ -27,11 +27,11 @@ resource "kubernetes_config_map" "sisense" {
       "Sisense_UsersUri" = "api/users?notify=false"
 
       #SISENSE EXTERNAL ENDPOINTS
-      "ENVIRONMENT_SISENSE_URL" = "https://sisense.sapienceanalytics.com"
+      "ENVIRONMENT_SISENSE_URL" = "https://sisense.load.load.us.azure.sapienceanalytics.com"
 
       #SISENSE INTERNAL ENDPOINTS
-      "Sisense__BaseHost" = "https://sisense.sapienceanalytics.com/"
-      "Sisense__SecurityEndpoint" = "https://sisense.sapienceanalytics.com/api/settings/security"
-      "Sisense__UserSecurityEndpoint" = "https://sisense.sapienceanalytics.com/api/v1/users"
+      "Sisense__BaseHost" = "http://sisense.load.load.us.azure.internal.sapienceanalytics.com:8081/"
+      "Sisense__SecurityEndpoint" = "http://sisense.load.load.us.azure.internal.sapienceanalytics.com:8081/api/settings/security"
+      "Sisense__UserSecurityEndpoint" = "http://sisense.load.load.us.azure.internal.sapienceanalytics.com:8081/api/v1/users"
   }
 }

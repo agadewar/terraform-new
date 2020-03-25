@@ -55,9 +55,9 @@ resource "kubernetes_namespace" "openfaas" {
 resource "kubernetes_namespace" "openfaas-fn" {
   metadata {
     name = "${var.environment}-openfaas-fn"
-  
+
     labels = {
-      test  = "steve"
+      vault-env = var.environment
     }
   }
 }
@@ -123,4 +123,32 @@ resource "azurerm_dns_a_record" "openfaas" {
   # brackets to avoid interpretation as a list of lists. If the expression
   # returns a single list item then leave it as-is and remove this TODO comment.
   records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
+}
+
+resource "kubernetes_service_account" "vault" {
+  metadata {
+    name      = "vault-${var.environment}"
+    namespace = kubernetes_namespace.openfaas-fn.metadata[0].name
+  }
+
+  automount_service_account_token = true
+}
+
+
+resource "kubernetes_cluster_role_binding" "vault_server_binding" {
+  metadata {
+    name      = "vault-${var.environment}-openfaas-fn-server-binding"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "system:auth-delegator"
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.vault.metadata[0].name
+    namespace = kubernetes_service_account.vault.metadata[0].namespace
+  }
 }

@@ -2,14 +2,12 @@
 
 load _helpers
 
-@test "server/standalone: testing deployment" {
+@test "server/ha-raft: testing deployment" {
   cd `chart_dir`
 
-  kubectl delete namespace acceptance --ignore-not-found=true
-  kubectl create namespace acceptance
-  kubectl config set-context --current --namespace=acceptance
-
-  helm install "$(name_prefix)" .
+  helm install "$(name_prefix)" \
+    --set='server.ha.enabled=true' \
+    --set='server.ha.raft.enabled=true' .
   wait_for_running $(name_prefix)-0
 
   # Sealed, not initialized
@@ -29,25 +27,12 @@ load _helpers
   # Replicas
   local replicas=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.replicas')
-  [ "${replicas}" == "1" ]
-
-  # Affinity
-  local affinity=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.affinity')
-  [ "${affinity}" != "null" ]
+  [ "${replicas}" == "3" ]
 
   # Volume Mounts
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.containers[0].volumeMounts | length')
   [ "${volumeCount}" == "2" ]
-
-  local mountName=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.containers[0].volumeMounts[0].name')
-  [ "${mountName}" == "data" ]
-
-  local mountPath=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.containers[0].volumeMounts[0].mountPath')
-  [ "${mountPath}" == "/vault/data" ]
 
   # Volumes
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
@@ -57,11 +42,6 @@ load _helpers
   local volume=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.volumes[0].configMap.name')
   [ "${volume}" == "$(name_prefix)-config" ]
-
-  # Security Context
-  local fsGroup=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.securityContext.fsGroup')
-  [ "${fsGroup}" == "1000" ]
 
   # Service
   local service=$(kubectl get service "$(name_prefix)" --output json |
@@ -85,21 +65,33 @@ load _helpers
   [ "${ports}" == "8201" ]
 
   # Vault Init
-  local token=$(kubectl exec -ti "$(name_prefix)-0" -- \
-    vault operator init -format=json -n 1 -t 1 | \
-    jq -r '.unseal_keys_b64[0]')
+  local init=$(kubectl exec -ti "$(name_prefix)-0" -- \
+    vault operator init -format=json -n 1 -t 1)
+
+  local token=$(echo ${init} | jq -r '.unseal_keys_b64[0]')
   [ "${token}" != "" ]
+  
+  local root=$(echo ${init} | jq -r '.root_token')
+  [ "${root}" != "" ]
+
+  kubectl exec -ti vault-0 -- vault operator unseal ${token}
+  wait_for_ready "$(name_prefix)-0"
+
+  sleep 5
 
   # Vault Unseal
   local pods=($(kubectl get pods --selector='app.kubernetes.io/name=vault' -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"
   do
-      kubectl exec -ti ${pod} -- vault operator unseal ${token}
+      if [[ ${pod?} != "$(name_prefix)-0" ]]
+      then
+          kubectl exec -ti ${pod} -- vault operator raft join http://$(name_prefix)-0.$(name_prefix)-internal:8200
+          kubectl exec -ti ${pod} -- vault operator unseal ${token}
+          wait_for_ready "${pod}"
+      fi
   done
 
-  wait_for_ready "$(name_prefix)-0"
-
-  # Unsealed, initialized
+  # Sealed, not initialized
   local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
     jq -r '.sealed' )
   [ "${sealed_status}" == "false" ]
@@ -107,11 +99,22 @@ load _helpers
   local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
     jq -r '.initialized')
   [ "${init_status}" == "true" ]
+
+  kubectl exec "$(name_prefix)-0" -- vault login ${root}
+
+  local raft_status=$(kubectl exec "$(name_prefix)-0" -- vault operator raft configuration -format=json | 
+    jq -r '.data.config.servers | length')
+  [ "${raft_status}" == "3" ]
 }
 
-# Clean up
+setup() {
+  kubectl delete namespace acceptance --ignore-not-found=true
+  kubectl create namespace acceptance
+  kubectl config set-context --current --namespace=acceptance
+}
+
+#cleanup
 teardown() {
-  echo "helm/pvc teardown"
   helm delete vault
   kubectl delete --all pvc
   kubectl delete namespace acceptance --ignore-not-found=true
