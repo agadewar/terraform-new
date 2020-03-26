@@ -31,6 +31,14 @@ variable "sql_database_staging_requested_service_objective_name" {}
 variable "sql_database_edw_edition" {}
 variable "sql_database_edw_requested_service_objective_name" {}
 
+variable "mysql_server_version" {}
+variable "mysql_server_sku_name" {}
+variable "mysql_server_sku_capacity" {}
+variable "mysql_server_sku_tier" {}
+variable "mysql_server_sku_family" {}
+variable "mysql_server_storage_profile_storage_mb" {}
+variable "mysql_server_administrator_login" {}
+variable "mysql_server_administrator_password" {}
 
 variable "realm_common_tags" {
   type = map(string)

@@ -18,14 +18,14 @@ provider "kubernetes" {
   config_path = "${local.config_path}"
 }
 
-provider "helm" {
-  kubernetes {
-    config_path = "${local.config_path}"
-  }
+# provider "helm" {
+#   kubernetes {
+#     config_path = "${local.config_path}"
+#   }
 
-  #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
-  service_account = "tiller"
-}
+#   #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
+#   service_account = "tiller"
+# }
 
 data "terraform_remote_state" "kubernetes" {
   backend = "azurerm"
@@ -70,68 +70,22 @@ resource "null_resource" "default_token_secret_name" {
   }
 }
 
-# data "local_file" "default_token_secret_name" {
-#   depends_on = [ "null_resource.default_token_secret_name" ]
 
-#   filename = ".local/default_token_secret_name.out"
-# }
+/*  resource "kubernetes_resource_quota" "resource_quota" {
+   #count = var.kubernetes_quota_memory == "none" && var.kubernetes_quota_cpu == "none" ? 0 : 1
+   #count = var.kubernetes_quota_memory ? 1 : 0
+   metadata {
+     name      = "resource-quota-${local.namespace}"
+     namespace = "${local.namespace}"
+   }
 
-# see: https://github.com/hashicorp/terraform/issues/11806
-/* data "null_data_source" "default_token_secret_name" {
-  depends_on = [ "null_resource.default_token_secret_name" ]
-
-  inputs = {
-    dummy = "${format(null_resource.default_token_secret_name.id)}"
-    data = "${file(".local/default_token_secret_name.out")}"
-  }
-} */
-
-/* resource "kubernetes_resource_quota" "resource_quota" {
-  count = var.kubernetes_quota_memory <> "0Gi"
-  metadata {
-    name      = "resource-quota-${local.namespace}"
-    namespace = "${local.namespace}"
-  }
-
-  spec {
-    hard = {
-      "requests.memory" = "10Gi"
-      "requests.cpu" = "4"
-    }
-  }
-}
- */
-# resource "azurerm_public_ip" "aks_egress" {
-#   name                = "aks-egress-${local.namespace}"
-#   # location            = "${var.resource_group_location}"
-#   location            = "${data.terraform_remote_state.kubernetes.outputs.kubernetes_location}"
-#   resource_group_name = "${data.terraform_remote_state.kubernetes.outputs.kubernetes_node_resource_group_name}"
-  
-#   public_ip_address_allocation = "Static"
-
-#   tags = "${merge(
-#     local.common_tags,
-#     {}
-#   )}"
-# }
-
-# resource "kubernetes_service" "aks_egress" {
-#   // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
-#   //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
-#   metadata {
-#     labels = {
-#       "sapienceanalytics.com/name" = "azure-egress"
-#     }
-
-#     name = "azure-egress"
-#     namespace = "${local.namespace}"
-#   }
-
-#   spec {
-#     load_balancer_ip = "${azurerm_public_ip.aks_egress.ip_address}"
-#     type = "LoadBalancer"
-#     port {
-#       port = "80"
-#     }
-#   }
-# }
+   spec {
+     hard =
+       #"requests.memory" = var.kubernetes_quota_memory == "none" ? "10Gi" : var.kubernetes_quota_memory
+       #"requests.cpu"    = var.kubernetes_quota_cpu == "none" ? "10Mi" : var.kubernetes_quota_cpu
+       #"requests.memory" = "${(var.kubernetes_quota_memory == "none") ? "10Gi" : "20Gi"}"
+       #"requests.cpu"    = var.kubernetes_quota_cpu == "none" ? "10Mi" : "20Mi"  
+       #"${map("requests.memory", "${(var.kubernetes_quota_memory == "none") ? "10Gi" : "20Gi"}")}"
+      
+   }
+ } */

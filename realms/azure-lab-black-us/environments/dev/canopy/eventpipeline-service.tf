@@ -29,8 +29,8 @@ resource "kubernetes_secret" "eventpipeline_service" {
 
   data = {
     "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
-    "canopy.database.username" = var.sql_server_canopy_username
-    "canopy.database.password" = var.sql_server_canopy_password
+    "canopy.database.username" = var.mysql_canopy_username
+    "canopy.database.password" = var.mysql_canopy_password
     "kafka.username"           = var.kafka_username
     "kafka.password"           = var.kafka_password
     "azure.datalake.key"       = data.terraform_remote_state.data_lake.outputs.azure_data_lake_storage_gen2_key_1

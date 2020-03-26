@@ -57,12 +57,10 @@ resource "kubernetes_ingress" "api" {
     namespace = local.namespace
 
     annotations = {
-      "certmanager.k8s.io/acme-challenge-type" = "dns01"
-      "certmanager.k8s.io/acme-dns01-provider" = "azure-dns"
-      "certmanager.k8s.io/cluster-issuer"      = "letsencrypt-prod"
-      "ingress.kubernetes.io/ssl-redirect"     = "true"
-      "kubernetes.io/ingress.class"            = "nginx"
-      "kubernetes.io/tls-acme"                 = "true"
+      "cert-manager.io/cluster-issuer"     = "letsencrypt-prod"
+      "ingress.kubernetes.io/ssl-redirect" = "true"
+      "kubernetes.io/ingress.class"        = "nginx"
+      "kubernetes.io/tls-acme"             = "true"
     }
   }
 
@@ -186,6 +184,30 @@ service: canopy-hierarchy-service
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  canopy_location_service_mapping
+prefix: /location/
+service: canopy-location-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  canopy_notification_service_mapping
+prefix: /notification/
+service: canopy-notification-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  canopy_setting_service_mapping
+prefix: /setting/
+service: canopy-setting-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  canopy_settings_service_mapping
+prefix: /settings/
+service: canopy-settings-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  canopy_user_service_mapping
 prefix: /user/
 service: canopy-user-service
@@ -201,6 +223,56 @@ kind:  Mapping
 name:  eventpipeline_service_mapping
 prefix: /eventpipeline/
 service: eventpipeline-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  kpi_service_mapping
+prefix: /kpi/
+service: kpi-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  admin_users_api_mapping
+prefix: /admin/users/
+service: admin-users-api
+rewrite: /admin/users/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  admin_settings_api_mapping
+prefix: /admin/settings/
+service: admin-settings-api
+rewrite: /admin/settings/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  admin_app_activity_api_mapping
+prefix: /admin/specs/
+service: admin-app-activity-api
+rewrite: /admin/specs/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_app_api_mapping
+prefix: /
+service: sapience-app-api
+timeout_ms: 10000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -221,19 +293,7 @@ cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
   headers: Content-Type, Authorization
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  sapience_app_api_mapping
-prefix: /
-service: sapience-app-api
-timeout_ms: 10000
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization
 EOF
-
     }
   }
 

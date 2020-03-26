@@ -9,14 +9,10 @@ variable "service_principal_password" {}
 variable "resource_group_name" {}
 
 variable "realm" {}
-# variable "environment" {}
 
 variable "nginx_ingress_replica_count" {}
 variable "nginx_ingress_resource_requests_cpu" {}
 variable "nginx_ingress_resource_requests_memory" {}
-# variable "nginx_ingress_controller_dns_records" {
-#     type = "list"
-# }
 
 variable "realm_common_tags" {
   type = map(string)

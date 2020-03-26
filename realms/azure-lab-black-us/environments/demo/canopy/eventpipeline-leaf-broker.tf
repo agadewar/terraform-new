@@ -18,8 +18,8 @@ resource "kubernetes_secret" "eventpipeline_leaf_broker" {
 
   data = {
     "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
-    "canopy.database.username" = var.sql_server_canopy_username
-    "canopy.database.password" = var.sql_server_canopy_password
+    "canopy.database.username" = var.mysql_canopy_username
+    "canopy.database.password" = var.mysql_canopy_password
     "kafka.username"           = var.kafka_username
     "kafka.password"           = var.kafka_password
   }
@@ -113,6 +113,15 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
               secret_key_ref {
                 name = "eventpipeline-leaf-broker"
                 key  = "kafka.password"
+              }
+            }
+          }
+          env {
+            name = "REDIS_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "redis"
+                key  = "redis-password"
               }
             }
           }

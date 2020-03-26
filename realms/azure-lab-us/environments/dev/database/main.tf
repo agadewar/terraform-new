@@ -184,14 +184,6 @@ resource "azurerm_sql_firewall_rule" "ip_banyan_office" {
   end_ip_address      = var.ip_banyan_office
 }
 
-resource "azurerm_sql_firewall_rule" "ip_benjamin_john_home" {
-  name                = "ip-benjamin-john-home"
-  resource_group_name = azurerm_sql_server.sapience.resource_group_name
-  server_name         = azurerm_sql_server.sapience.name
-  start_ip_address    = var.ip_benjamin_john_home
-  end_ip_address      = var.ip_benjamin_john_home
-}
-
 resource "azurerm_sql_firewall_rule" "ip_sapience_dallas_office" {
   name                = "ip-sapience-dallas-office"
   resource_group_name = azurerm_sql_server.sapience.resource_group_name

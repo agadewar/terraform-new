@@ -10,6 +10,7 @@ resource "kubernetes_config_map" "auth0" {
       "Auth0__Audience" = "https://api.sapienceanalytics.com"
       "Auth0__ClientId" = "gEurUe965S21CvJyQtArQ3z8TahgC20K"
       "Auth0__Connection" = "Username-Password-Authentication"
+      "Auth0__GrantType" = "client_credentials"
 
       #UI AUTH0
       "ENVIRONMENT_AUTH_AUTHORITY" = "https://login.dev.lab.sapienceanalytics.com"

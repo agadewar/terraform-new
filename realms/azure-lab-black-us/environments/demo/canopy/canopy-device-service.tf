@@ -18,8 +18,8 @@ resource "kubernetes_secret" "canopy_device_service" {
 
   data = {
     "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
-    "canopy.database.username" = var.sql_server_canopy_username
-    "canopy.database.password" = var.sql_server_canopy_password
+    "canopy.database.username" = var.mysql_canopy_username
+    "canopy.database.password" = var.mysql_canopy_password
     "kafka.username"           = var.kafka_username
     "kafka.password"           = var.kafka_password
     "google.api.key"           = var.google_api_key
@@ -67,7 +67,7 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.7.4.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.19.1.docker-SNAPSHOT"
           name  = "canopy-device-service"
 
           image_pull_policy = "Always"
@@ -125,6 +125,101 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
                 key  = "google.api.key"
               }
             }
+          }
+
+          env {
+            name  = "jms.queues"
+            value = "canopy-device-agent-info,canopy-device-device-event,canopy-device-device-component,canopy-device-file-version,canopy-device-generic-data-info,canopy-device-heartbeat,canopy-device-leaf-versions,canopy-device-software-update,canopy-device-system-info,canopy-device-system-utilization"
+          }
+          env {
+            name  = "jms.type"
+            value = "servicebus"
+          }
+
+          // servicebus settings
+          env { 
+            name  = "servicebus.host"
+            value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_hostname
+          }
+          env { 
+            name  = "servicebus.key"   // 
+            value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
+          }
+          env { 
+            name  = "servicebus.policy"
+            value = "RootManageSharedAccessKey"
+          }
+
+          // queues
+          env {
+            name  = "canopy.queue.agentInfo"
+            value = "canopy-device-agent-info"
+          }
+          env {
+            name  = "canopy.queue.deviceEvent"
+            value = "canopy-device-device-event"
+          }
+          env {
+            name  = "canopy.queue.deviceComponent"
+            value = "canopy-device-device-component"
+          }
+          env {
+            name  = "canopy.queue.fileVersion"
+            value = "canopy-device-file-version"
+          }
+          env {
+            name  = "canopy.queue.generic.dataInfo"
+            value = "canopy-device-generic-data-info"
+          }
+          env {
+            name  = "canopy.queue.heartbeat"
+            value = "canopy-device-heartbeat"
+          }
+          env {
+            name  = "canopy.queue.leafVersions"
+            value = "canopy-device-leaf-versions"
+          }
+          env {
+            name  = "canopy.queue.softwareUpdate"
+            value = "canopy-device-software-update"
+          }
+          env {
+            name  = "canopy.queue.systemInfo"
+            value = "canopy-device-system-info"
+          }
+          env {
+            name  = "canopy.queue.systemUtilization"
+            value = "canopy-device-system-utilization"
+          }
+
+          // disable custom eventhandlers
+          env {
+            name  = "chargeit.enabled"
+            value = "false"
+          }
+          env {
+            name  = "ipa.enabled"
+            value = "false"
+          }
+          env {
+            name  = "mm.enabled"
+            value = "false"
+          }
+          env {
+            name  = "optconnect.enabled"
+            value = "false"
+          }
+          env {
+            name  = "posiflex.enabled"
+            value = "false"
+          }
+          env {
+            name  = "pti.enabled"
+            value = "false"
+          }
+          env {
+            name  = "wu.enabled"
+            value = "false"
           }
 
           readiness_probe {

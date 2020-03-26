@@ -16,3 +16,5 @@ variable "cosmosdb_key_dashboard" {}
 variable "cosmosdb_key_alerts" {}
 variable "sisense_secret" {}
 variable "auth0_secret" {}
+variable "etl_secret" {}
+variable "staging_password" {}

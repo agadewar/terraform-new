@@ -10,6 +10,9 @@ variable "subscription_id" {}
 variable "resource_group_name" {}
 variable "resource_group_location" {}
 
+variable "kubernetes_quota_memory" {}
+variable "kubernetes_quota_cpu" {}
+
 variable "realm" {}
 
 variable "environment" {}

@@ -98,6 +98,8 @@ data "helm_repository" "jetstack" {
 }
 
 resource "helm_release" "cert_manager" {
+  depends_on = [ null_resource.create_cert_manager_crd ]
+  
   name       = "cert-manager"
   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
   chart      = "cert-manager"

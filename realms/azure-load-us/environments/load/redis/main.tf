@@ -1,6 +1,10 @@
 terraform {
   backend "azurerm" {
-    key = "black/redis.tfstate"
+    key = "redis.tfstate"
+  }
+
+  required_providers {
+    helm = "= 1.0.0"
   }
 }
 
@@ -9,8 +13,8 @@ provider "helm" {
     config_path = local.config_path
   }
 
-  #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
-  service_account = "tiller"
+  # #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
+  # service_account = "tiller"
 }
 
 locals {
@@ -25,7 +29,7 @@ locals {
 }
 
 resource "helm_release" "redis" {
-  name      = "redis-${var.environment}"
+  name      = "redis"
   namespace = var.environment
   chart     = "stable/redis"
 
@@ -56,21 +60,21 @@ resource "helm_release" "redis" {
 
   set {
     name = "master.resources.requests.memory"
-    value = "256Mi"
+    value = "512Mi"
   }
 
   set {
     name = "master.resources.requests.cpu"
-    value = "100m"
+    value = "200m"
   }
 
   set {
     name = "slave.resources.requests.memory"
-    value = "256Mi"
+    value = "512Mi"
   }
 
   set {
     name = "slave.resources.requests.cpu"
-    value = "100m"
+    value = "200m"
   }
 }
