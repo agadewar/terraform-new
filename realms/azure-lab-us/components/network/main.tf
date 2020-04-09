@@ -56,6 +56,7 @@ resource "azurerm_subnet" "aks_eastus_sisense_netapp" {
     name               = "netapp" 
     service_delegation {
       name             = "Microsoft.Netapp/volumes"
+      actions          = ["Microsoft.Network/networkinterfaces/*", "Microsoft.Network/virtualNetworks/subnets/join/action"]
     }
   }
 }
