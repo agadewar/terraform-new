@@ -22,6 +22,8 @@ locals {
   )
 }
 
+# VISUAL SUBNET CALCULATOR - 
+# http://davidc.net/sites/default/subnets/subnets.html?network=10.104.0.0&mask=16&division=59.f39770c13e13451
 resource "azurerm_virtual_network" "realm" {
   name                = var.resource_group_name
   location            = var.resource_group_location
@@ -42,6 +44,27 @@ resource "azurerm_subnet" "aks-pool" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.realm.name
   address_prefix       = var.subnet_address_prefix_aks-pool
+  service_endpoints    = var.subnet_service_endpoints
+}
+
+resource "azurerm_subnet" "aks_eastus_sisense_netapp" {
+  name                 = "aks-eastus-sisense-netapp"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.realm.name
+  address_prefix       = var.subnet_address_prefix_aks_eastus_sisense_netapp
+  delegation { 
+    name               = "netapp" 
+    service_delegation {
+      name             = "Microsoft.Netapp/volumes"
+    }
+  }
+}
+
+resource "azurerm_subnet" "aks_eastus_sisense" {
+  name                 = "aks-eastus-sisense"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.realm.name
+  address_prefix       = var.subnet_address_prefix_aks_eastus_sisense
   service_endpoints    = var.subnet_service_endpoints
 }
 
