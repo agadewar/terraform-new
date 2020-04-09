@@ -5,8 +5,8 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "1.31.0"
-
+  version = "2.0.0"
+  features {}
   subscription_id = var.subscription_id
   client_id       = var.service_principal_app_id
   client_secret   = var.service_principal_password
@@ -68,7 +68,7 @@ resource "azurerm_subnet" "aks-pool" {
   address_prefix       = var.subnet_address_prefix_aks-pool
   service_endpoints    = var.subnet_service_endpoints
   lifecycle { 
-    ignore_changes = [ route_table_id ]
+    #ignore_changes = [ route_table_id ]
   }
 }
 
@@ -81,7 +81,19 @@ resource "azurerm_subnet" "netapp" {
     name               = "netapp" 
     service_delegation {
       name             = "Microsoft.Netapp/volumes"
+      actions          = ["Microsoft.Network/networkinterfaces/*", "Microsoft.Network/virtualNetworks/subnets/join/action"]
+
     }
   }
+}
+
+
+resource "azurerm_subnet" "aks_eastus_sisense" {
+
+  name                 = "aks-eastus-sisense"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.realm.name
+  address_prefix       = var.subnet_address_prefix_aks_eastus_sisense
+
 }
 
