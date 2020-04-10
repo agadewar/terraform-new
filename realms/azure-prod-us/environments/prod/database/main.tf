@@ -26,7 +26,6 @@ locals {
   sql_server_administrator_password     = var.sql_server_administrator_password
   # sedw_requested_service_objective_name = var.sedw_requested_service_objective_name
   cosmos_failover_location              = "eastus2"
-
   common_tags = merge(
     var.realm_common_tags,
     var.environment_common_tags,
@@ -132,6 +131,8 @@ resource "azurerm_sql_database" "EDW" {
   server_name                      = azurerm_sql_server.sapience.name
   edition                          = var.sql_database_edw_edition
   requested_service_objective_name = var.sql_database_edw_requested_service_objective_name
+  read_scale                       = true
+
 
   tags = merge(local.common_tags, {})
 }
@@ -220,6 +221,23 @@ resource "azurerm_cosmosdb_account" "sapience_app_alerts" {
   location            = var.resource_group_location
   offer_type          = "Standard"
   kind                = "GlobalDocumentDB"
+
+  consistency_policy {
+    consistency_level = "Strong"
+  }
+
+  geo_location {
+    location          = local.cosmos_failover_location
+    failover_priority = 0
+  }
+}
+
+resource "azurerm_cosmosdb_account" "sapience_app_alerts_mongodb" {
+  name                = "sapience-app-alerts-mongodb-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+  offer_type          = "Standard"
+  kind                = "MongoDB"
 
   consistency_policy {
     consistency_level = "Strong"
