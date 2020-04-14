@@ -5,6 +5,6 @@ resource "kubernetes_config_map" "test_harness" {
   }
 
   data = {
-      "args": "-genusers=false -userspath=/opt/sapience/activitycollectortestharness/users.dat -numdays=1 -numusers=50 -mode=simulation"
+      "args": "-genusers=false -userspath=/opt/sapience/activity-collector-test-harness/users.dat -numdays=1 -numusers=50 -mode=simulation"
   }
 }

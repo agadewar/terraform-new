@@ -12,9 +12,12 @@ variable "environment_common_tags" {
 variable "connectionstring_admin" {}
 variable "connectionstring_mad" {}
 variable "connectionstring_staging" {}
+variable "connectionstring_edw" {}
+variable "connectionstring_notification_mongodb" {}
 variable "cosmosdb_key_dashboard" {}
 variable "cosmosdb_key_alerts" {}
 variable "sisense_secret" {}
 variable "auth0_secret" {}
 variable "etl_secret" {}
 variable "staging_password" {}
+variable "auth0_alertrules_secret" {}
