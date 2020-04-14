@@ -10,6 +10,14 @@ output "default_subnet_id" {
   value = "${azurerm_subnet.default.id}"
 }
 
+output "aks_eastus_sisense_subnet_id" {
+  value = "${azurerm_subnet.aks_eastus_sisense.id}"
+}
+
+output "netapp_subnet_id" {
+  value = "${azurerm_subnet.netapp.id}"
+}
+
 # output "demo-default_subnet_id" {
 #   value = "${azurerm_subnet.demo-default.id}"
 # }
