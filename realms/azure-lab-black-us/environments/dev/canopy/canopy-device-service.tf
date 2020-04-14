@@ -67,7 +67,7 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.19.1.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.19.2.docker-SNAPSHOT"
           name  = "canopy-device-service"
 
           image_pull_policy = "Always"
@@ -125,6 +125,15 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
                 key  = "google.api.key"
               }
             }
+          }
+
+          env {
+            name  = "canopy.security.service.username"
+            value = "dummy"
+          }
+          env {
+            name  = "canopy.security.service.password"
+            value = "dummy"
           }
 
           env {

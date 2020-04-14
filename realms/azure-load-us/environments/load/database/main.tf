@@ -391,6 +391,13 @@ resource "azurerm_mysql_configuration" "sapience_log_bin_trust_function_creators
   value               = "ON"
 }
 
+resource "azurerm_mysql_configuration" "max_connections" {   // TODO: make this come from tfvars
+  name                = "max_connections"
+  resource_group_name = var.resource_group_name
+  server_name         = "${azurerm_mysql_server.sapience.name}"
+  value               = "2500"
+}
+
 resource "azurerm_mysql_database" "device" {
   name                = "device"
   resource_group_name = var.resource_group_name

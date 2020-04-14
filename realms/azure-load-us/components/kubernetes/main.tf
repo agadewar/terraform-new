@@ -104,8 +104,8 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     kube_dashboard { enabled = true }
 
     oms_agent {
-      enabled = true
-      log_analytics_workspace_id = data.terraform_remote_state.log_analytics_workspace.outputs.log_analytics_workspace_id   # https://github.com/terraform-providers/terraform-provider-azurerm/issues/3457
+      enabled = false
+      # log_analytics_workspace_id = data.terraform_remote_state.log_analytics_workspace.outputs.log_analytics_workspace_id   # https://github.com/terraform-providers/terraform-provider-azurerm/issues/3457
     }
   } 
 

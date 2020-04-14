@@ -67,7 +67,7 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.19.1.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.19.3.docker-SNAPSHOT"
           name  = "canopy-device-service"
 
           image_pull_policy = "Always"
@@ -125,6 +125,20 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
                 key  = "google.api.key"
               }
             }
+          }
+
+          env {
+            name  = "server.undertow.worker-threads"
+            value = "2000"
+          }
+
+          env {
+            name  = "canopy.security.service.username"
+            value = "dummy"
+          }
+          env {
+            name  = "canopy.security.service.password"
+            value = "dummy"
           }
 
           env {
@@ -234,17 +248,17 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             failure_threshold = 3
           }
 
-          liveness_probe {
-            http_get {
-              path = "/ping"
-              port = 8080
-            }
+          # liveness_probe {
+          #   http_get {
+          #     path = "/ping"
+          #     port = 8080
+          #   }
 
-            initial_delay_seconds = 180
-            period_seconds = 10
-	          timeout_seconds = 2
-            failure_threshold = 6
-          }
+          #   initial_delay_seconds = 180
+          #   period_seconds = 10
+	        #   timeout_seconds = 2
+          #   failure_threshold = 6
+          # }
 
           resources {
             requests {

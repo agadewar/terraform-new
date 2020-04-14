@@ -126,6 +126,20 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
             }
           }
 
+          env {
+            name  = "logging.level.com.banyanhills.canopy.user"
+            value = "INFO"
+          }
+
+          env {
+            name  = "server.undertow.worker-threads"
+            value = "2000"
+          }
+          # env {
+          #   name  = "spring.datasource.tomcat.maxActive"   // https://tomcat.apache.org/tomcat-7.0-doc/jdbc-pool.html
+          #   value = ""
+          # }
+
           readiness_probe {
             http_get {
               path = "/ping"

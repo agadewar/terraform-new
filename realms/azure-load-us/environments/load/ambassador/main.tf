@@ -61,6 +61,9 @@ resource "kubernetes_ingress" "api" {
       "ingress.kubernetes.io/ssl-redirect" = "true"
       "kubernetes.io/ingress.class"        = "nginx"
       "kubernetes.io/tls-acme"             = "true"
+      "nginx.ingress.kubernetes.io/proxy-connect-timeout" = "120"
+      "nginx.ingress.kubernetes.io/proxy-read-timeout" = "120"
+      "nginx.ingress.kubernetes.io/proxy-send-timeout" = "120"
     }
   }
 
@@ -217,6 +220,12 @@ kind:  Mapping
 name:  eventpipeline_leaf_broker_mapping
 prefix: /leafbroker/
 service: eventpipeline-leaf-broker
+timeout_ms: 120000
+connect_timeout_ms: 120000
+circuit_breakers:
+- max_connections: 8000
+  max_pending_requests: 8000
+  max_requests: 8000
 ---
 apiVersion: ambassador/v1
 kind:  Mapping

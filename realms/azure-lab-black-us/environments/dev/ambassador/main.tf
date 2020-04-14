@@ -217,6 +217,7 @@ kind:  Mapping
 name:  eventpipeline_leaf_broker_mapping
 prefix: /leafbroker/
 service: eventpipeline-leaf-broker
+timeout_ms: 30000
 ---
 apiVersion: ambassador/v1
 kind:  Mapping

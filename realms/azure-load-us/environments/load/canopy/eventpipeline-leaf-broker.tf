@@ -66,7 +66,7 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.3.0.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.3.2.docker-SNAPSHOT"
           name  = "eventpipeline-leaf-broker"
 
           image_pull_policy = "Always"
@@ -126,6 +126,25 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
             }
           }
 
+          env {
+            name  = "canopy.security.userDetailsCacheEnabled"
+            value = "true"
+          }
+          env {
+            name  = "logging.level.io.canopy.leaf.broker"
+            value = "INFO"
+          }
+          env {
+            name  = "server.undertow.worker-threads"
+            value = "4000"
+          }
+          env {
+            // connection pool in Spring Boot 1.3.8 appears to use a different setting
+            name  = "spring.datasource.max-active"
+            # name  = "spring.datasource.tomcat.max-active"
+            value = "200"
+          }
+
           readiness_probe {
             http_get {
               path = "/ping"
@@ -133,22 +152,34 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
             }
 
             initial_delay_seconds = 15
-            period_seconds = 5
-            timeout_seconds = 2
-            failure_threshold = 3
-          }
-
-          liveness_probe {
-            http_get {
-              path = "/ping"
-              port = 8080
-            }
-
-            initial_delay_seconds = 180
             period_seconds = 10
-	          timeout_seconds = 2
-            failure_threshold = 6
+            timeout_seconds = 10
+            failure_threshold = 5
           }
+
+          # readiness_probe {
+          #   http_get {
+          #     path = "/ping"
+          #     port = 8080
+          #   }
+
+          #   initial_delay_seconds = 15
+          #   period_seconds = 5
+          #   timeout_seconds = 2
+          #   failure_threshold = 3
+          # }
+
+          # liveness_probe {
+          #   http_get {
+          #     path = "/ping"
+          #     port = 8080
+          #   }
+
+          #   initial_delay_seconds = 180
+          #   period_seconds = 10
+	        #   timeout_seconds =   2
+          #   failure_threshold = 6
+          # }
 
           resources {
             requests {

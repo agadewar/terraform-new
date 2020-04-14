@@ -128,6 +128,15 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
           }
 
           env {
+            name  = "canopy.security.service.username"
+            value = "dummy"
+          }
+          env {
+            name  = "canopy.security.service.password"
+            value = "dummy"
+          }
+
+          env {
             name  = "jms.queues"
             value = "canopy-device-agent-info,canopy-device-device-event,canopy-device-device-component,canopy-device-file-version,canopy-device-generic-data-info,canopy-device-heartbeat,canopy-device-leaf-versions,canopy-device-software-update,canopy-device-system-info,canopy-device-system-utilization"
           }
