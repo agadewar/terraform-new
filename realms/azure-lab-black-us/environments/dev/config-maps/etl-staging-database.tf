@@ -6,7 +6,7 @@ resource "kubernetes_config_map" "etl_staging_database" {
 
   data = {
       "KAFKA_BOOTSTRAP_SERVERS": "pkc-4nym6.us-east-1.aws.confluent.cloud:9092"
-      "KAFKA_CLUSTER_API_KEY": "QGXANP5DBQN5G4SK"
+      "KAFKA_CLUSTER_API_KEY": "KLAUITEA7HZH373R"
       "KAFKA_GROUP_ID": "etl-staging-database"
       "KAFKA_MAX_POLL_RECORDS": "500"
       "KAFKA_RETRY_BACKOFF_MS": "500"
