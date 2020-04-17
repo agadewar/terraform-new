@@ -59,7 +59,7 @@ resource "helm_release" "efk" {
 
   set {
     name  = "elasticsearch.spec.data-volume-size"
-    value = "200Gi"
+    value = "1000Gi"
   }
 
   set {
