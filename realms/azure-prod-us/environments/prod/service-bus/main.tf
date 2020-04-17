@@ -33,7 +33,8 @@ resource "azurerm_servicebus_namespace" "namespace" {
   name                = "sapience-${var.realm}-${var.environment}"
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
-  sku                 = "Standard"
+  sku                 = "Premium"
+  capacity            = "4"
 
   tags = merge(local.common_tags, {})
 }
@@ -51,7 +52,7 @@ resource "azurerm_servicebus_queue" "device_registration" {
   resource_group_name = var.resource_group_name
   namespace_name      = azurerm_servicebus_namespace.namespace.name
 
-  enable_partitioning = true
+  enable_partitioning = false
 }
 
 # resource "azurerm_servicebus_queue" "event_archive" {

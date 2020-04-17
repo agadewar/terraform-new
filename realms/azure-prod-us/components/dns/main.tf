@@ -40,7 +40,7 @@ resource "azurerm_private_dns_zone" "sapienceanalytics_com" {
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "realm" {
-depends_on              = [azurerm_private_dns_zone.sapienceanalytics_com]
+  depends_on            = [azurerm_private_dns_zone.sapienceanalytics_com]
 
   name                  = var.dns_realm
   resource_group_name   = var.resource_group_name

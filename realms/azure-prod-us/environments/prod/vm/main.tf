@@ -65,18 +65,6 @@ resource "azurerm_network_security_group" "sisense_appquery" {
   }
 
   security_rule {
-    name                       = "Allow-AllTraffic-Banyan-Office"
-    priority                   = 102
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = var.ip_banyan_office
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
     name                       = "Allow-8081-Open-To-The-World"
     priority                   = 103
     direction                  = "Inbound"
@@ -87,7 +75,6 @@ resource "azurerm_network_security_group" "sisense_appquery" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-
 }
 
 resource "azurerm_network_security_group" "sisense_build" {
@@ -116,18 +103,6 @@ resource "azurerm_network_security_group" "sisense_build" {
     source_port_range          = "*"
     destination_port_range     = "*"
     source_address_prefix      = var.ip_sapience_pune_office
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "Allow-AllTraffic-Banyan-Office"
-    priority                   = 102
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = var.ip_banyan_office
     destination_address_prefix = "*"
   }
 }
@@ -172,7 +147,7 @@ resource "azurerm_virtual_machine" "sisense_appquery_001" {
   }
 
   os_profile_windows_config {
-    provision_vm_agent   = true
+    provision_vm_agent = true
   }
 
   storage_data_disk {
@@ -260,11 +235,12 @@ resource "azurerm_virtual_machine" "sisense_appquery_002" {
   }
 
   os_profile_windows_config {
-    provision_vm_agent   = true
+    provision_vm_agent = true
   }
 
   storage_data_disk {
     name            = "sisense-appquery-data-002-${var.realm}-${var.environment}"
+
     managed_disk_id = azurerm_managed_disk.sisense_appquery_data_002.id
     create_option   = "Attach"
     disk_size_gb    = "100"
@@ -348,7 +324,7 @@ resource "azurerm_virtual_machine" "sisense_build_001" {
   }
 
   os_profile_windows_config {
-    provision_vm_agent   = true
+    provision_vm_agent = true
   }
 
   storage_data_disk {
