@@ -21,6 +21,7 @@ locals {
     },
   )
 }
+
 resource "azurerm_application_insights" "app_insights" {
   name                = "${var.realm}"
   location            = "${var.resource_group_location}"

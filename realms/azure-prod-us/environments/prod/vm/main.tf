@@ -87,7 +87,6 @@ resource "azurerm_network_security_group" "sisense_appquery" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-
 }
 
 resource "azurerm_network_security_group" "sisense_build" {
@@ -172,7 +171,7 @@ resource "azurerm_virtual_machine" "sisense_appquery_001" {
   }
 
   os_profile_windows_config {
-    provision_vm_agent   = true
+    provision_vm_agent = true
   }
 
   storage_data_disk {
@@ -260,11 +259,12 @@ resource "azurerm_virtual_machine" "sisense_appquery_002" {
   }
 
   os_profile_windows_config {
-    provision_vm_agent   = true
+    provision_vm_agent = true
   }
 
   storage_data_disk {
     name            = "sisense-appquery-data-002-${var.realm}-${var.environment}"
+
     managed_disk_id = azurerm_managed_disk.sisense_appquery_data_002.id
     create_option   = "Attach"
     disk_size_gb    = "100"
@@ -348,7 +348,7 @@ resource "azurerm_virtual_machine" "sisense_build_001" {
   }
 
   os_profile_windows_config {
-    provision_vm_agent   = true
+    provision_vm_agent = true
   }
 
   storage_data_disk {

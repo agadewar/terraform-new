@@ -57,7 +57,7 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
   }
 
   spec {
-    replicas = 1
+    replicas = var.kpi_service_deployment_replicas
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
@@ -240,8 +240,8 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
 
           resources {
             requests {
-              memory = "2048M"
-              cpu    = "1000m"
+              memory = var.kpi_service_deployment_request_memory
+              cpu    = var.kpi_service_deployment_request_cpu
             }
           }
 

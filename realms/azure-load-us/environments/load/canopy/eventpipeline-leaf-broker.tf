@@ -185,7 +185,7 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
 
           #   initial_delay_seconds = 180
           #   period_seconds = 10
-	        #   timeout_seconds =   2
+	        #   timeout_seconds = 2
           #   failure_threshold = 6
           # }
 

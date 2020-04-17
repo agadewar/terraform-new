@@ -18,15 +18,6 @@ provider "kubernetes" {
   config_path = "${local.config_path}"
 }
 
-provider "helm" {
-  kubernetes {
-    config_path = "${local.config_path}"
-  }
-
-  #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
-  service_account = "tiller"
-}
-
 data "terraform_remote_state" "kubernetes" {
   backend = "azurerm"
 

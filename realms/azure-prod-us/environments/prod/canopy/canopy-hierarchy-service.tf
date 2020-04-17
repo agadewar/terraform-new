@@ -86,6 +86,16 @@ resource "kubernetes_deployment" "canopy_hierarchy_service_deployment" {
             }
           }
 
+          env {
+            name  = "logging.level.com.banyanhills.canopy.hierarchy"
+            value = "INFO"
+          }
+
+          env {
+            name  = "server.undertow.worker-threads"
+            value = "2000"
+          }
+
           readiness_probe {
             http_get {
               path = "/ping"

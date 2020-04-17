@@ -26,6 +26,7 @@ locals {
   sql_server_administrator_password     = var.sql_server_administrator_password
   # sedw_requested_service_objective_name = var.sedw_requested_service_objective_name
   cosmos_failover_location              = "eastus2"
+
   common_tags = merge(
     var.realm_common_tags,
     var.environment_common_tags,
@@ -57,49 +58,49 @@ resource "azurerm_sql_server" "sapience" {
 #   tags = merge(local.common_tags, {})
 # }
 
-resource "azurerm_sql_database" "canopy_device" {
-  name                             = "canopy-device"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_canopy_device_edition
-  requested_service_objective_name = var.sql_database_canopy_device_requested_service_objective_name
+# resource "azurerm_sql_database" "canopy_device" {
+#   name                             = "canopy-device"
+#   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
+#   location                         = azurerm_sql_server.sapience.location
+#   server_name                      = azurerm_sql_server.sapience.name
+#   edition                          = var.sql_database_canopy_device_edition
+#   requested_service_objective_name = var.sql_database_canopy_device_requested_service_objective_name
 
-  tags = merge(local.common_tags, {})
-}
+#   tags = merge(local.common_tags, {})
+# }
 
-resource "azurerm_sql_database" "canopy_eventpipeline" {
-  name                             = "canopy-eventpipeline"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_canopy_eventpipeline_edition
-  requested_service_objective_name = var.sql_database_canopy_eventpipeline_requested_service_objective_name
+# resource "azurerm_sql_database" "canopy_eventpipeline" {
+#   name                             = "canopy-eventpipeline"
+#   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
+#   location                         = azurerm_sql_server.sapience.location
+#   server_name                      = azurerm_sql_server.sapience.name
+#   edition                          = var.sql_database_canopy_eventpipeline_edition
+#   requested_service_objective_name = var.sql_database_canopy_eventpipeline_requested_service_objective_name
 
-  tags = merge(local.common_tags, {})
-}
+#   tags = merge(local.common_tags, {})
+# }
 
-resource "azurerm_sql_database" "canopy_leafbroker" {
-  name                             = "canopy-leafbroker"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_canopy_leafbroker_edition
-  requested_service_objective_name = var.sql_database_canopy_leafbroker_requested_service_objective_name
+# resource "azurerm_sql_database" "canopy_leafbroker" {
+#   name                             = "canopy-leafbroker"
+#   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
+#   location                         = azurerm_sql_server.sapience.location
+#   server_name                      = azurerm_sql_server.sapience.name
+#   edition                          = var.sql_database_canopy_leafbroker_edition
+#   requested_service_objective_name = var.sql_database_canopy_leafbroker_requested_service_objective_name
 
-  tags = merge(local.common_tags, {})
-}
+#   tags = merge(local.common_tags, {})
+# }
 
-resource "azurerm_sql_database" "canopy_user" {
-  name                             = "canopy-user"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_canopy_user_edition
-  requested_service_objective_name = var.sql_database_canopy_user_requested_service_objective_name
+# resource "azurerm_sql_database" "canopy_user" {
+#   name                             = "canopy-user"
+#   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
+#   location                         = azurerm_sql_server.sapience.location
+#   server_name                      = azurerm_sql_server.sapience.name
+#   edition                          = var.sql_database_canopy_user_edition
+#   requested_service_objective_name = var.sql_database_canopy_user_requested_service_objective_name
 
-  tags = merge(local.common_tags, {})
-}
+#   tags = merge(local.common_tags, {})
+# }
 
 resource "azurerm_sql_database" "mad" {
   name                             = "mad"
@@ -368,6 +369,13 @@ resource "azurerm_mysql_configuration" "sapience_log_bin_trust_function_creators
   resource_group_name = var.resource_group_name
   server_name         = "${azurerm_mysql_server.sapience.name}"
   value               = "ON"
+}
+
+resource "azurerm_mysql_configuration" "max_connections" {   // TODO: make this come from tfvars
+  name                = "max_connections"
+  resource_group_name = var.resource_group_name
+  server_name         = "${azurerm_mysql_server.sapience.name}"
+  value               = "2500"
 }
 
 resource "azurerm_mysql_database" "device" {
