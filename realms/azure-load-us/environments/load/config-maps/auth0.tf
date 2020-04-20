@@ -6,7 +6,7 @@ resource "kubernetes_config_map" "auth0" {
 
   data = {
       #MAIN AUTH0
-      "Auth0__Authority" = "https://sapience-load-us-load.auth0.com/"
+      "Auth0__Authority" = "https://sapience-load-us-load.auth0.com"
       "Auth0__Audience" = "https://load.us.load.sapienceanalytics.com"
       "Auth0__ClientId" = "ZWLJJ6Tmswh7QSOqkXdYo4GfEVYL686G"
       "Auth0__Connection" = "Username-Password-Authentication"
