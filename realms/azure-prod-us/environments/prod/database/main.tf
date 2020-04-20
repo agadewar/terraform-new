@@ -232,6 +232,14 @@ resource "azurerm_cosmosdb_account" "sapience_app_alerts_mongodb" {
   offer_type          = "Standard"
   kind                = "MongoDB"
 
+  capabilities { 
+      name = "EnableAggregationPipeline"
+  }
+
+  capabilities { 
+      name = "MongoDBv3.4"
+  }
+
   consistency_policy {
     consistency_level = "Strong"
   }

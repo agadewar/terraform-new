@@ -1,0 +1,19 @@
+# Default values for cert-manager.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+email: "devops@sapience.net"
+
+service_account_id: ""
+
+secret_name: ""
+
+service_account_password: ""
+
+dns_zone: "sapienceanalytics.com"
+
+dnz_zone_resource_group: "global-us"
+
+global_subscription_id: ""
+
+tenant_id: ""
