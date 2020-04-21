@@ -21,3 +21,4 @@ variable "auth0_secret" {}
 variable "etl_secret" {}
 variable "staging_password" {}
 variable "auth0_alertrules_secret" {}
+variable "auth0_alertrules_clientid" {}
