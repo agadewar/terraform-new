@@ -70,7 +70,7 @@ resource "azurerm_kubernetes_cluster" "sisense" {
   resource_group_name                        = var.resource_group_name
   location                                   = var.resource_group_location
   dns_prefix                                 = "lab-us-sisense"
-  kubernetes_version                         = "1.16.7"
+  kubernetes_version                         = "1.17.3"
   default_node_pool {
     name                                     = "default"
     vnet_subnet_id                           = "/subscriptions/b78a61e7-f2ed-4cb0-8f48-6548408935e9/resourceGroups/lab-us/providers/Microsoft.Network/virtualNetworks/lab-us/subnets/lab-us-sisense"
