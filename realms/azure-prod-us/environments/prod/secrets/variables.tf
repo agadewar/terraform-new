@@ -13,7 +13,7 @@ variable "connectionstring_admin" {}
 variable "connectionstring_mad" {}
 variable "connectionstring_staging" {}
 variable "connectionstring_edw"{}
-variable "connectionstring_mongo"{}
+variable "connectionstring_notification_mongodb"{}
 variable "cosmosdb_key_dashboard" {}
 variable "cosmosdb_key_alerts" {}
 variable "sisense_secret" {}
