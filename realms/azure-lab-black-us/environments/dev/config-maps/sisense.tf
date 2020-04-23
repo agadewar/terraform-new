@@ -9,7 +9,7 @@ resource "kubernetes_config_map" "sisense" {
       "Sisense__Env" = "Dev"
 
       #SISENSE DATASOURCES
-      "Sisense__DataSource" = "Sapience-Daily-CompanyId-Env"
+      "Sisense__DataSource" = "Set/Sapience-Daily-CompanyId-Env"
       "Sisense_DailyDataSource" = "Sapience-Daily-CompanyId-Env"
       "Sisense_HourlyDataSource" = "Sapience-Hourly-CompanyId-Env"
 
