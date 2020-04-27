@@ -5,6 +5,7 @@ resource "kubernetes_config_map" "misc" {
   }
 
   data = {
+<<<<<<< HEAD
       "ASPNETCORE_ENVIRONMENT"   = "Development"
       "ENVIRONMENT_API_URL"      = "https://api.dev.lab.us.azure.sapienceanalytics.com"
       "LocalSwagger"             = "false"
@@ -12,5 +13,14 @@ resource "kubernetes_config_map" "misc" {
       "ENVIRONMENT_VUE_URL"      = "https://app.dev.sapienceanalytics.com"
       "ENVIRONMENT_ADMIN_URL"    = "https://manage.dev.sapienceanalytics.com" 
       "ENVIRONMENT_VUE_HELP_URL" = "https://help.dev.lab.us.azure.sapienceanalytics.com"
+=======
+      "ASPNETCORE_ENVIRONMENT"   =  "Development"
+      "ENVIRONMENT_API_URL"      =  "https://api.dev.lab.us.azure.sapienceanalytics.com"
+      "LocalSwagger"             =  "false"
+      "API_URL"                  =  "http://sapience-app-alerts/alertrules/company/eval"
+      "ENVIRONMENT_VUE_URL"      =  "https://app.dev.sapienceanalytics.com"
+      "ENVIRONMENT_ADMIN_URL"    =  "https://manage.dev.sapienceanalytics.com"
+      "ENVIRONMENT_VUE_HELP_URL" =  "https://help.dev.lab.us.azure.sapienceanalytics.com"
+>>>>>>> 65f723d72919864c53076dbd27e5e75ccc798008
   }
 }
