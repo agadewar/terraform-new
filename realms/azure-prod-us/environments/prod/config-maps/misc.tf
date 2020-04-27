@@ -10,6 +10,6 @@ resource "kubernetes_config_map" "misc" {
       "ENVIRONMENT_VUE_URL"        =   "https://app.dev.sapienceanalytics.com"
       "ENVIRONMENT_ADMIN_URL"      =   "https://manage.dev.sapienceanalytics.com"
       "LocalSwagger"               =   "false"
-      "ENVIRONMENT_VUE_HELP_URL"   =   "https://help.dev.lab.us.azure.sapienceanalytics.com"
+      "ENVIRONMENT_VUE_HELP_URL"   =   "https://help.dev.sapienceanalytics.com"
   }
 }
