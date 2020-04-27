@@ -1,0 +1,22 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: devops@sapience.net
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+    - dns01:
+        azuredns:
+          clientID: 1b65fc12-42cd-47cc-9a5f-2519228ae9c7
+          clientSecretSecretRef:
+            name: service-account
+            key: password
+          subscriptionID: 43e0bf01-5025-40ce-bdaa-c4291177828a
+          tenantID: 9c5c9da2-8ba9-4f91-8fa6-2c4382395477
+          resourceGroupName: global-us
+          hostedZoneName: sapienceanalytics.com
+          environment: AzurePublicCloud

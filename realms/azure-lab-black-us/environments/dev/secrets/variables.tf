@@ -23,3 +23,4 @@ variable "etl_secret" {}
 variable "staging_password" {}
 variable "auth0_alertrules_secret" {}
 variable "auth0_alertrules_clientid" {}
+variable "machine_learning_service_account_password" {}
