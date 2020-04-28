@@ -70,13 +70,18 @@ resource "azurerm_kubernetes_cluster" "sisense" {
   resource_group_name                        = var.resource_group_name
   location                                   = var.resource_group_location
   dns_prefix                                 = "lab-us-sisense"
-  kubernetes_version                         = "1.17.3"
+  kubernetes_version                         = "1.15.10"
   default_node_pool {
     name                                     = "default"
     vnet_subnet_id                           = "/subscriptions/b78a61e7-f2ed-4cb0-8f48-6548408935e9/resourceGroups/lab-us/providers/Microsoft.Network/virtualNetworks/lab-us/subnets/lab-us-sisense"
-    node_count                               = "1"
+    enable_auto_scaling                      = "true"
+    type                                     = "VirtualMachineScaleSets"
+    os_disk_size_gb                          = "100"
+    min_count                                = "1"
+    max_count                                = "3"
     max_pods                                 = 250
     vm_size                                  = "Standard_D4_v3"
+    node_labels                              = { "app" : "default" }
   }
   
   network_profile {
@@ -84,7 +89,7 @@ resource "azurerm_kubernetes_cluster" "sisense" {
     network_policy                           = "calico"
   }
   linux_profile {
-    admin_username                           = "sisense"
+    admin_username                           = "azureuser"
     ssh_key {
       key_data                               = var.public_ssh_key
     }
@@ -146,6 +151,7 @@ resource "helm_release" "custom_resource_definitions" {
   
   depends_on                                 = [ kubernetes_namespace.cert_manager ]
   provider                                   = helm.sisense
+  namespace                                  = kubernetes_namespace.cert_manager.metadata[0].name
   name                                       = "custom-resource-definitions"
   chart                                      = "${path.module}/charts/custom-resource-definitions"
 
@@ -161,12 +167,13 @@ resource "helm_release" "cert_manager_cluster_issuers" {
   
   depends_on                                 = [ helm_release.custom_resource_definitions, kubernetes_secret.cert_manager_service_account ]
   provider                                   = helm.sisense
+  namespace                                  = kubernetes_namespace.cert_manager.metadata[0].name
   name                                       = "cert-manager-cluster-issuers"
   chart                                      = "${path.module}/charts/cert-manager-cluster-issuers"
 
 }
-/* 
-resource "helm_release" "cert_manager" {
+
+/* resource "helm_release" "cert_manager" {
 
   depends_on                                 = [helm_release.cert_manager_cluster_issuers]
   provider                                   = helm.sisense
@@ -215,13 +222,8 @@ resource "helm_release" "nginx_ingress" {
   timeout                                    = 600
 
   set {
-    name                                     = "controller.nodeSelector"
-    value                                    = "app:default"
-  }
-
-  set {
-    name                                     = "controller.service.loadBalancerIP"
-    value                                    = azurerm_public_ip.ingress_controller.ip_address
+    name                                     = "controller.nodeSelector.app"
+    value                                    = "default"
   }
 
   set {
@@ -244,4 +246,4 @@ resource "helm_release" "nginx_ingress" {
     value                                    = "250Mi"
   }
   
-} */
+}  */
