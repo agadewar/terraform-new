@@ -277,7 +277,7 @@ kind:  Mapping
 name:  sapience_app_api_mapping
 prefix: /
 service: sapience-app-api
-timeout_ms: 10000
+timeout_ms: 30000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
