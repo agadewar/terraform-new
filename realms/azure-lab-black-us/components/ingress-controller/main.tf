@@ -46,6 +46,11 @@ resource "helm_release" "nginx_ingress" {
   }
 
   set {
+    name  = "controller.metrics.enabled"
+    value = "true"
+  }
+
+  set {
     name  = "controller.service.externalTrafficPolicy"
     value = "Local"
   }
