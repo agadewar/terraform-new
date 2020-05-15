@@ -70,7 +70,7 @@ resource "kubernetes_deployment" "canopy_location_service_deployment" {
           image = "${var.canopy_container_registry_hostname}/canopy-location-service:1.12.0.docker"
           name  = "canopy-location-service"
 
-          image_pull_policy = "Always"
+          # image_pull_policy = "Always"
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"

@@ -66,7 +66,7 @@ resource "kubernetes_deployment" "canopy_setting_service_deployment" {
           image = "${var.canopy_container_registry_hostname}/canopy-setting-service:1.3.0"
           name  = "canopy-setting-service"
 
-          image_pull_policy = "Always"
+          # image_pull_policy = "Always"
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"

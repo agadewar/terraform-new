@@ -132,6 +132,12 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             value = "2000"
           }
 
+          # Sapience has their own device event handler in the eventpipeline-registry codebase
+          env {
+            name  = "canopy.device.allDeviceEventHandler.enabled"
+            value = "false"
+          }
+
           env {
             name  = "canopy.security.service.username"
             value = "dummy"

@@ -172,6 +172,12 @@ resource "kubernetes_service" "api" {
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  canopy_auth0_service_mapping
+prefix: /auth0/
+service: canopy-auth0-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  canopy_device_service_mapping
 prefix: /device/
 service: canopy-device-service
@@ -190,6 +196,12 @@ service: canopy-location-service
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  canopy_marketplace_service_mapping
+prefix: /marketplace/
+service: canopy-marketplace-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  canopy_notification_service_mapping
 prefix: /notification/
 service: canopy-notification-service
@@ -205,6 +217,14 @@ kind:  Mapping
 name:  canopy_settings_service_mapping
 prefix: /settings/
 service: canopy-settings-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  canopy_user_service_token_mapping
+prefix: /user/token
+rewrite: /token
+service: canopy-user-service
+timeout_ms: 180000
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -230,6 +250,7 @@ kind:  Mapping
 name:  kpi_service_mapping
 prefix: /kpi/
 service: kpi-service
+timeout_ms: 30000
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
