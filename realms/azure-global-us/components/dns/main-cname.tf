@@ -365,13 +365,13 @@ resource "azurerm_dns_cname_record" "api_qa" {
   record              = "api.qa.lab.us.azure.sapienceanalytics.com"
 }
 
-/* resource "azurerm_dns_cname_record" "help_qa" {
+resource "azurerm_dns_cname_record" "help_qa" {
   name                = "help.qa"
   zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
   resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
   record              = "help.qa.lab.us.azure.sapienceanalytics.com"
-} */
+}
 
 resource "azurerm_dns_cname_record" "portal_qa" {
   name                = "portal.qa"
@@ -439,13 +439,13 @@ resource "azurerm_dns_cname_record" "api_demo" {
   record              = "api.demo.lab.us.azure.sapienceanalytics.com"
 }
 
-/* resource "azurerm_dns_cname_record" "help_demo" {
+resource "azurerm_dns_cname_record" "help_demo" {
   name                = "help.demo"
   zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
   resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
   record              = "help.demo.lab.us.azure.sapienceanalytics.com"
-} */
+}
 
 resource "azurerm_dns_cname_record" "portal_demo" {
   name                = "portal.demo"
@@ -529,13 +529,13 @@ resource "azurerm_dns_cname_record" "api" {
   record              = "api.prod.prod.us.azure.sapienceanalytics.com"
 }
 
-/* resource "azurerm_dns_cname_record" "help" {
+resource "azurerm_dns_cname_record" "help" {
   name                = "help"
   zone_name           = azurerm_dns_zone.sapienceanalytics_public.name
   resource_group_name = var.resource_group_name # for some reason, the ${azurerm_dns_zone.sapienceanalytics_public.resource_group_name} comes back as lowercase... must use ${var.resource_group_name} here
   ttl                 = 300
   record              = "help.prod.prod.us.azure.sapienceanalytics.com"
-} */
+}
 
 resource "azurerm_dns_cname_record" "sisense" {
   name                = "sisense"

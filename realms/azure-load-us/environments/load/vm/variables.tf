@@ -34,6 +34,9 @@ variable "sisense_appquery_002_admin_password" {}
 variable "sisense_build_001_admin_username" {}
 variable "sisense_build_001_admin_password" {}
 
+variable "talend_admin_username"{}
+variable "talend_admin_password"{}
+
 variable "ip_sapience_dallas_office" {}
 variable "ip_sapience_pune_office" {}
 variable "ip_banyan_office" {}

@@ -15,8 +15,8 @@ provider "helm" {
     config_path = local.config_path
   }
 
-  #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
-  #service_account = "tiller"
+  # #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
+  # service_account = "tiller"
 }
 
 locals {
@@ -47,7 +47,7 @@ resource "kubernetes_namespace" "namespace" {
 
 resource "null_resource" "alertmanagers_crd" {
   provisioner "local-exec" {
-    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/alertmanager.crd.yaml"
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.30/example/prometheus-operator-crd/alertmanager.crd.yaml"
   }
 
   provisioner "local-exec" {
@@ -59,7 +59,7 @@ resource "null_resource" "alertmanagers_crd" {
 
 resource "null_resource" "prometheuses_crd" {
   provisioner "local-exec" {
-    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheus.crd.yaml"
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.30/example/prometheus-operator-crd/prometheus.crd.yaml"
   }
 
   provisioner "local-exec" {
@@ -71,7 +71,7 @@ resource "null_resource" "prometheuses_crd" {
 
 resource "null_resource" "prometheusrules_crd" {
   provisioner "local-exec" {
-    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheusrule.crd.yaml"
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.30/example/prometheus-operator-crd/prometheusrule.crd.yaml"
   }
 
   provisioner "local-exec" {
@@ -83,7 +83,7 @@ resource "null_resource" "prometheusrules_crd" {
 
 resource "null_resource" "servicemonitors_crd" {
   provisioner "local-exec" {
-    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/servicemonitor.crd.yaml"
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.30/example/prometheus-operator-crd/servicemonitor.crd.yaml"
   }
   provisioner "local-exec" {
     when = destroy
