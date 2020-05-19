@@ -23,7 +23,7 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 10Gi
+              storage: 100Gi
 
 grafana:
   adminPassword: ${admin_password}

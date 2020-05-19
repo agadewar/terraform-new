@@ -112,4 +112,3 @@ resource "helm_release" "prometheus" {
     value = "false"
   }
 }
-
