@@ -7,6 +7,9 @@ resource "kubernetes_config_map" "misc" {
   data = {
       "ASPNETCORE_ENVIRONMENT" = "Production"
       "ENVIRONMENT_API_URL" = "https://api.load.load.us.azure.sapienceanalytics.com"
+      "ENVIRONMENT_ADMIN_URL"  =   "https://manage.load.sapienceanalytics.com"
+      "ENVIRONMENT_VUE_URL"      =  "https://app.load.sapienceanalytics.com"
+      "ENVIRONMENT_VUE_HELP_URL"    =   "https://help.load.load.us.azure.sapienceanalytics.com"
       "LocalSwagger" = "false"
   }
 }
