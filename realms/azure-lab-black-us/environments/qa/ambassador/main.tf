@@ -276,6 +276,17 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  admin_org_api_mapping
+prefix: /admin/org/
+service: admin-org-api
+rewrite: /admin/org/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  admin_app_activity_api_mapping
 prefix: /admin/specs/
 service: admin-app-activity-api
