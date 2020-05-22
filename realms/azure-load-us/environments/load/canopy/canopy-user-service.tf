@@ -7,6 +7,7 @@ resource "kubernetes_config_map" "canopy_user_service" {
   data = {
     "global.properties"      = data.template_file.global_properties.rendered
     "application.properties" = file("files/canopy-user-service.properties")
+    "service-permission.json" = file("files/service-permission.json")
   }
 }
 
@@ -20,6 +21,8 @@ resource "kubernetes_secret" "canopy_user_service" {
     "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
     "canopy.database.username" = var.mysql_canopy_username
     "canopy.database.password" = var.mysql_canopy_password
+    "canopy.service-account.username" = var.canopy_service_account_username
+    "canopy.service-account.password" = var.canopy_service_account_password
     "kafka.username"           = var.kafka_username
     "kafka.password"           = var.kafka_password
   }
@@ -66,10 +69,8 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-user-service:1.3.5.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-user-service:2.5.3.docker-SNAPSHOT"
           name  = "canopy-user-service"
-
-          image_pull_policy = "Always"
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
@@ -98,6 +99,26 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
               }
             }
           }
+
+          env {
+            name = "CANOPY_SERVICE_ACCOUNT_USERNAME"
+            value_from {
+              secret_key_ref {
+                name = "canopy-user-service"
+                key  = "canopy.service-account.username"
+              }
+            }
+          }
+          env {
+            name = "CANOPY_SERVICE_ACCOUNT_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "canopy-user-service"
+                key  = "canopy.service-account.password"
+              }
+            }
+          }
+
           env {
             name = "KAFKA_USERNAME"
             value_from {
@@ -126,19 +147,40 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
             }
           }
 
+          # env {
+          #   name  = "update.token.usage.statistics"
+          #   value = "false"
+          # }
+
+          # env {
+          #   name  = "cache.token.ttl-seconds"
+          #   value = "300"
+          # }          
+
           env {
-            name  = "logging.level.com.banyanhills.canopy.user"
-            value = "INFO"
+            name  = "canopy.security.service-permission-source"
+            value = "/opt/canopy/config/service-permission.json"
           }
+
+          # env {
+          #   name  = "logging.level.com.banyanhills.canopy.user.auth.provider"
+          #   value = "DEBUG"
+          # }
+
+          # env {
+          #   name  = "logging.level.com.banyanhills.canopy.user.service.TokenService"
+          #   value = "DEBUG"
+          # }
+
+          # env {
+          #   name  = "logging.level.com.banyanhills.canopy.user.cache.Cache"
+          #   value = "DEBUG"
+          # }
 
           env {
             name  = "server.undertow.worker-threads"
             value = "2000"
           }
-          # env {
-          #   name  = "spring.datasource.tomcat.maxActive"   // https://tomcat.apache.org/tomcat-7.0-doc/jdbc-pool.html
-          #   value = ""
-          # }
 
           readiness_probe {
             http_get {

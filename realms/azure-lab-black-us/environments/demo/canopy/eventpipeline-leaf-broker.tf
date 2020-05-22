@@ -66,10 +66,8 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.3.0.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.3.18.docker-SNAPSHOT"
           name  = "eventpipeline-leaf-broker"
-
-          image_pull_policy = "Always"
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
@@ -125,6 +123,19 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
               }
             }
           }
+
+          env {
+            name  = "canopy.security.cookie.enabled"
+            value = "true"
+          }
+          env {
+            name  = "canopy.security.userDetailsCacheEnabled"
+            value = "false"
+          }
+          # env {
+          #   name  = "logging.level.io.canopy.leaf.broker"
+          #   value = "DEBUG"
+          # }
 
           readiness_probe {
             http_get {

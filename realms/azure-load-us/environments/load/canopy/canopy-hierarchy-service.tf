@@ -74,8 +74,6 @@ resource "kubernetes_deployment" "canopy_hierarchy_service_deployment" {
           image = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.7.0.docker-SNAPSHOT"
           name  = "canopy-hierarchy-service"
 
-          image_pull_policy = "Always"
-
           env {
             name = "REDIS_PASSWORD"
             value_from {

@@ -61,6 +61,9 @@ resource "kubernetes_ingress" "api" {
       "ingress.kubernetes.io/ssl-redirect" = "true"
       "kubernetes.io/ingress.class"        = "nginx"
       "kubernetes.io/tls-acme"             = "true"
+      "nginx.ingress.kubernetes.io/proxy-connect-timeout" = "120"
+      "nginx.ingress.kubernetes.io/proxy-read-timeout" = "120"
+      "nginx.ingress.kubernetes.io/proxy-send-timeout" = "120"
     }
   }
 
@@ -172,6 +175,12 @@ resource "kubernetes_service" "api" {
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  canopy_auth0_service_mapping
+prefix: /auth0/
+service: canopy-auth0-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  canopy_device_service_mapping
 prefix: /device/
 service: canopy-device-service
@@ -187,6 +196,12 @@ kind:  Mapping
 name:  canopy_location_service_mapping
 prefix: /location/
 service: canopy-location-service
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  canopy_marketplace_service_mapping
+prefix: /marketplace/
+service: canopy-marketplace-service
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -217,6 +232,12 @@ kind:  Mapping
 name:  eventpipeline_leaf_broker_mapping
 prefix: /leafbroker/
 service: eventpipeline-leaf-broker
+timeout_ms: 120000
+connect_timeout_ms: 120000
+circuit_breakers:
+- max_connections: 8000
+  max_pending_requests: 8000
+  max_requests: 8000
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -229,6 +250,7 @@ kind:  Mapping
 name:  kpi_service_mapping
 prefix: /kpi/
 service: kpi-service
+timeout_ms: 30000
 ---
 apiVersion: ambassador/v1
 kind:  Mapping

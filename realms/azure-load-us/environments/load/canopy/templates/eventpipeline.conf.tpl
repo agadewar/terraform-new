@@ -59,7 +59,7 @@ eventpipeline.channels.eventarchive.kafka.topic = eventarchive-channel
 
 eventpipeline.sinks.eventarchive.type = hdfs
 eventpipeline.sinks.eventarchive.channel = eventarchive
-eventpipeline.sinks.eventarchive.hdfs.path = abfss://sapience-adls@${datalake_name}.dfs.core.windows.net/rawdata/avro/tenantId=%%{tenantId}/companyId=%%{companyId}/year=%Y/month=%m/day=%d/hour=%H/minute=%M
+eventpipeline.sinks.eventarchive.hdfs.path = abfss://sapience-adls@${datalake_name}.dfs.core.windows.net/rawdata/avro/tenantId=%%{tenantId}/companyId=%%{companyId}/recordType=%%{recordType}/year=%Y/month=%m/day=%d/hour=%H/minute=%M
 eventpipeline.sinks.eventarchive.hdfs.fileType = DataStream
 eventpipeline.sinks.eventarchive.hdfs.writeFormat = Text
 eventpipeline.sinks.eventarchive.hdfs.filePrefix = EventData

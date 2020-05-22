@@ -70,8 +70,6 @@ resource "kubernetes_deployment" "canopy_v2_deployment" {
           image = "${var.canopy_container_registry_hostname}/canopy-v2:0.2.5"
           name  = "canopy-v2"
 
-          # image_pull_policy = "Always"
-
           env {
             name = "ENVIRONMENT_AUTH0_SERVICE_BASE_URL"
             value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/auth0"

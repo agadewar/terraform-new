@@ -66,8 +66,6 @@ resource "kubernetes_deployment" "canopy_notification_service_deployment" {
           image = "${var.canopy_container_registry_hostname}/canopy-notification-service:1.3.0.docker-SNAPSHOT"
           name  = "canopy-notification-service"
 
-          image_pull_policy = "Always"
-
           env { 
             name = "CANOPY_DATABASE_USERNAME"
             value_from {

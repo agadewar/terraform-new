@@ -63,26 +63,6 @@ resource "kubernetes_deployment" "canopy_settings_service_deployment" {
           image = "${var.canopy_container_registry_hostname}/canopy-settings-service:1.1.6.docker-SNAPSHOT"
           name  = "canopy-settings-service"
 
-          # image_pull_policy = "Always"
-
-          # env {
-          #   name = "spring.data.mongodb.host"
-          #   # value = "canopy-settings-mongodb-${var.realm}-${var.environment}.documents.azure.com"
-          #   value = "canopy-settings-mongodb-${var.realm}-dev.documents.azure.com"                          ### TODO - make sure to replace "dev" with ${var.environment}
-          # }
-          # env {
-          #   name = "spring.data.mongodb.port"
-          #   value = "27017"
-          # }
-          # env {
-          #   name = "spring.data.mongodb.database"
-          #   value = "settings"
-          # }
-
-          # env {
-          #   name  = "canopy.security.ignores"
-          #   value = "/ping"
-          # }
           env {
             name  = "canopy.security.service.auhtenticationTokenName"
             value = "canopy-security-token"

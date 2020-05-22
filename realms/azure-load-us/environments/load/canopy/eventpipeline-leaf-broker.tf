@@ -66,10 +66,8 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.3.5.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.3.18.docker-SNAPSHOT"
           name  = "eventpipeline-leaf-broker"
-
-          # image_pull_policy = "Always"
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
@@ -127,25 +125,17 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
           }
 
           env {
-            name  = "canopy.leafbroker.devine-device-ids.disabled"
-            value = "true"
-          }
-          env {
-            name  = "canopy.leafbroker.next-leaf-actions.disabled"
-            value = "true"
-          }
-          env {
-            name  = "canopy.leafbroker.software-updates.disabled"
+            name  = "canopy.security.cookie.enabled"
             value = "true"
           }
           env {
             name  = "canopy.security.userDetailsCacheEnabled"
-            value = "true"
+            value = "false"
           }
-          env {
-            name  = "logging.level.io.canopy.leaf.broker"
-            value = "INFO"
-          }
+          # env {
+          #   name  = "logging.level.io.canopy.leaf.broker"
+          #   value = "DEBUG"
+          # }
           env {
             name  = "server.undertow.worker-threads"
             value = "4000"
@@ -153,7 +143,6 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
           env {
             // connection pool in Spring Boot 1.3.8 appears to use a different setting
             name  = "spring.datasource.max-active"
-            # name  = "spring.datasource.tomcat.max-active"
             value = "200"
           }
 

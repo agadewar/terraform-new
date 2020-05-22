@@ -32,6 +32,9 @@ variable "influxdb_password" {}
 variable "mysql_canopy_username" {}
 variable "mysql_canopy_password" {}
 
+variable "canopy_service_account_username" {}
+variable "canopy_service_account_password" {}
+
 variable "google_api_key" {
   default = ""
 }

@@ -86,8 +86,6 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
           image = "${var.canopy_container_registry_hostname}/kpi-service:2.14.9.docker"
           name  = "kpi-service"
 
-          # image_pull_policy = "Always"
-
           env { 
             name = "CANOPY_DATABASE_USERNAME"
             value_from {
@@ -135,72 +133,6 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
               }
             }
           }
-          # env {
-          #   name = "CANOPY_AMQP_PASSWORD"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "eventpipeline-service"
-          #       key  = "canopy.amqp.password"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "KAFKA_USERNAME"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "eventpipeline-service"
-          #       key  = "kafka.username"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "KAFKA_PASSWORD"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "eventpipeline-service"
-          #       key  = "kafka.password"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "AZURE_DATALAKE_KEY"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "eventpipeline-service"
-          #       key  = "azure.datalake.key"
-          #     }
-          #   }
-          # }
-
-          # env {
-          #   name  = "redisson.nettyThreads"
-          #   value = "128"
-          # }
-
-          # env {
-          #   name  = "redisson.retryAttempts"
-          #   value = "6"
-          # }
-
-          # env {
-          #   name  = "redisson.retryInterval"
-          #   value = "6000"
-          # }
-
-          # env {
-          #   name  = "redisson.masterConnectionPoolSize"
-          #   value = "48"
-          # }
-
-          # env {
-          #   name  = "redisson.subscriptionConnectionPoolSize"
-          #   value = "100"
-          # }
-
-          # env {
-          #   name  = "redisson.connectTimeout"
-          #   value = "25000"
-          # }
 
           env {
             name  = "bootstrap.enabled"
@@ -223,15 +155,6 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
             name  = "influx.retentionPolicy"
             value = "autogen"
           }
-
-          # env {
-          #   name  = "canopy.security.service.username"
-          #   value = "dummy"
-          # }
-          # env {
-          #   name  = "canopy.security.service.password"
-          #   value = "dummy"
-          # }
 
           env {
             name  = "jms.queues"

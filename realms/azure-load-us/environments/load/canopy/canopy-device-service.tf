@@ -20,6 +20,8 @@ resource "kubernetes_secret" "canopy_device_service" {
     "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
     "canopy.database.username" = var.mysql_canopy_username
     "canopy.database.password" = var.mysql_canopy_password
+    "canopy.service-account.username" = var.canopy_service_account_username
+    "canopy.service-account.password" = var.canopy_service_account_password
     "kafka.username"           = var.kafka_username
     "kafka.password"           = var.kafka_password
     "google.api.key"           = var.google_api_key
@@ -67,10 +69,8 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.19.3.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.19.5.docker-SNAPSHOT"
           name  = "canopy-device-service"
-
-          image_pull_policy = "Always"
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
@@ -99,6 +99,26 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
               }
             }
           }
+
+          env {
+            name = "CANOPY_SERVICE_ACCOUNT_USERNAME"
+            value_from {
+              secret_key_ref {
+                name = "canopy-user-service"
+                key  = "canopy.service-account.username"
+              }
+            }
+          }
+          env {
+            name = "CANOPY_SERVICE_ACCOUNT_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "canopy-user-service"
+                key  = "canopy.service-account.password"
+              }
+            }
+          }
+
           env {
             name = "KAFKA_USERNAME"
             value_from {
@@ -128,17 +148,13 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
           }
 
           env {
-            name  = "server.undertow.worker-threads"
-            value = "2000"
+            name  = "com.banyanhills.canopy.device.eventhandler.AllDeviceEventHandler.disabled"
+            value = "true"
           }
 
           env {
-            name  = "canopy.security.service.username"
-            value = "dummy"
-          }
-          env {
-            name  = "canopy.security.service.password"
-            value = "dummy"
+            name  = "server.undertow.worker-threads"
+            value = "2000"
           }
 
           env {

@@ -69,10 +69,8 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-user-service:2.5.2.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-user-service:2.5.3.docker-SNAPSHOT"
           name  = "canopy-user-service"
-
-          # image_pull_policy = "Always"
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
@@ -155,24 +153,29 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
           # }
 
           env {
+            name  = "cache.token.ttl-seconds"
+            value = "300"
+          }
+
+          env {
             name  = "canopy.security.service-permission-source"
             value = "/opt/canopy/config/service-permission.json"
           }
 
-          env {
-            name  = "logging.level.com.banyanhills.canopy.user.auth.provider"
-            value = "DEBUG"
-          }
+          # env {
+          #   name  = "logging.level.com.banyanhills.canopy.user.auth.provider"
+          #   value = "DEBUG"
+          # }
 
-          env {
-            name  = "logging.level.com.banyanhills.canopy.user.service.TokenService"
-            value = "DEBUG"
-          }
+          # env {
+          #   name  = "logging.level.com.banyanhills.canopy.user.service.TokenService"
+          #   value = "DEBUG"
+          # }
 
-          env {
-            name  = "logging.level.com.banyanhills.canopy.user.cache.Cache"
-            value = "DEBUG"
-          }
+          # env {
+          #   name  = "logging.level.com.banyanhills.canopy.user.cache.Cache"
+          #   value = "DEBUG"
+          # }
 
           readiness_probe {
             http_get {
