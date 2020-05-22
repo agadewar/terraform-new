@@ -407,6 +407,14 @@ resource "azurerm_mysql_configuration" "sapience_log_bin_trust_function_creators
   value               = "ON"
 }
 
+resource "azurerm_mysql_database" "auth0" {
+  name                = "auth0"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  charset             = "utf8"
+  collation           = "utf8_unicode_ci"
+}
+
 resource "azurerm_mysql_configuration" "max_connections" {   // TODO: make this come from tfvars
   name                = "max_connections"
   resource_group_name = var.resource_group_name
@@ -440,6 +448,14 @@ resource "azurerm_mysql_database" "kpi1" {
 
 resource "azurerm_mysql_database" "leafbroker" {
   name                = "leafbroker"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  charset             = "utf8"
+  collation           = "utf8_unicode_ci"
+}
+
+resource "azurerm_mysql_database" "marketplace" {
+  name                = "marketplace"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_mysql_server.sapience.name
   charset             = "utf8"
