@@ -42,3 +42,19 @@ grafana:
     enabled: true
     accessModes: ["ReadWriteOnce"]
     size: 10Gi
+  grafana.ini:
+    auth.azuread:
+      name: Azure AD
+      enabled: true
+      allow_sign_up: true
+      client_id: 14314a12-8baf-413e-a3cf-d7a57acc20ec
+      client_secret: ~gEZPm5Z2ap35TN-O.jWOr~~Kx3sUX9e76
+      scopes: openid email profile
+      auth_url: https://login.microsoftonline.com/9c5c9da2-8ba9-4f91-8fa6-2c4382395477/oauth2/v2.0/authorize
+      token_url: https://login.microsoftonline.com/9c5c9da2-8ba9-4f91-8fa6-2c4382395477/oauth2/v2.0/token
+    server:
+      domain: monitoring.prod-us.sapienceanalytics.com
+      enforce_domain: false
+      serve_from_sub_path: false
+      root_url: https://monitoring.prod-us.sapienceanalytics.com
+

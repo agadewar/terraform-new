@@ -19,8 +19,11 @@ resource "kubernetes_config_map" "auth0" {
       "ENVIRONMENT_AUTH_CLIENT_ID" = "ot1zP3J0CaNqNcX1EMoy3ob3jLvlTLnc"
       "ENVIRONMENT_AUTH_SCOPE" = "openid email profile"
       "ENVIRONMENT_VUE_URL" = "https://app.dev.sapienceanalytics.com"
+
+      #Alerts AUTH0
       "alertrules__clientid"   = "WOhe3bLbEEcJidxP7X5zZcXlf4eKHlSC"
       "alertrules__secret"     = "OPAPcsz-oZd8xabFPZIn5sxe9DFOYhlVkMTz2Jflnvz0syBv1sAlrH7PDE2RIgTO"
+      
       #AUTH0 URI
       "Auth0__PingUri" = "https://sapience-lab-us-demo.auth0.com/test"
 

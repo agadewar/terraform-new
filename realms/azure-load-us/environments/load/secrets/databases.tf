@@ -8,5 +8,7 @@ resource "kubernetes_secret" "databases" {
       admin = var.connectionstring_admin
       mad = var.connectionstring_mad
       staging = var.connectionstring_staging
+      mongodb = var.connectionstring_mongo
+      edw = var.connectionstring_edw
   }
 }
