@@ -85,7 +85,7 @@ resource "helm_release" "influxdb" {
 
   set {
     name  = "resources.requests.memory"
-    value = "1024Mi"
+    value = "3072Mi"
   }
 
   set {
@@ -96,5 +96,10 @@ resource "helm_release" "influxdb" {
   set {
     name  = "resources.limits.memory"
     value = "4096Mi"
+  }
+
+  set {
+    name  = "livenessProbe.initialDelaySeconds"
+    value = "3600"
   }
 }
