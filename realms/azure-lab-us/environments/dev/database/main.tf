@@ -515,3 +515,25 @@ resource "azurerm_cosmosdb_account" "integrations_mongodb" {
     failover_priority = 0
   }
 }
+
+resource "azurerm_redis_cache" "redis_cache" {
+  name                = "sapience-redis-cache-${var.realm}-${var.environment}"
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group_name
+  capacity            = 2
+  family              = "C"
+  sku_name            = "Standard"
+  enable_non_ssl_port = false
+  minimum_tls_version = "1.2"
+
+  redis_configuration {
+  }
+}
+
+resource "azurerm_redis_firewall_rule" "firewall_redis_cache" {
+  name                = "someIPrange"
+  redis_cache_name    = azurerm_redis_cache.redis_cache.name
+  resource_group_name = var.resource_group_name
+  start_ip            = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
+  end_ip              = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
+}

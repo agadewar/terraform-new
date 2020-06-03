@@ -12,5 +12,6 @@ resource "kubernetes_config_map" "misc" {
       "ENVIRONMENT_VUE_URL"         =   "https://app.dev.sapienceanalytics.com"
       "ENVIRONMENT_ADMIN_URL"       =   "https://manage.dev.sapienceanalytics.com"
       "ENVIRONMENT_VUE_HELP_URL"    =   "https://help.demo.lab.us.azure.sapienceanalytics.com"
+      "ENVIRONMENT_CANOPY_URL"      =  "https://canopy.demo.lab-black.us.azure.sapienceanalytics.com/#/sso?path=%2FSapience"
   }
 }
