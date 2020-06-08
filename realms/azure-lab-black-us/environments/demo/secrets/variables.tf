@@ -23,3 +23,4 @@ variable "auth0_alertrules_secret"{}
 variable "etl_secret" {}
 variable "staging_password" {}
 variable "machine_learning_service_account_password" {}
+variable "redis_dashboard_Password"{}
