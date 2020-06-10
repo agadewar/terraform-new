@@ -28,6 +28,10 @@ variable "sql_database_staging_edition" {}
 variable "sql_database_staging_requested_service_objective_name" {}
 variable "sql_database_edw_edition" {}
 variable "sql_database_edw_requested_service_objective_name" {}
+variable "sql_database_adminimport_edition"{}
+variable "sql_database_adminimport_requested_service_objective_name"{}
+variable "sql_database_admin_edition"{}
+variable "sql_database_admin_requested_service_objective_name"{}
 
 variable "mysql_server_version" {}
 variable "mysql_server_sku_name" {}

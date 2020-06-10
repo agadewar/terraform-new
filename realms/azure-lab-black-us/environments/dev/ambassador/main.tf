@@ -305,7 +305,7 @@ timeout_ms: 30000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization
+  headers: Content-Type, Authorization, v-request-id
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
