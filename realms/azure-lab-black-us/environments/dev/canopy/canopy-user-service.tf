@@ -152,10 +152,10 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
           #   value = "false"
           # }
 
-          env {
-            name  = "cache.token.ttl-seconds"
-            value = "300"
-          }
+          # env {
+          #   name  = "cache.token.ttl-seconds"
+          #   value = "300"
+          # }
 
           env {
             name  = "canopy.security.service-permission-source"

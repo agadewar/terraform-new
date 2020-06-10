@@ -23,6 +23,8 @@ resource "kubernetes_secret" "kpi_service" {
     # "kafka.username"           = var.kafka_username
     # "kafka.password"           = var.kafka_password
     # "azure.datalake.key"       = data.terraform_remote_state.data_lake.outputs.azure_data_lake_storage_gen2_key_1
+    "canopy.service-account.username" = var.canopy_service_account_username
+    "canopy.service-account.password" = var.canopy_service_account_password
   }
 
   type = "Opaque"
@@ -81,10 +83,8 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/kpi-service:2.14.0.docker"
+          image = "${var.canopy_container_registry_hostname}/kpi-service:2.14.10.docker"
           name  = "kpi-service"
-
-          image_pull_policy = "Always"
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
@@ -104,6 +104,26 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
               }
             }
           }
+
+          env {
+            name = "CANOPY_SERVICE_ACCOUNT_USERNAME"
+            value_from {
+              secret_key_ref {
+                name = "kpi-service"
+                key  = "canopy.service-account.username"
+              }
+            }
+          }
+          env {
+            name = "CANOPY_SERVICE_ACCOUNT_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "kpi-service"
+                key  = "canopy.service-account.password"
+              }
+            }
+          }
+
           env {
             name = "REDIS_PASSWORD"
             value_from {
@@ -113,43 +133,7 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
               }
             }
           }
-          # env {
-          #   name = "CANOPY_AMQP_PASSWORD"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "eventpipeline-service"
-          #       key  = "canopy.amqp.password"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "KAFKA_USERNAME"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "eventpipeline-service"
-          #       key  = "kafka.username"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "KAFKA_PASSWORD"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "eventpipeline-service"
-          #       key  = "kafka.password"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "AZURE_DATALAKE_KEY"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "eventpipeline-service"
-          #       key  = "azure.datalake.key"
-          #     }
-          #   }
-          # }
-
+          
           env {
             name  = "bootstrap.enabled"
             value = "true"
@@ -170,15 +154,6 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
           env {
             name  = "influx.retentionPolicy"
             value = "autogen"
-          }
-
-          env {
-            name  = "canopy.security.service.username"
-            value = "dummy"
-          }
-          env {
-            name  = "canopy.security.service.password"
-            value = "dummy"
           }
 
           env {

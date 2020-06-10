@@ -454,16 +454,16 @@ resource "azurerm_mysql_database" "leafbroker" {
   collation           = "utf8_unicode_ci"
 }
 
-resource "azurerm_mysql_database" "marketplace" {
-  name                = "marketplace"
+resource "azurerm_mysql_database" "location" {
+  name                = "location"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_mysql_server.sapience.name
   charset             = "utf8"
   collation           = "utf8_unicode_ci"
 }
 
-resource "azurerm_mysql_database" "location" {
-  name                = "location"
+resource "azurerm_mysql_database" "marketplace" {
+  name                = "marketplace"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_mysql_server.sapience.name
   charset             = "utf8"
