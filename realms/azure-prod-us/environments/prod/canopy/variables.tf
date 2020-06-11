@@ -18,6 +18,9 @@ variable "kafka_password" {}
 
 variable "canopy_container_registry_hostname" {}
 
+variable "canopy_auth0_service_deployment_replicas"{}
+variable "canopy_auth0_service_deployment_request_memory"{}
+variable "canopy_auth0_service_deployment_request_cpu"{}
 variable "canopy_device_service_deployment_replicas" {}
 variable "canopy_device_service_deployment_request_memory" {}
 variable "canopy_device_service_deployment_request_cpu" {}
@@ -27,6 +30,9 @@ variable "canopy_hierarchy_service_deployment_request_cpu" {}
 variable "canopy_location_service_deployment_replicas" {}
 variable "canopy_location_service_deployment_request_memory" {}
 variable "canopy_location_service_deployment_request_cpu" {}
+variable "canopy_marketplace_service_deployment_replicas"{}
+variable "canopy_marketplace_service_deployment_request_memory"{}
+variable "canopy_marketplace_service_deployment_request_cpu"{}
 variable "canopy_notification_service_deployment_replicas" {}
 variable "canopy_notification_service_deployment_request_memory" {}
 variable "canopy_notification_service_deployment_request_cpu" {}
