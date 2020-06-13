@@ -6,7 +6,7 @@ before() {
     echo "Creating decrypted files..."
 
 	# $2 = realm
-	tfvarsrealm=`echo $2 | sed -r 's/-(black|red)//g'`
+	tfvarsrealm=`echo $2 | sed -E 's/-(black|red)//g'`
 	echo $tfvarsrealm
     ansible-vault decrypt "$1/realm.$tfvarsrealm.tfvars.vault" --output "$1/realm.$tfvarsrealm.tfvars" --vault-password-file $1/$tfvarsrealm.vault.password
 
@@ -35,7 +35,7 @@ trap 'after $config_location $realm $environment' EXIT ERR INT TERM
 if [[ $PWD =~ $regexp ]]
 then
 	realm="${BASH_REMATCH[1]}"
-	tfvarsrealm=`echo $2 | sed -r 's/-(black|red)//g'`
+	tfvarsrealm=`echo $2 | sed -E 's/-(black|red)//g'`
 	environment="${BASH_REMATCH[2]}"
 	echo "realm = ${realm}"
 	echo "environment = $environment"
@@ -51,7 +51,7 @@ else
 	if [[ $PWD =~ $regexp ]]
 	then
 		realm="${BASH_REMATCH[1]}"
-		tfvarsrealm=`echo $2 | sed -r 's/-(black|red)//g'`
+		tfvarsrealm=`echo $2 | sed -E 's/-(black|red)//g'`
 		echo "realm = ${realm}"
 
 		config_location="../../../../config"
