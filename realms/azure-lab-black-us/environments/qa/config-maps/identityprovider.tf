@@ -7,7 +7,7 @@ resource "kubernetes_config_map" "identity_provider" {
   data = {
 
       #IDENTITY PROVIDER
-      "Authorization__IdentityProvider" = "Ping"
+      "Authorization__IdentityProvider" = "auth0"
 
       #AUTH0
       "Authorization__Auth0__Authority"  = "https://qa-sapienceanalytics.auth0.com/"
@@ -18,7 +18,7 @@ resource "kubernetes_config_map" "identity_provider" {
       "Authorization__Ping__Authority"   = "https://auth.pingone.com/568541f6-bc62-4fdd-b8f4-9f919a2ff4aa/as"
 
       #PING
-      "ENVIRONMENT_AUTH_MODE"            = "ping"
+      "ENVIRONMENT_AUTH_MODE"            = "auth0"
       "Authorization__Ping__Authority"   = "https://auth.pingone.com/568541f6-bc62-4fdd-b8f4-9f919a2ff4aa/as"
       "Authorization__Ping__Audience"    = "https://api.sapienceanalytics.com/activities"
       "ENVIRONMENT_PING_AUTH_SCOPE"      = "activity openid profile email"
