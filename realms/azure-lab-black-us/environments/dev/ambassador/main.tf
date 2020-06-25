@@ -261,7 +261,7 @@ rewrite: /admin/users/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization
+  headers: Content-Type, Authorization, v-request-id
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -272,7 +272,7 @@ rewrite: /admin/settings/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization
+  headers: Content-Type, Authorization, v-request-id
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -283,7 +283,7 @@ rewrite: /admin/specs/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization
+  headers: Content-Type, Authorization, v-request-id
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -294,7 +294,7 @@ rewrite: /admin/org/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization
+  headers: Content-Type, Authorization, v-request-id
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -315,17 +315,18 @@ service: sapience-app-alerts
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization
+  headers: Content-Type, Authorization, v-request-id
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
 name:  sapience_meeting_mapping
-prefix: /externalintegration/
+prefix: /external/integration/
 service: sapience-meeting
+rewrite: /external/integration/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization
+  headers: Content-Type, Authorization, v-request-id
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -335,7 +336,7 @@ service: sapience-app-dashboard
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization
+  headers: Content-Type, Authorization, v-request-id
 EOF
     }
   }
