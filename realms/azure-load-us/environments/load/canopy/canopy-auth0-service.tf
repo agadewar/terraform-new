@@ -41,7 +41,7 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
   }
 
   spec {
-    replicas = 1
+    replicas = 0
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels

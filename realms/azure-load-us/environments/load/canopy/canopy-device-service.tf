@@ -69,7 +69,7 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.19.5.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.28.6.docker-SNAPSHOT"
           name  = "canopy-device-service"
 
           env { 
@@ -138,6 +138,15 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             }
           }
           env {
+            name = "REDIS_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "redis"
+                key  = "redis-password"
+              }
+            }
+          }
+          env {
             name = "GOOGLE_API_KEY"
             value_from {
               secret_key_ref {
@@ -149,6 +158,10 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
 
           env {
             name  = "com.banyanhills.canopy.device.eventhandler.AllDeviceEventHandler.disabled"
+            value = "true"
+          }
+          env {
+            name  = "canopy.security.userDetailsCacheEnabled"
             value = "true"
           }
 
@@ -225,6 +238,14 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
           // disable custom eventhandlers
           env {
             name  = "chargeit.enabled"
+            value = "false"
+          }
+          env {
+            name  = "dgt.enabled"
+            value = "false"
+          }
+          env {
+            name  = "entrust.enabled"
             value = "false"
           }
           env {

@@ -69,7 +69,7 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-user-service:2.5.3.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-user-service:2.5.6.docker-SNAPSHOT"
           name  = "canopy-user-service"
 
           env { 
@@ -155,7 +155,12 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
           # env {
           #   name  = "cache.token.ttl-seconds"
           #   value = "300"
-          # }          
+          # }     
+
+          env {
+            name  = "canopy.security.userDetailsCacheEnabled"
+            value = "true"
+          }     
 
           env {
             name  = "canopy.security.service-permission-source"
