@@ -71,7 +71,7 @@ resource "kubernetes_deployment" "canopy_hierarchy_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.7.1.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.7.4.docker-SNAPSHOT"
           name  = "canopy-hierarchy-service"
 
           env {
@@ -82,6 +82,11 @@ resource "kubernetes_deployment" "canopy_hierarchy_service_deployment" {
                 key  = "redis-password"
               }
             }
+          }
+
+          env {
+            name  = "canopy.security.userDetailsCacheEnabled"
+            value = "true"
           }
 
           env {
