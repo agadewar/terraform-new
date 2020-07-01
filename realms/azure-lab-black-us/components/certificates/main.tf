@@ -3,9 +3,10 @@ terraform {
     key = "black/certificates.tfstate"
   }
 
-  # required_providers {
-  #   helm = "= 0.10.4"
-  # }
+  required_providers {
+    # helm = "= 0.10.4"
+    helm = "= v1.2.3"
+  }
 }
 
 provider "helm" {
@@ -13,7 +14,7 @@ provider "helm" {
     config_path = local.config_path
   }
 
-  service_account = "tiller"
+  # service_account = "tiller"
 }
 
 provider "kubernetes" {

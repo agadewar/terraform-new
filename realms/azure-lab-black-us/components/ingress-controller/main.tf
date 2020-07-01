@@ -2,6 +2,10 @@ terraform {
   backend "azurerm" {
     key = "black/ingress-controller.tfstate"
   }
+
+  required_providers {
+    helm = "= v1.2.3"
+  }
 }
 
 provider "azurerm" {
@@ -38,7 +42,7 @@ locals {
 resource "helm_release" "nginx_ingress" {
   name      = "nginx-ingress"
   namespace = "kube-system"
-  chart     = "stable/nginx-ingress"
+  chart     = "nginx-ingress"
 
   set {
     name  = "controller.replicaCount"
@@ -65,7 +69,7 @@ resource "helm_release" "nginx_ingress" {
     value = "100Mi"
   }
 
-  timeout = 600
+  timeout = 300
 }
 
 resource "null_resource" "nginx_ingress_controller_ip" {

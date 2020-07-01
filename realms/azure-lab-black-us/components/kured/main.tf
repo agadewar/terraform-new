@@ -2,16 +2,20 @@ terraform {
   backend "azurerm" {
     key = "black/kured.tfstate"
   }
+
+  required_providers {
+    # helm = "= 0.10.4"
+    helm = "= v1.2.3"
+  }
 }
 
 provider "helm" {
-  version = "0.10.4"
   kubernetes {
     config_path = local.config_path
   }
 
   #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
-  service_account = "tiller"
+  # service_account = "tiller"
 }
 
 locals {

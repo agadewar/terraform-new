@@ -4,7 +4,8 @@ terraform {
   }
 
   required_providers {
-    helm = "= 0.10.4"
+    # helm = "= 0.10.4"
+    helm = "= v1.2.3"
   }
 }
 
@@ -29,7 +30,7 @@ provider "helm" {
   }
 
   #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
-  service_account = "tiller"
+  # service_account = "tiller"
 }
 
 locals {
