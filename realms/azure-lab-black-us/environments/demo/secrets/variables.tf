@@ -10,6 +10,7 @@ variable "environment_common_tags" {
     type = "map"
 }
 variable "connectionstring_admin" {}
+variable "connectionstring_adminimport"{}
 variable "connectionstring_mongo" {}
 variable "connectionstring_edw" {}
 variable "connectionstring_mad" {}
