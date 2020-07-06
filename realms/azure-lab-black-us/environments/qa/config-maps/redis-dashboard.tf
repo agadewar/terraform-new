@@ -9,6 +9,7 @@ resource "kubernetes_config_map" "redis-dashboard" {
       "RedisCacheSettings__Endpoint__SSL"          =     "true"
       "RedisCacheSettings__Endpoint__Port"         =     "6380"
       "RedisCacheSetting__DefaultDatabase"         =     "0"
+      "RedisCacheSettings__Enabled"                =     "true"
 
 }
 }

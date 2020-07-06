@@ -65,7 +65,7 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-auth0-service:1.1.6.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-auth0-service:1.1.7.docker-SNAPSHOT"
           name  = "canopy-auth0-service"
 
           env { 
