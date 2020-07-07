@@ -10,6 +10,9 @@ resource "kubernetes_config_map" "redis-dashboard" {
       "RedisCacheSettings__Endpoint__Port"         =     "6380"
       "RedisCacheSetting__DefaultDatabase"         =     "0"
       "RedisCacheSettings__Enabled"                =     "true"
+      "RedisCacheSettings__ConnectRetry"           =     "3"
+      "RedisCacheSettings__TTL"                    =     "21600"
+      "RedisCacheSettings__ConnectTimeout"         =     "100000"
 
 }
 }
