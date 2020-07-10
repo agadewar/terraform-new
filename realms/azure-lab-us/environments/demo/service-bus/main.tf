@@ -61,4 +61,3 @@ resource "azurerm_servicebus_queue" "device_registration" {
 
 #   enable_partitioning = true
 # }
-
