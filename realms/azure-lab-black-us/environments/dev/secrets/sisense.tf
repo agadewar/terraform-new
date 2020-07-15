@@ -6,5 +6,6 @@ resource "kubernetes_secret" "sisense" {
 
   data = {
       secret = var.sisense_secret
+      sharedsecret = var.sisense_sharedsecret
   }
 }
