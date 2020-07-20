@@ -92,7 +92,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     name                 = local.node_pool_profile_1_name
     type                 = "VirtualMachineScaleSets"
     vm_size              = var.kubernetes_pool01_vm_size
-    #os_type              = var.kubernetes_pool01_os_type
+    #os_type             = var.kubernetes_pool01_os_type
     os_disk_size_gb      = var.kubernetes_pool01_os_disk_size_gb
     enable_auto_scaling  = true
     min_count            = var.kubernetes_pool01_min_count
