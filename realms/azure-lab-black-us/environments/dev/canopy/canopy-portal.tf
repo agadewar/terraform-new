@@ -67,7 +67,7 @@ resource "kubernetes_deployment" "canopy_portal_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-portal:3.0.0rc1-alpha.20200711225808949"
+          image = "${var.canopy_container_registry_hostname}/canopy-portal:3.0.0rc1-alpha.20200723204619860"
           name  = "canopy-portal"
 
           env {
