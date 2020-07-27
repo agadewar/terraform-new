@@ -187,6 +187,27 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
             value = "2000"
           }
 
+          env {
+            name  = "spring.datasource.initial-size"
+            value = "10"
+          }
+          env {
+            name  = "spring.datasource.max-active"
+            value = "200"
+          }
+          env {
+            name  = "spring.datasource.min-idle"
+            value = "10"
+          }
+          env {
+            name  = "spring.datasource.max-idle"
+            value = "50"
+          }
+          env {
+            name  = "spring.datasource.min-evictable-idle-time-millis"
+            value = "5000"
+          }
+
           readiness_probe {
             http_get {
               path = "/ping"
