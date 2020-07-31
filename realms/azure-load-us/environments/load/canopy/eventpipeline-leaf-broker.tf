@@ -140,10 +140,26 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
             name  = "server.undertow.worker-threads"
             value = "4000"
           }
+          
           env {
-            // connection pool in Spring Boot 1.3.8 appears to use a different setting
+            name  = "spring.datasource.initial-size"
+            value = "10"
+          }
+          env {
             name  = "spring.datasource.max-active"
             value = "200"
+          }
+          env {
+            name  = "spring.datasource.min-idle"
+            value = "10"
+          }
+          env {
+            name  = "spring.datasource.max-idle"
+            value = "50"
+          }
+          env {
+            name  = "spring.datasource.min-evictable-idle-time-millis"
+            value = "5000"
           }
 
           readiness_probe {

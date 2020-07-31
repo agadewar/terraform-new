@@ -17,6 +17,6 @@ resource "kubernetes_config_map" "etl_staging_database" {
       "STAGING_DATABASE_PORT": "1433"
       "STAGING_DATABASE_SERVER_NAME": "sapience-load-us-load.database.windows.net"
       "STAGING_DATABASE_USERNAME": "appsvc_etl_user"
-      "THREAD_POOL_SIZE": "3"
+      "THREAD_POOL_SIZE": "10"
   }
 }
