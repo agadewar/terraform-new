@@ -97,4 +97,9 @@ resource "helm_release" "influxdb" {
     name  = "resources.limits.memory"
     value = "4096Mi"
   }
+
+  set {
+    name  = "livenessProbe.initialDelaySeconds"
+    value = "3600"
+  }
 }
