@@ -19,7 +19,7 @@ resource "kubernetes_ingress" "kibana" {
         path {
           backend {
             service_name = "efk-kibana"
-            service_port = 80
+            service_port = 443
           }
 
           path = "/"
