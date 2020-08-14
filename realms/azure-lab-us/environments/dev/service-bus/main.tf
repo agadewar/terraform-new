@@ -38,6 +38,16 @@ resource "azurerm_servicebus_namespace" "namespace" {
   tags = merge(local.common_tags, {})
 }
 
+resource "azurerm_servicebus_namespace" "admin-users" {
+  name                = "sapience-${var.realm}-${var.environment}-admin-users"
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group_name
+  sku                 = "Standard"
+
+  tags = merge(local.common_tags, {})
+}
+
+
 # resource "azurerm_servicebus_queue" "canopy_eventpipeline" {
 #   name                = "sapience-canopy-eventpipeline"
 #   resource_group_name = var.resource_group_name
@@ -228,3 +238,30 @@ resource "azurerm_servicebus_queue" "canopy-notification-twilio" {
   enable_partitioning = false
 
  }
+
+resource "azurerm_servicebus_topic" "admin-users" {
+  name                = "admin-users"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.admin-users.name
+
+  enable_partitioning = false
+
+}
+
+resource "azurerm_servicebus_topic" "subscribe-sisense" {
+  name                = "subscribe-sisense"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.admin-users.name
+
+  enable_partitioning = false
+
+}
+
+resource "azurerm_servicebus_topic" "subscribe-auth0" {
+  name                = "subscribe-auth0"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.admin-users.name
+
+  enable_partitioning = false
+  
+}

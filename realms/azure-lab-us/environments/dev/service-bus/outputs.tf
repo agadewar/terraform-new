@@ -7,3 +7,13 @@ output "servicebus_namespace_hostname" {
   description = "The hostname for the service bus namespace"
   value       = "${azurerm_servicebus_namespace.namespace.name}.servicebus.windows.net"
 }
+
+output "servicebus_namespace_admin-users_default_primary_key" {
+  description = "The primary key for service bus namespace"
+  value       = azurerm_servicebus_namespace.admin-users.default_primary_key
+}
+
+output "servicebus_namespace_admin-users_hostname" {
+  description = "The hostname for the service bus namespace"
+  value       = "${azurerm_servicebus_namespace.admin-users.name}.servicebus.windows.net"
+}
