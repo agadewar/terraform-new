@@ -397,7 +397,7 @@ resource "azurerm_mysql_configuration" "max_connections" {   // TODO: make this 
   name                = "max_connections"
   resource_group_name = var.resource_group_name
   server_name         = "${azurerm_mysql_server.sapience.name}"
-  value               = "2500"
+  value               = "1250"
 }
 
 resource "azurerm_mysql_database" "device" {
