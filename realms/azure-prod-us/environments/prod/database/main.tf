@@ -474,22 +474,22 @@ resource "azurerm_mysql_database" "user" {
 
 
 
-resource "azurerm_cosmosdb_account" "integrations_mongodb" {
-  name                = "sapience-integrations-mongodb-${var.realm}-${var.environment}"
-  resource_group_name = var.resource_group_name
-  location            = var.resource_group_location
-  offer_type          = "Standard"
-  kind                = "MongoDB"
+#resource "azurerm_cosmosdb_account" "integrations_mongodb" {
+#  name                = "sapience-integrations-mongodb-${var.realm}-${var.environment}"
+#  resource_group_name = var.resource_group_name
+#  location            = var.resource_group_location
+#  offer_type          = "Standard"
+#  kind                = "MongoDB"
 
-  consistency_policy {
-    consistency_level = "Strong"
-  }
+#  consistency_policy {
+#    consistency_level = "Strong"
+#  }
 
-  geo_location {
-    location          = local.cosmos_failover_location
-    failover_priority = 0
-  }
-}
+#  geo_location {
+#    location          = local.cosmos_failover_location
+#    failover_priority = 0
+#  }
+#}
 
 resource "azurerm_redis_cache" "redis_cache" {
   name                = "sapience-redis-cache-${var.realm}-${var.environment}"
