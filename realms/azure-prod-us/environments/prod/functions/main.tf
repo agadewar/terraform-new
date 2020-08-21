@@ -72,5 +72,5 @@ resource "azurerm_function_app" "function_app" {
   storage_connection_string = azurerm_storage_account.sapience_functions.primary_connection_string
   # storage_connection_string = data.terraform_remote_state.storage_account.outputs.primary_connection_string
   version                   = "~2"
+  app_settings              = var.function_app_settings
 }
-

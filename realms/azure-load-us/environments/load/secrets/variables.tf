@@ -21,3 +21,4 @@ variable "auth0_secret" {}
 variable "etl_secret" {}
 variable "staging_password" {}
 variable "sisense_sharedsecret" {}
+variable "redis_dashboard_Password"{}
