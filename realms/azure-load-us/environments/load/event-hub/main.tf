@@ -29,9 +29,6 @@ resource "azurerm_eventhub_namespace" "namespace" {
   kafka_enabled       = true
   capacity            = 1
 
-  tags = {
-    environment = "Production"
-  }
 }
 
 resource "azurerm_eventhub" "canopy-eventpipeline" {
