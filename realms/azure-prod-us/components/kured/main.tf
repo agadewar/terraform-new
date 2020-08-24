@@ -4,8 +4,7 @@ terraform {
   }
 
   required_providers {
-    # helm = "= 0.10.4"
-    helm = "= v1.2.3"
+    helm = "= 0.10.4"
   }
 }
 

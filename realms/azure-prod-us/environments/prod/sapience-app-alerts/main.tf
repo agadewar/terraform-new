@@ -55,8 +55,8 @@ resource "kubernetes_secret" "sapience_app_alerts" {
     namespace = local.namespace
   }
 
-  data = {
-      CosmosDb__Key = data.terraform_remote_state.database.outputs.sapience_app_alerts_cosmos_password
-      ApplicationInsights__InstrumentationKey = data.terraform_remote_state.app_insights.outputs.instrumentation_key
-  }
+  # data = {
+  #     ApplicationInsights__InstrumentationKey = data.terraform_remote_state.app_insights.outputs.instrumentation_key
+  #     # NotificationsDb__Key =  Is this still in use? the key doesn't appear to be valid. there's a new databases secret with a mongo connection string that replaces this.
+  # }
 }

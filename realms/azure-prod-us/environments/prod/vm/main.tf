@@ -116,7 +116,7 @@ resource "azurerm_virtual_machine" "sisense_appquery_001" {
   resource_group_name   = var.resource_group_name
   location              = var.resource_group_location
   network_interface_ids = [azurerm_network_interface.sisense_appquery_001.id]
-  vm_size               = "Standard_A8_v2"
+  vm_size               = "Standard_A8m_v2"
 
   # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
   # NOTE: This may not be optimal in all cases.
@@ -204,7 +204,7 @@ resource "azurerm_virtual_machine" "sisense_appquery_002" {
   resource_group_name   = var.resource_group_name
   location              = var.resource_group_location
   network_interface_ids = [azurerm_network_interface.sisense_appquery_002.id]
-  vm_size               = "Standard_A8_v2"
+  vm_size               = "Standard_A8m_v2"
 
   # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
   # NOTE: This may not be optimal in all cases.
@@ -293,7 +293,7 @@ resource "azurerm_virtual_machine" "sisense_build_001" {
   resource_group_name   = var.resource_group_name
   location              = var.resource_group_location
   network_interface_ids = [azurerm_network_interface.sisense_build_001.id]
-  vm_size               = "Standard_A8_v2"
+  vm_size               = "Standard_A8m_v2"
 
   # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
   # NOTE: This may not be optimal in all cases.

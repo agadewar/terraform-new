@@ -72,7 +72,7 @@ resource "azurerm_virtual_machine" "talend" {
   resource_group_name   = var.resource_group_name
   location              = var.resource_group_location
   network_interface_ids = [azurerm_network_interface.talend.id]
-  vm_size               = "Standard_B8ms"
+  vm_size               = "Standard_B4ms"
 
   # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
   # NOTE: This may not be optimal in all cases.
