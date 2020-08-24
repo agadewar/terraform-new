@@ -312,6 +312,7 @@ kind:  Mapping
 name:  sapience_app_alerts_mapping
 prefix: /alerts/
 service: sapience-app-alerts
+timeout_ms: 10000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
