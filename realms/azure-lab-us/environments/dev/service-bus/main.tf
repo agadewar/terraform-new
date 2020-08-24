@@ -239,29 +239,35 @@ resource "azurerm_servicebus_queue" "canopy-notification-twilio" {
 
  }
 
-resource "azurerm_servicebus_topic" "admin-users" {
-  name                = "admin-users"
+resource "azurerm_servicebus_topic" "sapience-admin-users-created" {
+  name                = "sapience-admin-users-created"
   resource_group_name = var.resource_group_name
   namespace_name      = azurerm_servicebus_namespace.admin-users.name
 
-  enable_partitioning = false
+  enable_partitioning = true
 
 }
 
-resource "azurerm_servicebus_topic" "subscribe-sisense" {
-  name                = "subscribe-sisense"
+resource "azurerm_servicebus_subscription" "subscriptions-auth0" {
+  name                = "sapience-admin-users-created-subscriptions_auth0"
   resource_group_name = var.resource_group_name
   namespace_name      = azurerm_servicebus_namespace.admin-users.name
-
-  enable_partitioning = false
-
-}
-
-resource "azurerm_servicebus_topic" "subscribe-auth0" {
-  name                = "subscribe-auth0"
-  resource_group_name = var.resource_group_name
-  namespace_name      = azurerm_servicebus_namespace.admin-users.name
-
-  enable_partitioning = false
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-created.name
   
+  max_delivery_count  = 10
+  #auto_delete_on_idle = 10
+  requires_session = false
+
+}
+
+resource "azurerm_servicebus_subscription" "subscriptions-sisense" {
+  name                = "sapience-admin-users-created-subscriptions_sisense"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.admin-users.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-created.name
+  
+  max_delivery_count  = 10
+  #auto_delete_on_idle = 10
+  requires_session = false
+
 }
