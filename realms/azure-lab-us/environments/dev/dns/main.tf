@@ -132,6 +132,14 @@ resource "azurerm_dns_a_record" "sisense_appquery" {
   records = ["40.90.250.17"]
 }
 
+resource "azurerm_dns_a_record" "sisense_linux" {
+  name                = "sisense-linux.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
+  zone_name           = "sapienceanalytics.com"
+  resource_group_name = "global-us"
+  ttl                 = 300
+  records = ["52.136.127.174"]
+}
+
 resource "azurerm_dns_cname_record" "kubernetes" {
   name                = "kubernetes.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
   zone_name           = "sapienceanalytics.com"

@@ -38,6 +38,9 @@ variable "sisense_appquery_002_admin_password" {}
 variable "sisense_build_001_admin_username" {}
 variable "sisense_build_001_admin_password" {}
 
+variable "sisense_linux_admin_username" {}
+variable "sisense_linux_admin_password" {}
+
 variable "talend_admin_username" {}
 variable "talend_admin_password" {}
 

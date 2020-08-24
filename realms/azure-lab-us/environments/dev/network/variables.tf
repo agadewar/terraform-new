@@ -21,7 +21,10 @@ variable "subnet_address_prefix_env-default" {}
 variable "subnet_address_prefix_env-application" {}
 variable "subnet_address_prefix_env-data" {}
 
+variable "subnet_service_endpoints_env-data" {
+  type = list(string)
+}
+
 variable "realm_common_tags" {
   type = map(string)
 }
-
