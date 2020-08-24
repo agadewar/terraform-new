@@ -135,16 +135,16 @@ resource "azurerm_sql_database" "EDW" {
   tags = merge(local.common_tags, {})
 }
 
-resource "azurerm_sql_database" "EDW_new" {
-  name                             = "EDW_new"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_edw_new_edition
-  requested_service_objective_name = var.sql_database_edw_new_requested_service_objective_name
+#resource "azurerm_sql_database" "EDW_new" {
+#  name                             = "EDW_new"
+#  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
+# location                         = azurerm_sql_server.sapience.location
+#  server_name                      = azurerm_sql_server.sapience.name
+#  edition                          = var.sql_database_edw_new_edition
+#  requested_service_objective_name = var.sql_database_edw_new_requested_service_objective_name
 
-  tags = merge(local.common_tags, {})
-}
+#  tags = merge(local.common_tags, {})
+#}
 
 resource "azurerm_sql_database" "mad" {
   name                             = "mad"
