@@ -62,9 +62,14 @@ eventpipeline.sinks.eventarchive.channel = eventarchive
 eventpipeline.sinks.eventarchive.hdfs.path = abfss://sapience-adls@${datalake_name}.dfs.core.windows.net/rawdata/avro/tenantId=%%{tenantId}/companyId=%%{companyId}/recordType=%%{recordType}/year=%Y/month=%m/day=%d/hour=%H/minute=%M
 eventpipeline.sinks.eventarchive.hdfs.fileType = DataStream
 eventpipeline.sinks.eventarchive.hdfs.writeFormat = Text
-eventpipeline.sinks.eventarchive.hdfs.filePrefix = EventData
+eventpipeline.sinks.eventarchive.hdfs.filePrefix = EventData-%[localhost]
 eventpipeline.sinks.eventarchive.hdfs.fileSuffix = .avro
 eventpipeline.sinks.eventarchive.hdfs.rollSize = 0
 eventpipeline.sinks.eventarchive.hdfs.rollCount = 0
+eventpipeline.sinks.eventarchive.hdfs.rollInterval = 0
+eventpipeline.sinks.eventarchive.hdfs.closeTries = 20
+eventpipeline.sinks.eventarchive.hdfs.retryInterval = 15
+eventpipeline.sinks.eventarchive.hdfs.batchSize = 100
+eventpipeline.sinks.eventarchive.hdfs.idleTimeout = 60
 eventpipeline.sinks.eventarchive.serializer = avro_event
 eventpipeline.sinks.eventarchive.serializer.compressionCodec = snappy
