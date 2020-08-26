@@ -74,3 +74,35 @@ resource "azurerm_function_app" "function_app" {
   version                   = "~2"
 }
 
+resource "azurerm_storage_account" "sapience_functions_admin_users" {
+  name                     = "adminfn${replace(lower(var.realm), "-", "")}${var.environment}"
+  resource_group_name      = var.resource_group_name
+  location                 = "eastus2"
+  account_tier             = "Standard"
+  account_replication_type = "GRS"
+
+  tags = merge(local.common_tags, {})
+}
+
+resource "azurerm_app_service_plan" "service_plan_admin_users" {
+  name                = "azure-functions-service-plan-admin-users-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+
+  sku {
+    tier = "Standard"
+    size = "S1"
+  }
+}
+
+resource "azurerm_function_app" "function_app_admin_users" {
+  name                      = "azure-functions-app-sapience-user-provisioning-${var.realm}-${var.environment}"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  app_service_plan_id       = azurerm_app_service_plan.service_plan_admin_users.id
+  storage_connection_string = azurerm_storage_account.sapience_functions_admin_users.primary_connection_string
+  version                   = "3.1"
+
+  #os_type                   = "linux"
+
+}
