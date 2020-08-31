@@ -6,5 +6,6 @@ resource "kubernetes_secret" "auth0" {
 
   data = {
       secret =  var.auth0_secret
+      auth0clientsecret = var.sisense_auth0clientsecret
   }
 }

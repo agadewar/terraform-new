@@ -33,18 +33,18 @@ locals {
   )}"
 }
 
-resource "kubernetes_secret" "sapience_app_alerts" {
-  metadata {
-    labels = {
-      "sapienceanalytics.com/name" = "sapience-app-alerts"
-    }
+# resource "kubernetes_secret" "sapience_app_alerts" {
+#   metadata {
+#     labels = {
+#       "sapienceanalytics.com/name" = "sapience-app-alerts"
+#     }
 
-    name = "sapience-app-alerts"
-    namespace = local.namespace
-  }
+#     name = "sapience-app-alerts"
+#     namespace = local.namespace
+#   }
 
-  data = {
-      NotificationsDb__Key = var.cosmosdb_key_alerts
-      ApplicationInsights__InstrumentationKey = data.terraform_remote_state.app_insights.outputs.instrumentation_key
-  }
-}
+#   data = {
+#       NotificationsDb__Key = var.cosmosdb_key_alerts
+#       ApplicationInsights__InstrumentationKey = data.terraform_remote_state.app_insights.outputs.instrumentation_key
+#   }
+# }

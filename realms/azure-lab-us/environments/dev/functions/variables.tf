@@ -10,6 +10,14 @@ variable "subscription_id" {}
 variable "resource_group_name" {}
 variable "resource_group_location" {}
 
+variable "function_app_settings" {
+  type = map(string)
+}
+
+variable "function_app_admin_users" {
+  type = map(string)
+}
+
 variable "realm_common_tags" {
   type = map(string)
 }

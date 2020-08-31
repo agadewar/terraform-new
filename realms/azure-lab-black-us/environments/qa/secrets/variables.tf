@@ -26,3 +26,4 @@ variable "auth0_alertrules_clientid"{}
 variable "machine_learning_service_account_password"{}
 variable "redis_dashboard_Password"{}
 variable "sisense_sharedsecret"{}
+variable "sisense_auth0clientsecret"{}
