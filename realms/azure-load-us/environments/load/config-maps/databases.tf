@@ -5,7 +5,7 @@ resource "kubernetes_config_map" "databases" {
   }
 
   data = {
-      "sql_server_name"                  = "sapience-lab-us-load.database.windows.net"
+      "sql_server_name"                  = "sapience-load-us-load.database.windows.net"
       "data_warehouse"                   = "edw"
       "api_service_account"              = "appsvc_api_user"
       "machine_learning_service_account" = "appsvc_ml_user"
