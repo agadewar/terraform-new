@@ -188,23 +188,23 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
           }
 
           env {
-            name  = "spring.datasource.initial-size"
-            value = "10"
-          }
-          env {
-            name  = "spring.datasource.max-active"
-            value = "200"
-          }
-          env {
-            name  = "spring.datasource.min-idle"
-            value = "10"
-          }
-          env {
-            name  = "spring.datasource.max-idle"
+            name  = "spring.datasource.tomcat.initial-size"
             value = "50"
           }
           env {
-            name  = "spring.datasource.min-evictable-idle-time-millis"
+            name  = "spring.datasource.tomcat.max-active"
+            value = "300"
+          }
+          env {
+            name  = "spring.datasource.tomcat.min-idle"
+            value = "50"
+          }
+          env {
+            name  = "spring.datasource.tomcat.max-idle"
+            value = "60"
+          }
+          env {
+            name  = "spring.datasource.tomcat.min-evictable-idle-time-millis"
             value = "5000"
           }
 

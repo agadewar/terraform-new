@@ -140,6 +140,27 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
           }
 
           env {
+            name  = "spring.datasource.tomcat.initial-size"
+            value = "10"
+          }
+          env {
+            name  = "spring.datasource.tomcat.max-active"
+            value = "200"
+          }
+          env {
+            name  = "spring.datasource.tomcat.min-idle"
+            value = "10"
+          }
+          env {
+            name  = "spring.datasource.tomcat.max-idle"
+            value = "30"
+          }
+          env {
+            name  = "spring.datasource.tomcat.min-evictable-idle-time-millis"
+            value = "5000"
+          }
+
+          env {
             name  = "bootstrap.enabled"
             value = "true"
           }

@@ -171,26 +171,26 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
           }
           
           env {
-            name  = "spring.datasource.initial-size"
-            value = "10"
+            name  = "spring.datasource.tomcat.initial-size"
+            value = "20"
           }
           env {
-            name  = "spring.datasource.max-active"
-            value = "200"
+            name  = "spring.datasource.tomcat.max-active"
+            value = "300"
           }
           env {
-            name  = "spring.datasource.min-idle"
-            value = "10"
+            name  = "spring.datasource.tomcat.min-idle"
+            value = "20"
           }
           env {
-            name  = "spring.datasource.max-idle"
+            name  = "spring.datasource.tomcat.max-idle"
             value = "50"
           }
           env {
-            name  = "spring.datasource.min-evictable-idle-time-millis"
+            name  = "spring.datasource.tomcat.min-evictable-idle-time-millis"
             value = "5000"
           }
-
+          
           env {
             name  = "jms.queues"
             value = "canopy-device-agent-info,canopy-device-device-event,canopy-device-device-component,canopy-device-file-version,canopy-device-generic-data-info,canopy-device-heartbeat,canopy-device-leaf-versions,canopy-device-software-update,canopy-device-system-info,canopy-device-system-utilization"
