@@ -103,6 +103,24 @@ resource "azurerm_function_app" "function_app_admin_users" {
   storage_connection_string = azurerm_storage_account.sapience_functions_admin_users.primary_connection_string
   version                   = "3.1"
 
-  #os_type                   = "linux"
+      app_settings                   = {
+      AzureWebJobsStorage           =  " "
+      Connection                    =  " "
+      FUNCTIONS_WORKER_RUNTIME      =  "dotnet"
+      Auth0__Connection             =  "Username-Password-Authentication"
+      Auth0__ManagementApiClientId  =  " "
+      Auth0__ManagementApiIdentifier  = " "
+      Auth0__ManagementApiAudience    =  ""
+      Auth0__ManagementApiSecret      =  ""
+      Sisense__BaseUrl                =  "https://sisense.dev.lab.us.azure.sapienceanalytics.com/"
+      Sisense__UsersUri               =  "api/users?notify=false"
+      Sisense__DefaultGroupUri        =  "api/v1/groups?name="
+      Sisense__DataSecurityUri        =  "api/elasticubes/datasecurity"
+      Sisense__ElasticubesUri         =  "api/v1/elasticubes/getElasticubes"
+      Sisense__DailyDataSource        =  "Sapience-Daily-CompanyId-Env"
+      Sisense__HourlyDataSource       =  "Sapience-Hourly-CompanyId-Env"
+      Sisense__Env                    =  "Dev"
+      Sisense__Secret                 =  ""
 
+  }
 }
