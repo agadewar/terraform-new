@@ -5,8 +5,8 @@ resource "kubernetes_config_map" "etl_staging_database" {
   }
 
   data = {
-      "KAFKA_BOOTSTRAP_SERVERS": "pkc-lgwgm.eastus2.azure.confluent.cloud:9092"
-      "KAFKA_CLUSTER_API_KEY": "73A25FUPCGBN7JQZ"
+      "KAFKA_BOOTSTRAP_SERVERS": "sapience-eventhub-load-us-load.servicebus.windows.net:9093"
+      "KAFKA_CLUSTER_API_KEY": "$ConnectionString"
       "KAFKA_GROUP_ID": "etl-staging-database"
       "KAFKA_MAX_POLL_RECORDS": "500"
       "KAFKA_RETRY_BACKOFF_MS": "500"

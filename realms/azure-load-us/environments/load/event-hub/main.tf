@@ -22,27 +22,28 @@ locals {
 
 
 resource "azurerm_eventhub_namespace" "namespace" {
-  name                = "sapience-eventhub-${var.realm}-${var.environment}"
-  location            = var.resource_group_location
-  resource_group_name = var.resource_group_name
-  sku                 = "Standard"
-  kafka_enabled       = true
-  capacity            = 1
-
+  name                     = "sapience-eventhub-${var.realm}-${var.environment}"
+  location                 = var.resource_group_location
+  resource_group_name      = var.resource_group_name
+  sku                      = "Standard"
+  kafka_enabled            = true
+  capacity                 = 1
+  auto_inflate_enabled     = true
+  maximum_throughput_units = 20
 }
 
 resource "azurerm_eventhub" "canopy-eventpipeline" {
   name                = "canopy-eventpipeline"
   namespace_name      = azurerm_eventhub_namespace.namespace.name
   resource_group_name = var.resource_group_name
-  partition_count     = 2
-  message_retention   = 1
+  partition_count     = 32
+  message_retention   = 3
 }
 
 resource "azurerm_eventhub" "eventarchive-channel" {
   name                = "eventarchive-channel"
   namespace_name      = azurerm_eventhub_namespace.namespace.name
   resource_group_name = var.resource_group_name
-  partition_count     = 2
-  message_retention   = 1
+  partition_count     = 32
+  message_retention   = 3
 }

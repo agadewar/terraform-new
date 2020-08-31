@@ -2,6 +2,10 @@ terraform {
   backend "azurerm" {
     key = "ingress-controller.tfstate"
   }
+
+  required_providers {
+    helm = "= 0.10.4"
+  }
 }
 
 provider "azurerm" {
