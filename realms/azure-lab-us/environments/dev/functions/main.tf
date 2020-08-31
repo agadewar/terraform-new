@@ -69,6 +69,7 @@ resource "azurerm_function_app" "function_app" {
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
   app_service_plan_id       = azurerm_app_service_plan.service_plan.id
+  app_settings              = var.function_app_settings
   storage_connection_string = azurerm_storage_account.sapience_functions.primary_connection_string
   # storage_connection_string = data.terraform_remote_state.storage_account.outputs.primary_connection_string
   version                   = "~2"
@@ -100,6 +101,7 @@ resource "azurerm_function_app" "function_app_admin_users" {
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
   app_service_plan_id       = azurerm_app_service_plan.service_plan_admin_users.id
+  app_settings              = var.function_app_admin_users  
   storage_connection_string = azurerm_storage_account.sapience_functions_admin_users.primary_connection_string
   version                   = "3.1"
 

@@ -63,6 +63,9 @@ resource "kubernetes_ingress" "kubernetes_dashboard_stg" {
       "ingress.kubernetes.io/ssl-redirect"     = "true"
       "kubernetes.io/ingress.class"            = "nginx"
       "kubernetes.io/tls-acme"                 = "true"
+      "nginx.ingress.kubernetes.io/auth-realm"  = "Authentication Required"
+      "nginx.ingress.kubernetes.io/auth-secret" = "htpasswd-dashboard"
+      "nginx.ingress.kubernetes.io/auth-type"   = "basic"
     }
   }
 
@@ -128,108 +131,108 @@ data "template_file" "ambassador-rbac" {
   }
 }
 
-resource "null_resource" "ambassador_rbac" {
-  triggers = {
-    template_changed = data.template_file.ambassador-rbac.rendered
-  }
+# resource "null_resource" "ambassador_rbac" {
+#   triggers = {
+#     template_changed = data.template_file.ambassador-rbac.rendered
+#   }
 
-  provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.ambassador-rbac.rendered}\nEOF"
-  }
+#   provisioner "local-exec" {
+#     command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.ambassador-rbac.rendered}\nEOF"
+#   }
 
-  provisioner "local-exec" {
-    when = destroy
+#   provisioner "local-exec" {
+#     when = destroy
 
-    command = "kubectl delete --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.ambassador-rbac.rendered}\nEOF"
-  }
-}
+#     command = "kubectl delete --kubeconfig=${local.config_path} -n ${local.namespace} -f - <<EOF\n${data.template_file.ambassador-rbac.rendered}\nEOF"
+#   }
+# }
 
-resource "kubernetes_service" "ambassador" {
-  metadata {
-    name      = "ambassador"
-    namespace = local.namespace
-  }
+# resource "kubernetes_service" "ambassador" {
+#   metadata {
+#     name      = "ambassador"
+#     namespace = local.namespace
+#   }
 
-  spec {
-    selector = {
-      service = "ambassador"
-    }
+#   spec {
+#     selector = {
+#       service = "ambassador"
+#     }
 
-    port {
-      name = "http"
-      port = 80
-      target_port = 8080
-    }
+#     port {
+#       name = "http"
+#       port = 80
+#       target_port = 8080
+#     }
 
-    type = "ClusterIP"
-  }
-}
+#     type = "ClusterIP"
+#   }
+# }
 
-resource "kubernetes_service" "api" {
-  metadata {
-    name      = "api"
-    namespace = local.namespace
-    annotations = {
-      "getambassador.io/config" = <<EOF
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  canopy_device_service_mapping
-prefix: /device/
-service: canopy-device-service
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  canopy_hierarchy_service_mapping
-prefix: /hierarchy/
-service: canopy-hierarchy-service
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  canopy_user_service_mapping
-prefix: /user/
-service: canopy-user-service
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  eventpipeline_leaf_broker_mapping
-prefix: /leafbroker/
-service: eventpipeline-leaf-broker
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  eventpipeline_service_mapping
-prefix: /eventpipeline/
-service: eventpipeline-service
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  sapience_app_dashboard_mapping
-prefix: /dashboard/
-service: sapience-app-dashboard
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  sapience_app_api_mapping
-prefix: /
-service: sapience-app-api
-timeout_ms: 10000
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization
-EOF
+# resource "kubernetes_service" "api" {
+#   metadata {
+#     name      = "api"
+#     namespace = local.namespace
+#     annotations = {
+#       "getambassador.io/config" = <<EOF
+# ---
+# apiVersion: ambassador/v1
+# kind:  Mapping
+# name:  canopy_device_service_mapping
+# prefix: /device/
+# service: canopy-device-service
+# ---
+# apiVersion: ambassador/v1
+# kind:  Mapping
+# name:  canopy_hierarchy_service_mapping
+# prefix: /hierarchy/
+# service: canopy-hierarchy-service
+# ---
+# apiVersion: ambassador/v1
+# kind:  Mapping
+# name:  canopy_user_service_mapping
+# prefix: /user/
+# service: canopy-user-service
+# ---
+# apiVersion: ambassador/v1
+# kind:  Mapping
+# name:  eventpipeline_leaf_broker_mapping
+# prefix: /leafbroker/
+# service: eventpipeline-leaf-broker
+# ---
+# apiVersion: ambassador/v1
+# kind:  Mapping
+# name:  eventpipeline_service_mapping
+# prefix: /eventpipeline/
+# service: eventpipeline-service
+# ---
+# apiVersion: ambassador/v1
+# kind:  Mapping
+# name:  sapience_app_dashboard_mapping
+# prefix: /dashboard/
+# service: sapience-app-dashboard
+# ---
+# apiVersion: ambassador/v1
+# kind:  Mapping
+# name:  sapience_app_api_mapping
+# prefix: /
+# service: sapience-app-api
+# timeout_ms: 10000
+# cors:
+#   origins: "*"
+#   methods: GET, POST, PUT, DELETE, OPTIONS
+#   headers: Content-Type, Authorization
+# EOF
 
-    }
-  }
+#     }
+#   }
 
-  spec {
-    port {
-      name = "http"
-      port = 80
-    }
-  }
-}
+#   spec {
+#     port {
+#       name = "http"
+#       port = 80
+#     }
+#   }
+# }
 
 # resource "kubernetes_deployment" "statsd_sink" {
 #   metadata {

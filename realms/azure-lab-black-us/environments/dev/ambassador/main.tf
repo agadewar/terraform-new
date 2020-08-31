@@ -241,6 +241,18 @@ circuit_breakers:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  eventpipeline_leaf_broker_eh_mapping
+prefix: /leafbroker_eh/
+service: eventpipeline-leaf-broker-eh
+timeout_ms: 120000
+connect_timeout_ms: 120000
+circuit_breakers:
+- max_connections: 8000
+  max_pending_requests: 8000
+  max_requests: 8000
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  eventpipeline_service_mapping
 prefix: /eventpipeline/
 service: eventpipeline-service
