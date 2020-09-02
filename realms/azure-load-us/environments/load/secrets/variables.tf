@@ -10,10 +10,12 @@ variable "environment_common_tags" {
     type = "map"
 }
 variable "connectionstring_admin" {}
+variable "connectionstring_adminimport" {}
 variable "connectionstring_mad" {}
 variable "connectionstring_staging" {}
 variable "connectionstring_mongo"{}
 variable "connectionstring_edw"{}
+variable "machine_learning_service_account_password"{}
 variable "cosmosdb_key_dashboard" {}
 variable "cosmosdb_key_alerts" {}
 variable "sisense_secret" {}
