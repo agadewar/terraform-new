@@ -58,39 +58,6 @@ resource "azurerm_sql_server" "sapience" {
 #   tags = merge(local.common_tags, {})
 # }
 
-resource "azurerm_sql_database" "canopy_device" {
-  name                             = "canopy-device"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_canopy_device_edition
-  requested_service_objective_name = var.sql_database_canopy_device_requested_service_objective_name
-
-  tags = merge(local.common_tags, {})
-}
-
-resource "azurerm_sql_database" "canopy_eventpipeline" {
-  name                             = "canopy-eventpipeline"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_canopy_eventpipeline_edition
-  requested_service_objective_name = var.sql_database_canopy_eventpipeline_requested_service_objective_name
-
-  tags = merge(local.common_tags, {})
-}
-
-resource "azurerm_sql_database" "canopy_leafbroker" {
-  name                             = "canopy-leafbroker"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_canopy_leafbroker_edition
-  requested_service_objective_name = var.sql_database_canopy_leafbroker_requested_service_objective_name
-
-  tags = merge(local.common_tags, {})
-}
-
 resource "azurerm_mysql_database" "marketplace" {
   name                = "marketplace"
   resource_group_name = var.resource_group_name
@@ -99,16 +66,6 @@ resource "azurerm_mysql_database" "marketplace" {
   collation           = "utf8_unicode_ci"
 }
 
-resource "azurerm_sql_database" "canopy_user" {
-  name                             = "canopy-user"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_canopy_user_edition
-  requested_service_objective_name = var.sql_database_canopy_user_requested_service_objective_name
-
-  tags = merge(local.common_tags, {})
-}
 
 resource "azurerm_sql_database" "automation" {
   name                             = "automation-reporting-db"
@@ -211,14 +168,6 @@ resource "azurerm_sql_firewall_rule" "ip_steve_ardis_home" {
   server_name         = azurerm_sql_server.sapience.name
   start_ip_address    = var.ip_steve_ardis_home
   end_ip_address      = var.ip_steve_ardis_home
-}
-
-resource "azurerm_sql_firewall_rule" "ip_azure_services" {
-  name                = "ip-azure-services"
-  resource_group_name = azurerm_sql_server.sapience.resource_group_name
-  server_name         = azurerm_sql_server.sapience.name
-  start_ip_address    = "0.0.0.0"
-  end_ip_address      = "0.0.0.0"
 }
 
 resource "azurerm_cosmosdb_account" "lab_us_qa" {
@@ -566,10 +515,10 @@ resource "azurerm_redis_cache" "redis_cache" {
   }
 }
 
-resource "azurerm_redis_firewall_rule" "firewall_redis_cache" {
-  name                = "someIPrange"
-  redis_cache_name    = azurerm_redis_cache.redis_cache.name
-  resource_group_name = var.resource_group_name
-  start_ip            = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
-  end_ip              = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
-}
+#resource "azurerm_redis_firewall_rule" "firewall_redis_cache" {
+#  name                = "someIPrange"
+#  redis_cache_name    = azurerm_redis_cache.redis_cache.name
+#  resource_group_name = var.resource_group_name
+#  start_ip            = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
+#  end_ip              = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
+#}
