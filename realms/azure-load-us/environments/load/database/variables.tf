@@ -48,9 +48,6 @@ variable "environment_common_tags" {
   type = map(string)
 }
 
-variable "ip_banyan_office" {}
 variable "ip_sapience_dallas_office" {}
 variable "ip_sapience_pune_office" {}
-variable "ip_sapience_pune_office2" {}
-variable "ip_steve_ardis_home" {}
 
