@@ -195,14 +195,6 @@ resource "azurerm_sql_firewall_rule" "ip_steve_ardis_home" {
   end_ip_address      = var.ip_steve_ardis_home
 }
 
-# resource "azurerm_sql_firewall_rule" "ip_azure_services" {
-#   name                = "ip-azure-services"
-#   resource_group_name = azurerm_sql_server.sapience.resource_group_name
-#   server_name         = azurerm_sql_server.sapience.name
-#   start_ip_address    = "0.0.0.0"
-#   end_ip_address      = "0.0.0.0"
-# }
-
 resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
   name                = "sapience-canopy-hierarchy-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name

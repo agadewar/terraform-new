@@ -52,5 +52,4 @@ variable "environment_common_tags" {
 
 variable "ip_sapience_dallas_office" {}
 variable "ip_sapience_pune_office" {}
-variable "ip_sapience_pune_office2" {}
 
