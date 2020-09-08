@@ -86,20 +86,6 @@ resource "null_resource" "default_token_secret_name" {
   }
 } */
 
-resource "kubernetes_resource_quota" "resource_quota" {
-  metadata {
-    name      = "resource-quota-${local.namespace}"
-    namespace = "${local.namespace}"
-  }
-
-  spec {
-    hard = {
-      "requests.memory" = "12Gi"
-      "requests.cpu" = "8"
-    }
-  }
-}
-
 # resource "azurerm_public_ip" "aks_egress" {
 #   name                = "aks-egress-${local.namespace}"
 #   # location            = "${var.resource_group_location}"
