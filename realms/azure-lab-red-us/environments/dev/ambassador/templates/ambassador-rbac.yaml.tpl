@@ -48,7 +48,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: ambassador
-  namespace: default
+  namespace: dev
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
