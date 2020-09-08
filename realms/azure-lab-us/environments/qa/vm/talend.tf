@@ -28,18 +28,6 @@ resource "azurerm_network_security_group" "talend" {
   }
 
   security_rule {
-    name                       = "Allow-AllTraffic-Banyan-Office"
-    priority                   = 102
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = var.ip_banyan_office
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
     name                       = "Allow-8003-Open-To-The-World"
     priority                   = 103
     direction                  = "Inbound"
@@ -74,42 +62,6 @@ resource "azurerm_network_security_group" "talend" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-
-  security_rule {
-    name                       = "Allow-AllTraffic-BenjaminJohn-Home"
-    priority                   = 201
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = var.ip_benjamin_john_home
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "Allow-AllTraffic-SteveArdis-Home"
-    priority                   = 202
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = var.ip_steve_ardis_home
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "Allow-AllTraffic-BenjaminJohn-Home2"
-    priority                   = 203
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = var.ip_benjamin_john_home2
-    destination_address_prefix = "*"
-  }
 }
 
 resource "azurerm_virtual_machine" "talend" {
@@ -119,7 +71,7 @@ resource "azurerm_virtual_machine" "talend" {
   resource_group_name   = var.resource_group_name
   location              = var.resource_group_location
   network_interface_ids = [azurerm_network_interface.talend.id]
-  vm_size               = "Standard_B8ms"
+  vm_size               = "Standard_B2ms"
 
   # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
   # NOTE: This may not be optimal in all cases.
