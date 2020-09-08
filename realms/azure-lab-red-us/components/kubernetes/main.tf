@@ -73,7 +73,10 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
             #pod_cidr           = "10.244.0.0/16"
             #service_cidr       = "10.0.0.0/16"
         }
-
+api_server_authorized_ip_ranges = [
+           "219.91.160.58/32",
+           "47.190.73.52/32",
+        ]
   role_based_access_control {
     enabled = true
   }
