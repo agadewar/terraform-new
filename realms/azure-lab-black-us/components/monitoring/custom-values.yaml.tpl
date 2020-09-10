@@ -15,6 +15,21 @@ alertmanager:
             requests:
               storage: 10Gi
 
+alertmanagerFiles:
+  alertmanager.yml: |-
+    global:
+      resolve_timeout: 5m
+      # slack_api_url: ''
+    receivers:
+      - name: eks_alerts
+        opsgenie_configs:
+        - api_key: 1cefb4a0-890c-46d7-b596-1fc19ff4f324
+    route:
+      group_wait: 30s
+      group_interval: 5m
+      receiver: eks_alerts
+      repeat_interval
+
 prometheus:
   prometheusSpec:
     storageSpec:
