@@ -12,6 +12,7 @@ variable "service_principal_password" {}
 
 variable "resource_group_name" {}
 variable "resource_group_location" {}
+variable "api_auth_ips" {}
 
 variable "kubernetes_red_version" {}
 

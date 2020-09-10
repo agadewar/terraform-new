@@ -58,13 +58,13 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     prevent_destroy = "false"
   }
 
-  name                = local.cluster_name
-  location            = var.resource_group_location
-  resource_group_name = var.resource_group_name
-  dns_prefix          = local.dns_prefix
-  #load_balancer_sku = "standard"
+  name                                  = local.cluster_name
+  location                              = var.resource_group_location
+  resource_group_name                   = var.resource_group_name
+  dns_prefix                            = local.dns_prefix
+  api_server_authorized_ip_ranges       = var.api_auth_ips
+  kubernetes_version                    = var.kubernetes_red_version
 
-  kubernetes_version =  var.kubernetes_red_version
   network_profile {
             #dns_service_ip     = "10.0.0.10"
             #docker_bridge_cidr = "172.17.0.1/16"
@@ -100,11 +100,6 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   }
   addon_profile {
     kube_dashboard { enabled = true }
-
-  #network_profile {
-  #  network_plugin = "azure"
-  #  load_balancer_sku = "standard"
-  #}
 
     oms_agent {
       enabled = false
