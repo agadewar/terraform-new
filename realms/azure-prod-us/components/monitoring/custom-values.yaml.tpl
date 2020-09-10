@@ -6,6 +6,23 @@ kubeDns:
   enabled: true
 
 alertmanager:
+  config:
+    global:
+      resolve_timeout: 5m
+    receivers:
+    - name: eks_alerts
+      opsgenie_configs:
+      - api_key: 89e5f7b4-54da-4ac8-b3f6-f9ba5ce67976
+    route:
+      group_by:
+      - job
+      group_interval: 5m
+      group_wait: 30s
+      receiver: eks_alerts
+      repeat_interval: 12h
+      routes:
+      - match:
+          alertname: Watchdog
   alertmanagerSpec:
     storage:
       volumeClaimTemplate:
