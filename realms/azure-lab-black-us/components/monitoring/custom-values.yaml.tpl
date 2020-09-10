@@ -6,6 +6,22 @@ kubeDns:
   enabled: true
 
 alertmanager:
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+       group_wait: 30s
+       group_interval: 5m
+       repeat_interval
+       receiver: 'eks_alerts'
+       routes:
+       - match:
+          alertname: Watchdog
+        receiver: 'null'
+     receivers:
+        - name: 'eks_alerts'
+        opsgenie_configs:
+         - api_key: 1cefb4a0-890c-46d7-b596-1fc19ff4f324
   alertmanagerSpec:
     storage:
       volumeClaimTemplate:
@@ -14,21 +30,6 @@ alertmanager:
           resources:
             requests:
               storage: 10Gi
-
-alertmanagerFiles:
-  alertmanager.yml: |-
-    global:
-      resolve_timeout: 5m
-      # slack_api_url: ''
-    receivers:
-      - name: eks_alerts
-        opsgenie_configs:
-        - api_key: 1cefb4a0-890c-46d7-b596-1fc19ff4f324
-    route:
-      group_wait: 30s
-      group_interval: 5m
-      receiver: eks_alerts
-      repeat_interval
 
 prometheus:
   prometheusSpec:
@@ -56,4 +57,4 @@ grafana:
   persistence:
     enabled: true
     accessModes: ["ReadWriteOnce"]
-    size: 10Gi
+    size: 50Gi
