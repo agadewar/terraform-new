@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: sapience-container-registry-credential
-  namespace: activity-collector-test-harness
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: eyJhdXRocyI6eyJzYXBpZW5jZS5henVyZWNyLmlvIjp7InVzZXJuYW1lIjoic2FwaWVuY2UiLCJwYXNzd29yZCI6IlM9QThiY3c3emVHZXpwek80TWo5c210aExnWHkzcEVVIn19fQ==
