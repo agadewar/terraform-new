@@ -125,7 +125,8 @@ data "template_file" "ambassador-rbac" {
   template = file("templates/ambassador-rbac.yaml.tpl")
 
   vars = {
-    replicas = var.ambassador_rbac_replicas
+    replicas      = var.ambassador_rbac_replicas
+    namespace     = var.environment
   }
 }
 
