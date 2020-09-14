@@ -12,7 +12,7 @@ alertmanager:
     receivers:
     - name: eks_alerts
       opsgenie_configs:
-      - api_key: 89e5f7b4-54da-4ac8-b3f6-f9ba5ce67976
+      - api_key: ${api_key}
     route:
       group_by:
       - job

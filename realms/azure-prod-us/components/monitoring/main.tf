@@ -36,6 +36,7 @@ data "template_file" "custom_values" {
 
   vars = {
     admin_password = var.monitoring_grafana_admin_password
+    api_key        = var.monitoring_alertmanager_api_key
   }
 }
 
