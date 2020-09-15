@@ -1,44 +1,71 @@
 # Depending on which DNS solution you have installed in your cluster enable the right exporter
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: alertmanager-lab-red-us
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.109.196.4
+    path: 10.109.196.4:/alertmanager-lab-red-us
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: grafana-lab-red-us
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.109.196.4
+    path: 10.109.196.4:/grafana-lab-us-red
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prometheus-lab-us-red
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.109.196.4
+    path: 10.109.196.4:/prometheus-lab-us-red
+
 coreDns:
   enabled: false
 
 kubeDns:
   enabled: true
 
-alertmanager:
-  alertmanagerSpec:
+alertmanagerSpec:
     storage:
       volumeClaimTemplate:
         spec:
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: 10Gi
-
+            volumeMounts:
+              - name: alertmanager-lab-red-us
+                mountPath: 10.109.196.4:/alertmanager-lab-red-us
 prometheus:
-  prometheusSpec:
-    storageSpec:
+  storage:
       volumeClaimTemplate:
         spec:
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: 10Gi
+          volumeMounts:
+            - name: prometheus-lab-us-red
+              mountPath: 10.109.196.4:/prometheus-lab-us-red
 
 grafana:
-  adminPassword: ${admin_password}
-#   ingress:
-#     enabled: true
-#     # annotations:
-#     #   kubernetes.io/ingress.class: nginx
-#     #   kubernetes.io/tls-acme: "true"
-#     # hosts:
-#     #   - grafana.test.akomljen.com
-#     # tls:
-#     #   - secretName: grafana-tls
-#     #     hosts:
-#     #       - grafana.test.akomljen.com
-  persistence:
-    enabled: true
-    accessModes: ["ReadWriteOnce"]
-    size: 10Gi
+  storage:
+      volumeClaimTemplate:
+        spec:
+          volumeMounts:
+            - name: grafana-lab-us-red
+              mountPath: 10.109.196.4:/grafana-lab-us-red
