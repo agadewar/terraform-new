@@ -298,6 +298,17 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  admin-uploads-api_mapping
+prefix: /admin/uploads/
+service: admin-uploads-api
+rewrite: /admin/uploads/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  sapience_app_api_mapping
 prefix: /
 service: sapience-app-api

@@ -5,7 +5,7 @@ resource "kubernetes_config_map" "users" {
   }
 
   data = {
-      "AzureServiceBus__UseAzureServiceBus"    =  true
+      "AzureServiceBus__UseAzureServiceBus"    =  false
       "AzureServiceBus__EntityPath"            = "sapience-admin-users-created"
       "AzureServiceBus__Endpoint"              = ""
   }

@@ -176,7 +176,7 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
 
           resources {
             requests {
-              memory = "2048M"
+              memory = "3072M"
               cpu    = "1000m"
             }
           }

@@ -8,7 +8,7 @@ resource "kubernetes_ingress" "grafana" {
       "kubernetes.io/ingress.class"                        = "nginx"
       "kubernetes.io/tls-acme"                             = "true"
       "ingress.kubernetes.io/ssl-redirect"           = "true"
-      "nginx.ingress.kubernetes.io/whitelist-source-range" = "114.143.13.42/32,47.190.73.52/32"
+      "nginx.ingress.kubernetes.io/whitelist-source-range" = "219.91.160.58/32,47.190.73.52/32"
     }
   }
 

@@ -30,7 +30,7 @@ alertmanager:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 10Gi
+              storage: 50Gi
 
 prometheus:
   prometheusSpec:
@@ -40,7 +40,7 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 10Gi
+              storage: 100Gi
 
 grafana:
   adminPassword: ${admin_password}
@@ -58,7 +58,7 @@ grafana:
   persistence:
     enabled: true
     accessModes: ["ReadWriteOnce"]
-    size: 10Gi
+    size: 100Gi
   grafana.ini:
     auth.azuread:
       name: Azure AD

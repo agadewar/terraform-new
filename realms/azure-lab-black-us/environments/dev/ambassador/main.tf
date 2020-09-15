@@ -239,17 +239,17 @@ circuit_breakers:
   max_pending_requests: 8000
   max_requests: 8000
 ---
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  eventpipeline_leaf_broker_eh_mapping
-prefix: /leafbroker_eh/
-service: eventpipeline-leaf-broker-eh
-timeout_ms: 120000
-connect_timeout_ms: 120000
-circuit_breakers:
-- max_connections: 8000
-  max_pending_requests: 8000
-  max_requests: 8000
+#apiVersion: ambassador/v1
+#kind:  Mapping
+#name:  eventpipeline_leaf_broker_eh_mapping
+#prefix: /leafbroker_eh/
+#service: eventpipeline-leaf-broker-eh
+#timeout_ms: 120000
+#connect_timeout_ms: 120000
+#circuit_breakers:
+#- max_connections: 8000
+#  max_pending_requests: 8000
+#  max_requests: 8000
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -335,6 +335,17 @@ name:  sapience_meeting_mapping
 prefix: /external/integration/
 service: sapience-meeting
 rewrite: /external/integration/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  admin-uploads-api_mapping
+prefix: /admin/uploads/
+service: admin-uploads-api
+rewrite: /admin/uploads/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
