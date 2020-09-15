@@ -343,7 +343,6 @@ kind:  Mapping
 name:  sapience_cache_control_mapping
 prefix: /sapience/cache/
 service: sapience-cache-control
-rewrite: /sapience/cache/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
