@@ -1,1 +1,0 @@
-{"auths":{"${server}":{"username":"${username}","password":"${password}"}}}

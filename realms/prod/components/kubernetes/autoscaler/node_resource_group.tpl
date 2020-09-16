@@ -1,1 +1,0 @@
-MC_${ resource_group }_${ cluster_name }_${ location }
