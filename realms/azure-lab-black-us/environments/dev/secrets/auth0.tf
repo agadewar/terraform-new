@@ -8,6 +8,6 @@ resource "kubernetes_secret" "auth-1" {
       alertrules_secret = var.auth0_alertrules_secret
       alertrules_clientid = var.auth0_alertrules_clientid
       secret =  var.auth0_secret
-      Sisense__Auth0ClientSecret = var.sisense_auth0clientsecret
+      Sisense__Auth0ClientSecret = var.Sisense__Auth0ClientSecret
   }
 }

@@ -22,6 +22,6 @@ variable "sisense_secret" {}
 variable "auth0_secret" {}
 variable "etl_secret" {}
 variable "staging_password" {}
-variable "sisense_sharedsecret" {}
+variable "Sisense__SharedSecret" {}
 variable "redis_dashboard_Password"{}
-variable "sisense_auth0clientsecret"{}
+variable "Sisense__Auth0ClientSecret"{}
