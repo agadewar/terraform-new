@@ -10,19 +10,20 @@ variable "environment_common_tags" {
     type = "map"
 }
 variable "connectionstring_admin" {}
-variable "connectionstring_adminimport"{}
-variable "connectionstring_mongo" {}
-variable "connectionstring_edw" {}
+variable "connectionstring_adminimport" {}
 variable "connectionstring_mad" {}
 variable "connectionstring_staging" {}
+variable "connectionstring_edw" {}
+variable "connectionstring_notification_mongodb" {}
 variable "cosmosdb_key_dashboard" {}
 variable "cosmosdb_key_alerts" {}
 variable "sisense_secret" {}
 variable "auth0_secret" {}
-variable "auth0_alertrules_clientid"{}
-variable "auth0_alertrules_secret"{}
 variable "etl_secret" {}
 variable "staging_password" {}
+variable "auth0_alertrules_secret" {}
+variable "auth0_alertrules_clientid" {}
 variable "machine_learning_service_account_password" {}
 variable "redis_dashboard_Password"{}
 variable "sisense_sharedsecret"{}
+variable "sisense_auth0clientsecret"{}

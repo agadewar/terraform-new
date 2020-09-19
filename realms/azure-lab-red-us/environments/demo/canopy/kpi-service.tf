@@ -83,7 +83,7 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/kpi-service:2.14.10.docker"
+          image = "${var.canopy_container_registry_hostname}/kpi-service:2.14.12.docker"
           name  = "kpi-service"
 
           env { 
@@ -132,6 +132,11 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
                 key  = "redis-password"
               }
             }
+          }
+
+          env {
+            name  = "com.banyanhills.canopy.kpi.event.inbound.KpiInboundEventPipeLineHandler.disabled"
+            value = "true"
           }
 
           env {

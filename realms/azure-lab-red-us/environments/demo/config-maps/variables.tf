@@ -4,8 +4,8 @@ variable "realm_backend_container_name" {}
 variable "environment" {}
 
 variable "realm_common_tags" {
-    type = "map"
+    type = map
 }
 variable "environment_common_tags" {
-    type = "map"
+    type = map
 }

@@ -132,10 +132,10 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
             name  = "canopy.security.userDetailsCacheEnabled"
             value = "false"
           }
-          # env {
-          #   name  = "logging.level.io.canopy.leaf.broker"
-          #   value = "DEBUG"
-          # }
+          env {
+            name  = "logging.level.io.canopy.leaf.broker"
+            value = "DEBUG"
+          }
 
           readiness_probe {
             http_get {
