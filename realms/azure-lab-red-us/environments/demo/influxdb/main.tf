@@ -21,16 +21,16 @@ provider "kubernetes" {
   config_path = local.config_path
 }
 
-data "terraform_remote_state" "storage" {
-  backend = "azurerm"
+#data "terraform_remote_state" "storage" {
+#  backend = "azurerm"
 
-  config = {
-    access_key           = "${var.realm_backend_access_key}"
-    storage_account_name = "${var.realm_backend_storage_account_name}"
-	  container_name       = "${var.realm_backend_container_name}"
-    key                  = "red/storage.tfstate"
-  }
-}
+#  config = {
+#    access_key           = "${var.realm_backend_access_key}"
+#    storage_account_name = "${var.realm_backend_storage_account_name}"
+#	  container_name       = "${var.realm_backend_container_name}"
+#    key                  = "red/storage.tfstate"
+#  }
+#}/*
 
 locals {
   config_path = "../../../components/kubernetes/.local/kubeconfig"
@@ -53,14 +53,14 @@ resource "helm_release" "influxdb" {
     value = "true"
   }
 
-  set {
-    name  = "persistence.storageClass"
-    value = data.terraform_remote_state.storage.outputs.azure_file_storage_class_name
-  }
+  #set {
+  #  name  = "persistence.storageClass"
+  #  value = data.terraform_remote_state.storage.outputs.azure_file_storage_class_name
+  #}
 
   set {
     name  = "persistence.accessMode"
-    value = "ReadWriteMany"
+    value = "ReadWriteOnce"
   }
 
   set {
@@ -85,7 +85,7 @@ resource "helm_release" "influxdb" {
 
   set {
     name  = "resources.requests.memory"
-    value = "1024Mi"
+    value = "3072Mi"
   }
 
   set {
@@ -96,5 +96,10 @@ resource "helm_release" "influxdb" {
   set {
     name  = "resources.limits.memory"
     value = "4096Mi"
+  }
+
+  set {
+    name  = "livenessProbe.initialDelaySeconds"
+    value = "3600"
   }
 }

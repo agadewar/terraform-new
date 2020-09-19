@@ -6,6 +6,6 @@ resource "kubernetes_secret" "etl_staging_database" {
 
   data = {
       secret =  var.etl_secret
-      password = var.staging_password     
+      password = var.staging_password
   }
 }

@@ -25,8 +25,8 @@ resource "kubernetes_config_map" "auth0" {
       "Auth0__PingUri" = "https://qa-sapienceanalytics.auth0.com/test"
 
       #MANAGEMENT API
-      "Auth0__ManagementApiBaseUrl" = ""
-      "Auth0__ManagementApiAudience" = ""
-      "Auth0__ManagementApiClientId" = ""
+      "Auth0__ManagementApiBaseUrl" = "https://qa-sapienceanalytics.auth0.com/"
+      "Auth0__ManagementApiAudience" = "https://api.sapienceanalytics.com"
+      "Auth0__ManagementApiClientId" = "0ljzI5jQnH9Fx8yQLxWxGdYOVQGRB4DY"
   }
 }
