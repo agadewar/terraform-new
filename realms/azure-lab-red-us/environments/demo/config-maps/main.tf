@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "red/config-maps.tfstate"
+    key = "black/config-maps.tfstate"
   }
 }
 

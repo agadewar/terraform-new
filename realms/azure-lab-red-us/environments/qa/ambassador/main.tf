@@ -83,7 +83,7 @@ resource "kubernetes_ingress" "api" {
     }
 
     rule {
-      host = "api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com"
+      host = "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
       http {
         path {
           backend {
@@ -125,7 +125,8 @@ data "template_file" "ambassador-rbac" {
   template = file("templates/ambassador-rbac.yaml.tpl")
 
   vars = {
-    replicas = var.ambassador_rbac_replicas
+    replicas      = var.ambassador_rbac_replicas
+    namespace     = var.environment
   }
 }
 
@@ -241,6 +242,18 @@ circuit_breakers:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  eventpipeline_leaf_broker_eh_mapping
+prefix: /leafbroker_eh/
+service: eventpipeline-leaf-broker-eh
+timeout_ms: 120000
+connect_timeout_ms: 120000
+circuit_breakers:
+- max_connections: 8000
+  max_pending_requests: 8000
+  max_requests: 8000
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  eventpipeline_service_mapping
 prefix: /eventpipeline/
 service: eventpipeline-service
@@ -276,17 +289,6 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
-name:  admin_org_api_mapping
-prefix: /admin/org/
-service: admin-org-api
-rewrite: /admin/org/
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
----
-apiVersion: ambassador/v1
-kind:  Mapping
 name:  admin_app_activity_api_mapping
 prefix: /admin/specs/
 service: admin-app-activity-api
@@ -298,10 +300,31 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  admin_org_api_mapping
+prefix: /admin/org/
+service: admin-org-api
+rewrite: /admin/org/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  sapience_app_api_mapping
 prefix: /
 service: sapience-app-api
-timeout_ms: 30000
+timeout_ms: 20000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_app_alerts_mapping
+prefix: /alerts/
+service: sapience-app-alerts
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -320,10 +343,10 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
-name:  sapience_app_alerts_mapping
-prefix: /alerts/
-service: sapience-app-alerts
-timeout_ms: 10000
+name:  sapience_openapi_mapping
+prefix: /openapi
+service: sapience-open-api
+rewrite: /openapi
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -432,6 +455,6 @@ EOF
 #     timestamp = "${timestamp()}"   # DELETE ME
 #   }
 #   provisioner "local-exec" {
-#     command = "kubectl apply --kubeconfig=${local.config_path} -n dev -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
+#     command = "kubectl apply --kubeconfig=${local.config_path} -n qa -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
 #   }
 # }
