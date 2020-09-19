@@ -5,7 +5,7 @@ resource "kubernetes_config_map" "redis-app-api" {
   }
 
   data = {
-      "RedisCacheSettings__Endpoint__server"       =     "sapience-redis-cache-lab-us-dev.redis.cache.windows.net"
+      "RedisCacheSettings__Endpoint__server"       =     "sapience-redis-cache-lab-us-demo.redis.cache.windows.net"
       "RedisCacheSettings__Endpoint__SSL"          =     "true"
       "RedisCacheSettings__Endpoint__Port"         =     "6380"
       "RedisCacheSettings__DefaultDatabase"         =     "1"
@@ -13,5 +13,5 @@ resource "kubernetes_config_map" "redis-app-api" {
       "RedisCacheSettings__ConnectRetry"           =     "3"
       "RedisCacheSettings__TTL"                    =     "21600"
       "RedisCacheSettings__ConnectTimeout"         =     "100000"
-}
+} 
 }

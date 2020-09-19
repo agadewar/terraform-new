@@ -28,7 +28,7 @@ rules:
 - apiGroups: [ "apiextensions.k8s.io" ]
   resources: [ "customresourcedefinitions" ]
   verbs: ["get", "list", "watch"]
-- apiGroups: [ "networking.internal.knative.dev" ]
+- apiGroups: [ "networking.internal.knative.demo" ]
   resources: [ "clusteringresses" ]
   verbs: ["get", "list", "watch"]
 ---
