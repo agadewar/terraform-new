@@ -62,7 +62,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   location                              = var.resource_group_location
   resource_group_name                   = var.resource_group_name
   dns_prefix                            = local.dns_prefix
-  api_server_authorized_ip_ranges       = var.api_auth_ips
+  #api_server_authorized_ip_ranges       = var.api_auth_ips
   kubernetes_version                    = var.kubernetes_red_version
 
   network_profile {
