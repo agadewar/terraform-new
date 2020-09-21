@@ -73,10 +73,6 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
             #pod_cidr           = "10.244.0.0/16"
             #service_cidr       = "10.0.0.0/16"
         }
-api_server_authorized_ip_ranges = [
-           "219.91.160.58/32",
-           "47.190.73.52/32",
-        ]
   role_based_access_control {
     enabled = true
   }
@@ -134,14 +130,14 @@ api_server_authorized_ip_ranges = [
   }
 }
    
-  data "template_file" "node_resource_group" {
-  template = file("autoscaler/node_resource_group.tpl")
+  #data "template_file" "node_resource_group" {
+  #template = file("autoscaler/node_resource_group.tpl")
 
-  vars = {
-    resource_group = azurerm_kubernetes_cluster.kubernetes.resource_group_name
-    cluster_name   = azurerm_kubernetes_cluster.kubernetes.name
-    location       = azurerm_kubernetes_cluster.kubernetes.location
-  }
-}
+  #vars = {
+  #  resource_group = azurerm_kubernetes_cluster.kubernetes.resource_group_name
+  #  cluster_name   = azurerm_kubernetes_cluster.kubernetes.name
+  #  location       = azurerm_kubernetes_cluster.kubernetes.location
+  #}
+#}
    
   
