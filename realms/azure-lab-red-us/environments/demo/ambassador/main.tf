@@ -455,6 +455,6 @@ EOF
 #     timestamp = "${timestamp()}"   # DELETE ME
 #   }
 #   provisioner "local-exec" {
-#     command = "kubectl apply --kubeconfig=${local.config_path} -n dev -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
+#     command = "kubectl apply --kubeconfig=${local.config_path} -n demo -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
 #   }
 # }

@@ -5,7 +5,7 @@ resource "kubernetes_config_map" "cosmos-db" {
   }
 
   data = {
-      "dashboard" = "https://sapience-app-dashboard-lab-us-dev.documents.azure.com:443/"
-      "alerts" = "https://sapience-app-alerts-lab-us-dev.documents.azure.com:443/"
+      "dashboard" = "https://sapience-app-dashboard-lab-us-demo.documents.azure.com:443/"
+      "alerts" = "https://sapience-app-alerts-lab-us-demo.documents.azure.com:443/"
   }
 }
