@@ -1,4 +1,4 @@
-resource "kubernetes_secret" "auth-1" {
+resource "kubernetes_secret" "auth0" {
   metadata {
     name = "auth0"
     namespace = local.namespace
