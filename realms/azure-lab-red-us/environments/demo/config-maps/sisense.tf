@@ -25,7 +25,7 @@ resource "kubernetes_config_map" "sisense" {
       "Sisense_SearchUserUri" = "api/users?search="
       "Sisense_SecurityUri" = "api/settings/security"
       "Sisense_UsersUri" = "api/users?notify=false"
-      "ENVIRONMENT_SISENSETYPE" = "iframe"
+      
 
       #SISENSE EXTERNAL ENDPOINTS
       "ENVIRONMENT_SISENSE_URL" = "https://sisense.demo.lab.us.azure.sapienceanalytics.com"
