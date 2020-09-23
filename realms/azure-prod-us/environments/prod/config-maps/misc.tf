@@ -13,5 +13,6 @@ resource "kubernetes_config_map" "misc" {
       "ENVIRONMENT_VUE_HELP_URL"   =   "https://help.sapienceanalytics.com"
       "ENVIRONMENT_CANOPY_URL"     =  "https://canopy.prod.prod.us.azure.sapienceanalytics.com/#/sso?path=%2FSapience"
       "ENVIRONMENT_NAME"           =  "prod"
+      "ENVIRONMENT_SISENSETYPE"    =  "iframe"
   }
 }
