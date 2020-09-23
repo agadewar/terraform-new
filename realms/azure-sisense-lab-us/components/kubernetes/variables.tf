@@ -21,11 +21,11 @@ variable "kubernetes_pool01_os_disk_size_gb" {}
 variable "kubernetes_pool01_min_count" {}
 variable "kubernetes_pool01_max_count" {}
 
-# variable "kubernetes_pool02_vm_size" {}
-# variable "kubernetes_pool02_os_type" {}
-# variable "kubernetes_pool02_os_disk_size_gb" {}
-# variable "kubernetes_pool02_min_count" {}
-# variable "kubernetes_pool02_max_count" {}
+variable "kubernetes_pool02_vm_size" {}
+variable "kubernetes_pool02_os_type" {}
+variable "kubernetes_pool02_os_disk_size_gb" {}
+variable "kubernetes_pool02_min_count" {}
+variable "kubernetes_pool02_max_count" {}
 
 variable "realm_common_tags" {
   type = map(string)
