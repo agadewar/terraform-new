@@ -170,7 +170,7 @@ resource "kubernetes_service" "ambassador" {
 resource "kubernetes_service" "api" {
   metadata {
     name      = "api"
-    namespace = local.namespace
+    namespace = var.environment
     annotations = {
       "getambassador.io/config" = <<EOF
 ---
