@@ -41,13 +41,13 @@ prometheus:
           resources:
             requests:
               storage: 100Gi
-
+              
 additionalPrometheusRules:
   - name: custom-rules-file
     groups:
       - name: custom-node-exporter-rules
         rules:
-          - alert: PhysicalComponentHot
+          - alert: PhysicalComponentTooHot
             expr: node_hwmon_temp_celsius > 75
             for: 5m
             labels:
@@ -66,6 +66,11 @@ additionalPrometheusRules:
 
 grafana:
   adminPassword: ${admin_password}
+  image:
+    repository: grafana/grafana
+    tag: 6.7.3
+    sha: ""
+    pullPolicy: IfNotPresent
 #   ingress:
 #     enabled: true
 #     # annotations:

@@ -42,6 +42,28 @@ prometheus:
             requests:
               storage: 100Gi
 
+additionalPrometheusRules:
+  - name: custom-rules-file
+    groups:
+      - name: custom-node-exporter-rules
+        rules:
+          - alert: PhysicalComponentTooHot
+            expr: node_hwmon_temp_celsius > 75
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Physical component too hot (instance {{ $labels.instance }})"
+              description: "Physical hardware component too hot\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+          - alert: NodeOvertemperatureAlarm
+            expr: node_hwmon_temp_alarm == 1
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Node overtemperature alarm (instance {{ $labels.instance }})"
+              description: "Physical node temperature alarm triggered\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
 grafana:
   adminPassword: ${admin_password}
   image:
@@ -49,7 +71,7 @@ grafana:
     tag: 6.7.3
     sha: ""
     pullPolicy: IfNotPresent
-    
+
 #   ingress:
 #     enabled: true
 #     # annotations:
