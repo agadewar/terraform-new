@@ -41,13 +41,13 @@ prometheus:
           resources:
             requests:
               storage: 100Gi
-              
+
 additionalPrometheusRules:
   - name: custom-rules-file
     groups:
       - name: custom-node-exporter-rules
         rules:
-          - alert: PhysicalComponentTooHot
+          - alert: PhysicalComponentHot
             expr: node_hwmon_temp_celsius > 75
             for: 5m
             labels:
