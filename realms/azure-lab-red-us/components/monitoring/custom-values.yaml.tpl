@@ -62,28 +62,6 @@ prometheus:
             - name: prometheus-lab-us-red
               mountPath: 10.109.196.4:/prometheus-lab-us-red
 
-additionalPrometheusRules:
-  - name: custom-rules-file
-    groups:
-      - name: custom-node-exporter-rules
-        rules:
-          - alert: PhysicalComponentTooHot
-            expr: node_hwmon_temp_celsius > 75
-            for: 5m
-            labels:
-              severity: warning
-            annotations:
-              summary: "Physical component too hot (instance {{ $labels.instance }})"
-              description: "Physical hardware component too hot\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
-          - alert: NodeOvertemperatureAlarm
-            expr: node_hwmon_temp_alarm == 1
-            for: 5m
-            labels:
-              severity: critical
-            annotations:
-              summary: "Node overtemperature alarm (instance {{ $labels.instance }})"
-              description: "Physical node temperature alarm triggered\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
-
 grafana:
   image:
     repository: grafana/grafana
