@@ -27,6 +27,11 @@ prometheus:
 
 grafana:
   adminPassword: ${admin_password}
+  image:
+    repository: grafana/grafana
+    tag: 6.7.3
+    sha: ""
+    pullPolicy: IfNotPresent
 #   ingress:
 #     enabled: true
 #     # annotations:
