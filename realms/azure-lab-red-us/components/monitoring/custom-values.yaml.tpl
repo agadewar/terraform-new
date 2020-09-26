@@ -63,6 +63,11 @@ prometheus:
               mountPath: 10.109.196.4:/prometheus-lab-us-red
 
 grafana:
+  image:
+    repository: grafana/grafana
+    tag: 6.7.3
+    sha: ""
+    pullPolicy: IfNotPresent
   storage:
       volumeClaimTemplate:
         spec:
