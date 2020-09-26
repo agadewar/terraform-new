@@ -69,7 +69,7 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.28.3.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.19.5.docker-SNAPSHOT"
           name  = "canopy-device-service"
 
           env { 
@@ -225,14 +225,6 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
           // disable custom eventhandlers
           env {
             name  = "chargeit.enabled"
-            value = "false"
-          }
-          env {
-            name  = "dgt.enabled"
-            value = "false"
-          }
-          env {
-            name  = "entrust.enabled"
             value = "false"
           }
           env {

@@ -92,7 +92,7 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.3.5.sapience-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.3.6.sapience-SNAPSHOT"
           name  = "eventpipeline-service"
 
           env { 
