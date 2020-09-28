@@ -65,13 +65,13 @@ additionalPrometheusRules:
               description: "Physical node temperature alarm triggered\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
       - name: custom-kubernetes-monitoring-rules
         rules:
-          - alert: KubernetesOutOfDisk
+          - alert: KubernetesNodeOutOfDisk
             expr: kube_node_status_condition{condition="OutOfDisk",status="true"} == 1
             for: 5m
             labels:
               severity: critical
             annotations:
-              summary: "Kubernetes out of disk (instance {{ $labels.instance }})"
+              summary: "Kubernetes Node out of disk (instance {{ $labels.instance }})"
               description: "{{ $labels.node }} has OutOfDisk condition\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
           - alert: KubernetesCronjobSuspended
             expr: kube_cronjob_spec_suspend != 0
@@ -121,6 +121,22 @@ additionalPrometheusRules:
             annotations:
               summary: "Kubernetes HPA scaling ability (instance {{ $labels.instance }})"
               description: "Pod is unable to scale\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+          - alert: KubernetesNodeMemoryPressure
+            expr: kube_node_status_condition{condition="MemoryPressure",status="true"} == 1
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes Node memory pressure (instance {{ $labels.instance }})"
+              description: "{{ $labels.node }} has MemoryPressure condition\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+          - alert: KubernetesNodeDiskPressure
+            expr: kube_node_status_condition{condition="DiskPressure",status="true"} == 1
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes Node disk pressure (instance {{ $labels.instance }})"
+              description: "{{ $labels.node }} has DiskPressure condition\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
 
 grafana:
   adminPassword: ${admin_password}
