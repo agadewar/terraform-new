@@ -8,8 +8,8 @@ resource "kubernetes_config_map" "sisense" {
       #SISENSE ENVIRONMENT
       "Sisense__Env" = "Load"
 
-      #SISENSE DATASOURCES
-      "Sisense__DataSource" = "Sapience-Daily-CompanyId-Env"
+#SISENSE DATASOURCES
+      "Sisense__DataSource" = "Set/Sapience-Daily-CompanyId-Env"
       "Sisense_DailyDataSource" = "Sapience-Daily-CompanyId-Env"
       "Sisense_HourlyDataSource" = "Sapience-Hourly-CompanyId-Env"
 
@@ -21,7 +21,7 @@ resource "kubernetes_config_map" "sisense" {
       "Sisense_ElasticubesUri" = "api/v1/elasticubes/getElasticubes"
       "Sisense_PingUri" = "api/test"
       #UPDATE REQUEST URI (e.g. SapienceCube-[Env])
-      "Sisense__RequestUri" = "api/elasticubes/SapienceCube-Prod/jaql"
+      "Sisense__RequestUri" = "api/elasticubes/SapienceCube-Load/jaql"
       "Sisense_SearchUserUri" = "api/users?search="
       "Sisense_SecurityUri" = "api/settings/security"
       "Sisense_UsersUri" = "api/users?notify=false"

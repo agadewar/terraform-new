@@ -7,13 +7,13 @@ resource "kubernetes_config_map" "auth0" {
   data = {
       #MAIN AUTH0
       "Auth0__Authority" = "https://sapience-load-us-load.auth0.com/"
-      "Auth0__Audience" = "https://load.us.load.sapienceanalytics.com"
+      "Auth0__Audience" = "https://api.sapienceanalytics.com"
       "Auth0__ClientId" = "NJa0UdhJ8v9XqNHz8jroF7dS2QCr0Zm0"
       "Auth0__Connection" = "Username-Password-Authentication"
 
       #UI AUTH0
       "ENVIRONMENT_AUTH_AUTHORITY" = "https://sapience-load-us-load.auth0.com"
-      "ENVIRONMENT_AUTH_AUDIENCE" = "https://load.us.load.sapienceanalytics.com"
+      "ENVIRONMENT_AUTH_AUDIENCE" = "https://api.sapienceanalytics.com"
       "ENVIRONMENT_AUTH_CLIENT_ID" = "NJa0UdhJ8v9XqNHz8jroF7dS2QCr0Zm0"
       "ENVIRONMENT_AUTH_SCOPE" = "openid email profile"
       "ENVIRONMENT_ADMIN_URL"  =   "https://manage.load.sapienceanalytics.com"
