@@ -71,7 +71,7 @@ additionalPrometheusRules:
               summary: "Kubernetes StatefulSet down (instance {{ $labels.instance }})"
               description: "A StatefulSet went down\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
           - alert: KubernetesPodNotHealthy
-            expr: min_over_time(sum by (namespace, pod) (kube_pod_status_phase{phase=~"Pending|Unknown|Failed"})[1h:]) > 0
+            expr: min_over_time(sum by (namespace, pod) (kube_pod_status_phase{phase=~"Pending|Unknown|Failed|ErrImagePull|ImagePullBackOff"})[1h:]) > 0
             for: 5m
             labels:
               severity: critical
