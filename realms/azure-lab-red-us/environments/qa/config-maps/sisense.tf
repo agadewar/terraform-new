@@ -30,8 +30,8 @@ resource "kubernetes_config_map" "sisense" {
       "ENVIRONMENT_SISENSE_URL" = "https://sisense.qa.lab.us.azure.sapienceanalytics.com"
 
       #SISENSE INTERNAL ENDPOINTS
-      "Sisense__BaseHost" = "http://sisense.qa.lab.us.azure.internal.sapienceanalytics.com:8081/"
-      "Sisense__SecurityEndpoint" = "http://sisense.qa.lab.us.azure.internal.sapienceanalytics.com:8081/api/settings/security"
-      "Sisense__UserSecurityEndpoint" = "http://sisense.qa.lab.us.azure.internal.sapienceanalytics.com:8081/api/v1/users"
+      "Sisense__BaseHost" = "http://sisense.qa.lab.red.us.azure.internal.sapienceanalytics.com:8081/"
+      "Sisense__SecurityEndpoint" = "http://sisense.qa.lab.red.us.azure.internal.sapienceanalytics.com:8081/api/settings/security"
+      "Sisense__UserSecurityEndpoint" = "http://sisense.qa.lab.red.us.azure.internal.sapienceanalytics.com:8081/api/v1/users"
   }
 }

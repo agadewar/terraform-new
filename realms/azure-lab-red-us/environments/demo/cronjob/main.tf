@@ -27,6 +27,14 @@ locals {
   )}"
 }
 
+data "template_file" "sa" {
+  template = file("templates/sa.yaml.tpl")
+
+  vars = {
+    namespace     = var.environment
+  }
+}
+
 resource "kubernetes_secret" "banyan_aws" {
   metadata {
     name      = "banyan-aws"
