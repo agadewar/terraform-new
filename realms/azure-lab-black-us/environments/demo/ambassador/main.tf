@@ -320,6 +320,17 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  sapience_openapi_mapping
+prefix: /openapi
+service: sapience-open-api
+rewrite: /openapi
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  sapience_app_alerts_mapping
 prefix: /alerts/
 service: sapience-app-alerts
