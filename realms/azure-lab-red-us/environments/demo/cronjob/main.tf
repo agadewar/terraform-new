@@ -26,15 +26,6 @@ locals {
     )
   )}"
 }
-
-data "template_file" "sa" {
-  template = file("templates/sa.yaml.tpl")
-
-  vars = {
-    namespace     = var.environment
-  }
-}
-
 resource "kubernetes_secret" "banyan_aws" {
   metadata {
     name      = "banyan-aws"
@@ -58,5 +49,16 @@ resource "null_resource" "cronjob_canopy_container_registry_credential_helper" {
 
   provisioner "local-exec" {
     command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f ./config/canopy-container-registry-credential-helper.yaml"
+  }
+}
+
+resource "null_resource" "sa" {
+
+  triggers = {
+    config_changed = "${sha1(file("./config/sa.yaml"))}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f ./config/sa.yaml"
   }
 }
