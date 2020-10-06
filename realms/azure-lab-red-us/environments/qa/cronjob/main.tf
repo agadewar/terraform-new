@@ -53,7 +53,7 @@ resource "null_resource" "cronjob_canopy_container_registry_credential_helper" {
   }
 }
 
-resource "null_resource" "Service Account" {
+resource "null_resource" "Service_Account" {
 
   triggers = {
     config_changed = "${sha1(file("./config/service-account.yaml"))}"
