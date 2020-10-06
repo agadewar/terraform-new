@@ -61,13 +61,13 @@ resource "null_resource" "cronjob_canopy_container_registry_credential_helper" {
   }
 }
 
-resource "null_resource" "sa" {
+resource "null_resource" "Service Account" {
 
   triggers = {
-    config_changed = "${sha1(file("./config/sa.yaml"))}"
+    config_changed = "${sha1(file("./config/service-account.yaml"))}"
   }
 
   provisioner "local-exec" {
-    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f ./config/sa.yaml"
+    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f ./config/service-account.yaml"
   }
 }
