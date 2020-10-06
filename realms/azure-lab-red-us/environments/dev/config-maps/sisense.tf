@@ -22,7 +22,7 @@ resource "kubernetes_config_map" "sisense" {
       "Sisense_ElasticubesUri" = "api/v1/elasticubes/getElasticubes"
       "Sisense_PingUri" = "api/test"
       #"Sisense__RequestUri" = "api/elasticubes/SapienceCube-Dev/jaql"
-       "Sisense__RequestUri" = "api/datasources/SapienceCube-Dev/jaql"
+      "Sisense__RequestUri" = "api/datasources/SapienceCube-Dev/jaql"
       "Sisense_SearchUserUri" = "api/users?search="
       "Sisense_SecurityUri" = "api/settings/security"
       "Sisense_UsersUri" = "api/users?notify=false"

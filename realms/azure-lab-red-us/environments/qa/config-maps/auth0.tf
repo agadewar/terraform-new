@@ -28,5 +28,12 @@ resource "kubernetes_config_map" "auth0" {
       "Auth0__ManagementApiBaseUrl" = "https://qa-sapienceanalytics.auth0.com/"
       "Auth0__ManagementApiAudience" = "https://api.sapienceanalytics.com"
       "Auth0__ManagementApiClientId" = "0ljzI5jQnH9Fx8yQLxWxGdYOVQGRB4DY"
+
+      #Open-API
+      "Auth0ManagementApi__BaseUrl"            =   "https://qa-sapienceanalytics.auth0.com"
+      "Auth0ManagementApi__Audience"           =   "https://qa-sapienceanalytics.auth0.com/api/v2/"
+      "Auth0ManagementApi__ClientId"           =   "0ljzI5jQnH9Fx8yQLxWxGdYOVQGRB4DY"
+      "Auth0ManagementApi__OpenApiAudience"    =   "https://sapience-lab-us-qa.developer.azure-api.net"
+
   }
 }

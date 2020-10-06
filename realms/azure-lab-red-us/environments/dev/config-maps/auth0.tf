@@ -28,6 +28,13 @@ resource "kubernetes_config_map" "auth0" {
       "Auth0__ManagementApiAudience" = "https://dev-piin5umt.auth0.com/api/v2/"
       "Auth0__ManagementApiClientId" = "pGmGyQ49XNlCp8gd46a2cbEwC53xX4sj"
 
+      #Open-API
+      "Auth0ManagementApi__BaseUrl"  = "https://dev-piin5umt.auth0.com"
+      "Auth0ManagementApi__Audience" = ""
+      "Auth0ManagementApi__ClientId" = ""
+      "Auth0ManagementApi__ClientSecret" = ""
+      "Auth0ManagementApi__OpenApiAudience" ""
+
       # POST API NOTIFICATION
       "auth0_alertrules_id" = "w6Qfd31Vzgv2b1rfqIj9II5rWnTB7HQv"
   }

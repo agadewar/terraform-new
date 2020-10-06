@@ -380,7 +380,7 @@ EOF
 #     namespace = "${local.namespace}"
 #   }
 #   spec {
-#     replicas = 1
+#     replicas = 2
 #     selector {
 #       match_labels {
 #         service = "statsd-sink"
