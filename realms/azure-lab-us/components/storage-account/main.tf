@@ -53,3 +53,40 @@ resource "azurerm_storage_container" "leaf_downloads" {
   storage_account_name  = "${azurerm_storage_account.storage_account.name}"
   container_access_type = "blob"
 }
+
+resource "azurerm_storage_account" "bulk_upload" {
+  name                      = "sapiencebu${replace(var.realm, "-", "")}"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  account_tier              = "Standard"
+  account_replication_type  = "ZRS"
+  account_kind              = "StorageV2"
+  enable_https_traffic_only = "true"
+
+  tags = merge(local.common_tags)
+
+  lifecycle {
+    prevent_destroy = "true"
+  }
+}
+
+resource "azurerm_storage_container" "bulk_upload_dev" {
+  name                  = "${var.realm}-dev"
+  resource_group_name   = var.resource_group_name
+  storage_account_name  = "${azurerm_storage_account.bulk_upload.name}"
+  container_access_type = "blob"
+}
+
+resource "azurerm_storage_container" "bulk_upload_qa" {
+  name                  = "${var.realm}-qa"
+  resource_group_name   = var.resource_group_name
+  storage_account_name  = "${azurerm_storage_account.bulk_upload.name}"
+  container_access_type = "blob"
+}
+
+resource "azurerm_storage_container" "bulk_upload_demo" {
+  name                  = "${var.realm}-demo"
+  resource_group_name   = var.resource_group_name
+  storage_account_name  = "${azurerm_storage_account.bulk_upload.name}"
+  container_access_type = "blob"
+}
