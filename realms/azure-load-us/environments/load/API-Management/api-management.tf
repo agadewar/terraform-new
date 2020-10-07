@@ -38,3 +38,18 @@ resource "azurerm_api_management" "api-management" {
     }
   
   }
+
+resource "azurerm_api_management_api" "api-management" {
+  name                = "api-management-api"
+  resource_group_name = var.resource_group_name
+  api_management_name = "sapience-${var.realm}-${var.environment}"
+  revision            = "1"
+  display_name        = "Example API"
+  path                = "example"
+  protocols           = ["https"]
+
+  import {
+    content_format = "swagger-link-json"
+    content_value  = "http://conferenceapi.azurewebsites.net/?format=json"
+  }
+}
