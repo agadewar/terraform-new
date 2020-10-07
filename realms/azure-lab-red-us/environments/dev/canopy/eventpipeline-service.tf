@@ -92,7 +92,7 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.3.5.sapience-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.3.7.sapience-SNAPSHOT"
           name  = "eventpipeline-service"
 
           env { 
@@ -179,6 +179,11 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
               memory = "2048M"
               cpu    = "1000m"
             }
+          }
+
+        env { 
+            name = "EVENTPIPELINE_SERVICE_XMX"
+            value = "2048m"
           }
 
           volume_mount { 
