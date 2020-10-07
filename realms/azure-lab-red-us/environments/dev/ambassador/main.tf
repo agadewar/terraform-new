@@ -170,7 +170,7 @@ resource "kubernetes_service" "ambassador" {
 resource "kubernetes_service" "api" {
   metadata {
     name      = "api"
-    namespace = var.environment
+    namespace = local.namespace
     annotations = {
       "getambassador.io/config" = <<EOF
 ---
@@ -240,17 +240,17 @@ circuit_breakers:
   max_pending_requests: 8000
   max_requests: 8000
 ---
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  eventpipeline_leaf_broker_eh_mapping
-prefix: /leafbroker_eh/
-service: eventpipeline-leaf-broker-eh
-timeout_ms: 120000
-connect_timeout_ms: 120000
-circuit_breakers:
-- max_connections: 8000
-  max_pending_requests: 8000
-  max_requests: 8000
+#apiVersion: ambassador/v1
+#kind:  Mapping
+#name:  eventpipeline_leaf_broker_eh_mapping
+#prefix: /leafbroker_eh/
+#service: eventpipeline-leaf-broker-eh
+#timeout_ms: 120000
+#connect_timeout_ms: 120000
+#circuit_breakers:
+#- max_connections: 8000
+#  max_pending_requests: 8000
+#  max_requests: 8000
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -343,17 +343,6 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
-name:  sapience_openapi_mapping
-prefix: /openapi
-service: sapience-open-api
-rewrite: /openapi
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
----
-apiVersion: ambassador/v1
-kind:  Mapping
 name:  admin_uploads_api_mapping
 prefix: /admin/uploads/
 service: admin-uploads-api
@@ -365,9 +354,31 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  sapience_openapi_mapping
+prefix: /openapi
+service: sapience-open-api
+rewrite: /openapi
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  sapience_app_dashboard_mapping
 prefix: /dashboard/
 service: sapience-app-dashboard
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_cache_control_mapping
+prefix: /sapience/cache/
+service: sapience-cache-control
+rewrite: /sapience/cache/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
