@@ -58,6 +58,7 @@ variable "kpi_service_deployment_replicas" {}
 variable "kpi_service_deployment_request_memory" {}
 variable "kpi_service_deployment_request_cpu" {}
 
+
 # variable "sapience_container_registry_hostname" {}
 # variable "sapience_container_registry_username" {}
 # variable "sapience_container_registry_password" {}
