@@ -111,6 +111,7 @@ data "template_file" "ambassador-rbac" {
 
   vars = {
     replicas = var.ambassador_rbac_replicas
+    namespace     = var.environment
   }
 }
 
