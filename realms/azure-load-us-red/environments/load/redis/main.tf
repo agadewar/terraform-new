@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "redis.tfstate"
+    key = "red/redis.tfstate"
   }
 
   required_providers {

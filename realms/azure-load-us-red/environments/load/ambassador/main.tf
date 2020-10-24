@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "ambassador.tfstate"
+    key = "red/ambassador.tfstate"
   }
 }
 

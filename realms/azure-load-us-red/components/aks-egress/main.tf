@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "aks-egress.tfstate"
+    key = "red/aks-egress.tfstate"
   }
 }
 

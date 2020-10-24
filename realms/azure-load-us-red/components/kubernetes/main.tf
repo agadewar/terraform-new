@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "kubernetes.tfstate"
+    key = "red/kubernetes.tfstate"
   }
 }
 
@@ -91,7 +91,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     admin_username = local.linux_profile_admin_username
 
     ssh_key {
-      key_data = file("../../../../config/${var.cloud}-${var.realm}/id_rsa.pub")
+      key_data = file("../../../../config/${var.cloud}-${var.realm}-red/id_rsa.pub")
     }
   }
 

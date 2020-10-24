@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "cronjob.tfstate"
+    key = "red/cronjob.tfstate"
   }
 }
 

@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "ingress-controller.tfstate"
+    key = "red/ingress-controller.tfstate"
   }
 
   required_providers {

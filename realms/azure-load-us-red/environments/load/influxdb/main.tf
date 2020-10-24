@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "influxdb.tfstate"
+    key = "red/influxdb.tfstate"
   }
 
   required_providers {

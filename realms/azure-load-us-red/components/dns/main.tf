@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "dns.tfstate"
+    key = "red/dns.tfstate"
   }
 }
 
