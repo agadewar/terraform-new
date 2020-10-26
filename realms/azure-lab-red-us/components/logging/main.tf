@@ -2,6 +2,11 @@ terraform {
   backend "azurerm" {
     key = "red/logging.tfstate"
   }
+
+  required_providers {
+    # helm = "= 0.10.4"
+    helm = "= v1.2.3"
+  }
 }
 
 # See: https://akomljen.com/get-kubernetes-logs-with-efk-stack-in-5-minutes/
@@ -25,7 +30,7 @@ provider "helm" {
   }
 
   #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
-  service_account = "tiller"
+  # service_account = "tiller"
 }
 
 locals {
@@ -40,37 +45,70 @@ locals {
   )
 }
 
-/* resource "kubernetes_namespace" "namespace" {
+data "template_file" "custom_values" {
+  template = file("custom-values.yaml.tpl")
+}
+
+resource "kubernetes_namespace" "namespace" {
   metadata {
     name = local.namespace
   }
 }
+
+#data "helm_repository" "stable" {
+#  name = "stable"
+#  url  = "https://github.com/helm/charts/tree/master/stable/"
+#}
 
 data "helm_repository" "akomljen_charts" {
   name = "akomljen-charts"
   url  = "https://raw.githubusercontent.com/komljen/helm-charts/master/charts/"
 }
 
-resource "helm_release" "es_operator" {
+/*resource "helm_release" "es_operator" {
   name       = "es-operator"
   namespace  = local.namespace
   repository = data.helm_repository.akomljen_charts.name
   chart      = "akomljen-charts/elasticsearch-operator"
-}
+  #chart      = "stable/elasticsearch-operator"
+}*/
 
-resource "helm_release" "efk" {
-  depends_on = [helm_release.es_operator]
+resource "helm_release" "elastic-stack" {
+  #depends_on = [helm_release.es_operator]
 
   name       = "efk"
   namespace  = local.namespace
   repository = data.helm_repository.akomljen_charts.name
-  chart      = "akomljen-charts/efk"
-} */
+  #repository = data.helm_repository.stable.name
+  #chart      = "akomljen-charts/efk"
+  chart      = "stable/elastic-stack"
+  values = [
+    data.template_file.custom_values.rendered,
+  ]
+   #set {
+   #  name  = "fluent-bit.image.fluent_bit.tag"
+   #  value = "1.1.1-debug"
+   #}
 
-resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
-  name                = "sapience-${var.realm}-red"
-  resource_group_name = var.resource_group_name
-  location            = var.resource_group_location
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
+  // see: https://github.com/helm/charts/blob/master/stable/fluent-bit/values.yaml
+  set {
+    name  = "fluent-bit.rawConfig"
+    value = <<EOF
+@INCLUDE fluent-bit-service.conf
+@INCLUDE fluent-bit-input.conf
+@INCLUDE fluent-bit-filter.conf
+    Merge_Log_Key       app
+    Keep_Log            On
+[FILTER]
+    Name                nest
+    Match               *
+    Operation           lift
+    Nested_under        kubernetes
+[FILTER]
+    Name                grep
+    Match               *
+    Exclude             namespace_name   kubernetes-dashboard
+@INCLUDE fluent-bit-output.conf
+EOF
+  }
 }
