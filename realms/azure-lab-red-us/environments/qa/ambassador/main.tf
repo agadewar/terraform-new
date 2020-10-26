@@ -361,6 +361,17 @@ cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
   headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_cache_control_mapping
+prefix: /sapience/cache/
+service: sapience-cache-control
+rewrite: /sapience/cache/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
 EOF
     }
   }
@@ -372,8 +383,6 @@ EOF
     }
   }
 }
-
-# resource "kubernetes_deployment" "statsd_sink" {
 #   metadata {
 #     # creation_timestamp = null
 #     name = "statsd-sink"
@@ -458,3 +467,4 @@ EOF
 #     command = "kubectl apply --kubeconfig=${local.config_path} -n qa -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
 #   }
 # }
+
