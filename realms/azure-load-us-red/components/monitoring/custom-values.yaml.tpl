@@ -1,29 +1,85 @@
 # Depending on which DNS solution you have installed in your cluster enable the right exporter
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: alertmanager-load-us-red
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.107.8.4
+    path: 10.107.8.4:/alertmanager-load-us-red
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: grafana-load-us-red
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.107.8.4
+    path: 10.107.8.4:/grafana-load-us-red
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prometheus-load-us-red
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.107.8.4
+    path: 10.107.8.4:/prometheus-load-us-red
+
 coreDns:
   enabled: false
 
 kubeDns:
   enabled: true
 
-alertmanager:
-  alertmanagerSpec:
+alertmanagerSpec:
     storage:
       volumeClaimTemplate:
         spec:
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: 10Gi
-
+            volumeMounts:
+              - name: alertmanager-load-us-red
+                mountPath: 10.107.8.4:/alertmanager-load-us-red
 prometheus:
-  prometheusSpec:
-    storageSpec:
+  storage:
       volumeClaimTemplate:
         spec:
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: 10Gi
+          volumeMounts:
+            - name: prometheus-load-us-red
+              mountPath: 10.107.8.4:/prometheus-load-us-red
+#alertmanager:
+#  alertmanagerSpec:
+#    storage:
+#      volumeClaimTemplate:
+#        spec:
+#          accessModes: ["ReadWriteOnce"]
+#          resources:
+#            requests:
+#              storage: 100Gi
+
+#prometheus:
+#  prometheusSpec:
+#    storageSpec:
+#      volumeClaimTemplate:
+#        spec:
+#          accessModes: ["ReadWriteOnce"]
+#          resources:
+#            requests:
+#              storage: 100Gi
 
 additionalPrometheusRules:
   - name: custom-rules-file
@@ -121,7 +177,13 @@ grafana:
 #     #   - secretName: grafana-tls
 #     #     hosts:
 #     #       - grafana.test.akomljen.com
-  persistence:
-    enabled: true
-    accessModes: ["ReadWriteOnce"]
-    size: 10Gi
+#  persistence:
+#    enabled: true
+#    accessModes: ["ReadWriteOnce"]
+#    size: 10Gi
+    storage:
+      volumeClaimTemplate:
+        spec:
+          volumeMounts:
+            - name: grafana-load-us-red
+              mountPath: 10.107.8.4:/grafana-load-us-red
