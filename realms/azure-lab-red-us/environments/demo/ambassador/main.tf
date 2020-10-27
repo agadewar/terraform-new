@@ -357,10 +357,22 @@ kind:  Mapping
 name:  sapience_app_dashboard_mapping
 prefix: /dashboard/
 service: sapience-app-dashboard
+timeout_ms: 10000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
   headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_cache_control_mapping
+prefix: /sapience/cache/
+service: sapience-cache-control
+rewrite: /sapience/cache/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id  
 EOF
     }
   }
