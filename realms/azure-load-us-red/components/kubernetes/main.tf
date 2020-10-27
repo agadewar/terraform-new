@@ -86,12 +86,13 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   role_based_access_control {
     enabled = true
   }
-  
+
+
   linux_profile {
     admin_username = local.linux_profile_admin_username
 
     ssh_key {
-      key_data = file("../../../../config/${var.cloud}-${var.realm}-red/id_rsa.pub")
+      key_data = file("../../../../config/${var.cloud}-${var.realm}/id_rsa.pub")
     }
   }
 
@@ -152,12 +153,12 @@ resource "null_resource" "kubeconfig" {
   }
 }
 
-#data "template_file" "node_resource_group" {
-#  template = file("templates/node_resource_group.tpl")
-#
-#  vars = {
-#    resource_group = azurerm_kubernetes_cluster.kubernetes.resource_group_name
-#    cluster_name   = azurerm_kubernetes_cluster.kubernetes.name
-#    location       = azurerm_kubernetes_cluster.kubernetes.location
-#  }
-#}  
+data "template_file" "node_resource_group" {
+  template = file("templates/node_resource_group.tpl")
+
+  vars = {
+    resource_group = azurerm_kubernetes_cluster.kubernetes.resource_group_name
+    cluster_name   = azurerm_kubernetes_cluster.kubernetes.name
+    location       = azurerm_kubernetes_cluster.kubernetes.location
+  }
+}  

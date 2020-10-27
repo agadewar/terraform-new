@@ -21,7 +21,7 @@ provider "kubernetes" {
   config_path = local.config_path
 }
 
-data "terraform_remote_state" "storage" {
+/*data "terraform_remote_state" "storage" {
   backend = "azurerm"
 
   config = {
@@ -30,7 +30,7 @@ data "terraform_remote_state" "storage" {
 	  container_name       = "${var.realm_backend_container_name}"
     key                  = "storage.tfstate"
   }
-}
+}*/
 
 locals {
   config_path = "../../../components/kubernetes/.local/kubeconfig"
@@ -53,10 +53,10 @@ resource "helm_release" "influxdb" {
     value = "true"
   }
 
-  set {
+  /*set {
     name  = "persistence.storageClass"
     value = data.terraform_remote_state.storage.outputs.azure_file_storage_class_name
-  }
+  }*/
 
   set {
     name  = "persistence.accessMode"
@@ -80,7 +80,7 @@ resource "helm_release" "influxdb" {
 
   set {
     name  = "resources.requests.cpu"
-    value = "1500m"
+    value = "1000m"
   }
 
   set {
@@ -90,11 +90,11 @@ resource "helm_release" "influxdb" {
 
   set {
     name  = "resources.limits.cpu"
-    value = "4000m"
+    value = "2000m"
   }
 
   set {
     name  = "resources.limits.memory"
-    value = "4096Mi"
+    value = "2096Mi"
   }
 }

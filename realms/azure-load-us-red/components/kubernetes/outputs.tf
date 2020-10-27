@@ -30,6 +30,6 @@ output "kubernetes_location" {
   value = azurerm_kubernetes_cluster.kubernetes.location
 }
 
-#output "kubernetes_node_resource_group_name" {
-#  value = data.template_file.node_resource_group.rendered
-#}
+output "kubernetes_node_resource_group_name" {
+  value = data.template_file.node_resource_group.rendered
+}
