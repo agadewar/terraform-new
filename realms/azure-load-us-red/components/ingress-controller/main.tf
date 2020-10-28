@@ -2,10 +2,6 @@ terraform {
   backend "azurerm" {
     key = "red/ingress-controller.tfstate"
   }
-
-  required_providers {
-    helm = "= 0.10.4"
-  }
 }
 
 provider "azurerm" {
@@ -18,12 +14,10 @@ provider "azurerm" {
 }
 
 provider "helm" {
+  version = "0.10.4"
   kubernetes {
     config_path = local.config_path
   }
-
-  #TODO - may want to pull service account name from kubernetes_service_account.tiller.metadata.0.name
-  #service_account = "tiller"
 }
 
 locals {
@@ -41,7 +35,7 @@ locals {
 
 resource "helm_release" "nginx_ingress" {
   name      = "nginx-ingress"
-  namespace = "kube-system"
+  namespace = local.namespace
   chart     = "stable/nginx-ingress"
 
   set {
@@ -56,12 +50,12 @@ resource "helm_release" "nginx_ingress" {
 
   set {
     name  = "controller.resources.requests.cpu"
-    value = var.nginx_ingress_resource_requests_cpu
+    value = "100m"
   }
 
   set {
     name  = "controller.resources.requests.memory"
-    value = var.nginx_ingress_resource_requests_memory
+    value = "100Mi"
   }
 
   timeout = 600
@@ -90,4 +84,3 @@ data "local_file" "nginx_ingress_controller_ip" {
 
   filename = ".local/nginx-ingress-controller-ip"
 }
-

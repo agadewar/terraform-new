@@ -28,7 +28,7 @@ data "terraform_remote_state" "storage" {
     access_key           = "${var.realm_backend_access_key}"
     storage_account_name = "${var.realm_backend_storage_account_name}"
 	  container_name       = "${var.realm_backend_container_name}"
-    key                  = "storage.tfstate"
+    key                  = "red/storage.tfstate"
   }
 }
 

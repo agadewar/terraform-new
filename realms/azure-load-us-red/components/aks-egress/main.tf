@@ -35,16 +35,17 @@ data "terraform_remote_state" "kubernetes" {
     access_key           = var.realm_backend_access_key
     storage_account_name = var.realm_backend_storage_account_name
     container_name       = var.realm_backend_container_name
-    key                  = "kubernetes.tfstate"
+    key                  = "red/kubernetes.tfstate"
   }
 }
 
 resource "azurerm_public_ip" "aks_egress" {
-  name                = "aks-egress-${var.realm}"
+  name                = "aks-egress-${var.realm}-red"
   location            = "${data.terraform_remote_state.kubernetes.outputs.kubernetes_location}"
   resource_group_name = "${data.terraform_remote_state.kubernetes.outputs.kubernetes_node_resource_group_name}"
   
   public_ip_address_allocation = "Static"
+  sku = "Standard"
 
   tags = "${merge(
     local.common_tags,

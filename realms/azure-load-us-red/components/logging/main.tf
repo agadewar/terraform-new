@@ -31,6 +31,10 @@ locals {
   )
 }
 
+data "template_file" "custom_values" {
+  template = file("custom-values.yaml.tpl")
+}
+
 resource "kubernetes_namespace" "namespace" {
   metadata {
     name = local.namespace
@@ -42,25 +46,29 @@ data "helm_repository" "akomljen_charts" {
   url  = "https://raw.githubusercontent.com/komljen/helm-charts/master/charts/"
 }
 
-resource "helm_release" "es_operator" {
+/*resource "helm_release" "es_operator" {
   name       = "es-operator"
   namespace  = local.namespace
   repository = data.helm_repository.akomljen_charts.name
   chart      = "akomljen-charts/elasticsearch-operator"
-}
+}*/
 
 resource "helm_release" "efk" {
-  depends_on = [helm_release.es_operator]
+  #depends_on = [helm_release.es_operator]
 
   name       = "efk"
   namespace  = local.namespace
   repository = data.helm_repository.akomljen_charts.name
-  chart      = "akomljen-charts/efk"
+  #chart      = "akomljen-charts/efk"
+  chart      = "stable/elastic-stack"
+  values = [
+    data.template_file.custom_values.rendered,
+  ]
 
-  set {
-    name  = "elasticsearch.spec.data-volume-size"
-    value = "200Gi"
-  }
+  #set {
+  #  name  = "elasticsearch.spec.data-volume-size"
+  #  value = "200Gi"
+  #}
 
   set {
     name  = "fluent-bit.image.fluent_bit.tag"
