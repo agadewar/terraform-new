@@ -297,7 +297,7 @@ resource "azurerm_servicebus_topic" "sapience-admin-users-deleted" {
   resource_group_name = var.resource_group_name
   namespace_name      = azurerm_servicebus_namespace.namespace.name
 
-  enable_partitioning = true
+  enable_partitioning = false
 
 }
 
@@ -360,7 +360,7 @@ resource "azurerm_servicebus_topic" "sapience-admin-users-updated" {
   resource_group_name = var.resource_group_name
   namespace_name      = azurerm_servicebus_namespace.namespace.name
 
-  enable_partitioning = true
+  enable_partitioning = false
 
 }
 
