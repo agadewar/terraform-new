@@ -29,5 +29,7 @@ resource "kubernetes_config_map" "auth0" {
       "Auth0__ManagementApiBaseUrl" = ""
       "Auth0__ManagementApiAudience" = ""
       "Auth0__ManagementApiClientId" = ""
+      "Auth0ManagementApi__OpenApiAudience"    =   ""
+
   }
 }
