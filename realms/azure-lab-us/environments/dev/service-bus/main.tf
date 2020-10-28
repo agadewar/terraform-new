@@ -238,6 +238,36 @@ resource "azurerm_servicebus_topic" "sapience-admin-users-created" {
 
 }
 
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-users-created-publish" {
+  name                = "Publish"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-created.name
+  resource_group_name = var.resource_group_name
+  listen              = false
+  send                = true
+  manage              = false
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-users-created-subscribe" {
+  name                = "Subscribe"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-created.name
+  resource_group_name = var.resource_group_name
+  listen              = true
+  send                = false
+  manage              = false
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-users-created-full" {
+  name                = "Full"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-created.name
+  resource_group_name = var.resource_group_name
+  listen              = true
+  send                = true
+  manage              = true
+}
+
 resource "azurerm_servicebus_subscription" "subscriptions-auth0" {
   name                = "sapience-admin-users-created-subscriptions_auth0"
   resource_group_name = var.resource_group_name
@@ -271,6 +301,36 @@ resource "azurerm_servicebus_topic" "sapience-admin-users-deleted" {
 
 }
 
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-users-deleted-publish" {
+  name                = "Publish"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-deleted.name
+  resource_group_name = var.resource_group_name
+  listen              = false
+  send                = true
+  manage              = false
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-users-deleted-subscribe" {
+  name                = "Subscribe"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-deleted.name
+  resource_group_name = var.resource_group_name
+  listen              = true
+  send                = false
+  manage              = false
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-users-deleted-full" {
+  name                = "Full"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-deleted.name
+  resource_group_name = var.resource_group_name
+  listen              = true
+  send                = true
+  manage              = true
+}
+
 resource "azurerm_servicebus_subscription" "sapience-admin-users-deleted-subscriptions_auth0" {
   name                = "sapience-admin-users-deleted-subscriptions_auth0"
   resource_group_name = var.resource_group_name
@@ -302,6 +362,36 @@ resource "azurerm_servicebus_topic" "sapience-admin-users-updated" {
 
   enable_partitioning = true
 
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-users-updated-publish" {
+  name                = "Publish"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-updated.name
+  resource_group_name = var.resource_group_name
+  listen              = false
+  send                = true
+  manage              = false
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-users-updated-subscribe" {
+  name                = "Subscribe"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-updated.name
+  resource_group_name = var.resource_group_name
+  listen              = true
+  send                = false
+  manage              = false
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-users-updated-full" {
+  name                = "Full"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-updated.name
+  resource_group_name = var.resource_group_name
+  listen              = true
+  send                = true
+  manage              = true
 }
 
 resource "azurerm_servicebus_subscription" "sapience-admin-users-updated-subscriptions_auth0" {
