@@ -234,12 +234,15 @@ spec:
     categories:
     - ambassador-crds
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ambassador
 spec:
   replicas: ${replicas}
+  selector:
+    matchLabels:
+      service: ambassador
   template:
     metadata:
       annotations:
