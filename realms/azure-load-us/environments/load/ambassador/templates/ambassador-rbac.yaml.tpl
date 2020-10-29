@@ -28,7 +28,7 @@ rules:
 - apiGroups: [ "apiextensions.k8s.io" ]
   resources: [ "customresourcedefinitions" ]
   verbs: ["get", "list", "watch"]
-- apiGroups: [ "networking.internal.knative.dev" ]
+- apiGroups: [ "networking.internal.knative.demo" ]
   resources: [ "clusteringresses" ]
   verbs: ["get", "list", "watch"]
 ---
@@ -48,7 +48,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: ambassador
-  namespace: default
+  namespace: ${namespace}
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
@@ -234,12 +234,15 @@ spec:
     categories:
     - ambassador-crds
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ambassador
 spec:
   replicas: ${replicas}
+  selector:
+    matchLabels:
+      service: ambassador
   template:
     metadata:
       annotations:
