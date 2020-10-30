@@ -3,9 +3,10 @@ terraform {
     key = "red/certificates.tfstate"
   }
 
-  # required_providers {
-  #   helm = "= 0.10.4"
-  # }
+  required_providers {
+    # helm = "= 0.10.4"
+    helm = "= v1.2.3"
+  }
 }
 
 provider "helm" {
@@ -45,7 +46,7 @@ resource "null_resource" "create_cert_manager_crd" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl apply --validate=false --kubeconfig=${local.config_path} -f files/cert-manager-crds.yaml; kubectl wait --kubeconfig=${local.config_path} --for=condition=Established crd/clusterissuers.cert-manager.io --timeout=60s --all-namespaces"
+    command = "kubectl apply --validate=false --kubeconfig=${local.config_path} -f files/cert-manager-crds.yaml"
   }
 
   provisioner "local-exec" {
@@ -109,7 +110,7 @@ data "helm_repository" "jetstack" {
 
 resource "helm_release" "cert_manager" {
   depends_on = [ null_resource.create_cert_manager_crd ]
-
+  
   name       = "cert-manager"
   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
   chart      = "cert-manager"
@@ -133,8 +134,6 @@ resource "helm_release" "cert_manager" {
 }
 
 data "template_file" "letsencrypt_cluster_issuer_staging" {
-  depends_on = [ null_resource.create_cert_manager_crd ]
-
   template = file("templates/letsencrypt-cluster-issuer.yaml.tpl")
 
   vars = {
@@ -151,7 +150,7 @@ data "template_file" "letsencrypt_cluster_issuer_staging" {
 }
 
 resource "null_resource" "letsencrypt_cluster_issuer_staging" {
-  depends_on = [ kubernetes_secret.service_principal_password, null_resource.create_cert_manager_crd, helm_release.cert_manager ]
+  depends_on = [ kubernetes_secret.service_principal_password ]
 
   triggers = {
     template_changed = data.template_file.letsencrypt_cluster_issuer_staging.rendered
@@ -163,8 +162,6 @@ resource "null_resource" "letsencrypt_cluster_issuer_staging" {
 }
 
 data "template_file" "letsencrypt_cluster_issuer_prod" {
-  depends_on = [ null_resource.create_cert_manager_crd ]
-
   template = file("templates/letsencrypt-cluster-issuer.yaml.tpl")
 
   vars = {
@@ -181,7 +178,7 @@ data "template_file" "letsencrypt_cluster_issuer_prod" {
 }
 
 resource "null_resource" "letsencrypt_cluster_issuer_prod" {
-  depends_on = [ kubernetes_secret.service_principal_password, null_resource.create_cert_manager_crd, helm_release.cert_manager ]
+  depends_on = [ kubernetes_secret.service_principal_password ]
 
   triggers = {
     template_changed = data.template_file.letsencrypt_cluster_issuer_prod.rendered
