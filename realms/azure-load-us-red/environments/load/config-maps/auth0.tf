@@ -26,10 +26,10 @@ resource "kubernetes_config_map" "auth0" {
       "Auth0__PingUri" = "https://sapience-load-us-load.auth0.com/"
 
       #MANAGEMENT API
-      "Auth0__ManagementApiBaseUrl" = ""
-      "Auth0__ManagementApiAudience" = ""
-      "Auth0__ManagementApiClientId" = ""
-      "Auth0ManagementApi__OpenApiAudience"    =   ""
+      "Auth0__ManagementApiBaseUrl" = "https://sapience-load-us-load.auth0.com"
+      "Auth0__ManagementApiAudience" = "https://sapience-load-us-load.auth0.com/api/v2/"
+      "Auth0__ManagementApiClientId" = "7TQZYoa2oy4HfN4HWHVPu1yAfmxhJSaz"
+      "Auth0ManagementApi__OpenApiAudience" = "https://sapience-load-us-load.developer.azure-api.net"
 
   }
 }

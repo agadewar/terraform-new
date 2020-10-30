@@ -31,7 +31,7 @@ resource "kubernetes_config_map" "auth0" {
       #Open-API
       "Auth0ManagementApi__BaseUrl"  = "https://dev-piin5umt.auth0.com"
       "Auth0ManagementApi__Audience" = "https://dev-piin5umt.auth0.com/api/v2/"
-      "Auth0ManagementApi__ClientId" = ""
+      "Auth0ManagementApi__ClientId" = "pGmGyQ49XNlCp8gd46a2cbEwC53xX4sj"
       "Auth0ManagementApi__OpenApiAudience" = "https://sapience-lab-us-dev.developer.azure-api.net"
 
       # POST API NOTIFICATION
