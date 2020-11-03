@@ -60,5 +60,28 @@ resource "azurerm_storage_container" "talend_storage_account" {
   name                  = "talend-${replace(var.realm, "-", "")}-load"
   resource_group_name      = var.resource_group_name
   storage_account_name  = azurerm_storage_account.talend_storage_account.name
-  container_access_type = "Blob"
+  container_access_type = "blob"
 } 
+
+resource "azurerm_storage_account" "bulk_upload_load" {
+  name                      = "saploadusbuload"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  account_tier              = "Standard"
+  account_replication_type  = "ZRS"
+  account_kind              = "StorageV2"
+  enable_https_traffic_only = "true"
+
+  tags = merge(local.common_tags)
+
+  lifecycle {
+    prevent_destroy = "true"
+  }
+}
+
+resource "azurerm_storage_container" "sapience-upload-load" {
+  name                  = "sapience-upload"
+  resource_group_name   = var.resource_group_name
+  storage_account_name  = "${azurerm_storage_account.bulk_upload_load.name}"
+  container_access_type = "blob"
+}
