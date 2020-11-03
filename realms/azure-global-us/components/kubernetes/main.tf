@@ -54,7 +54,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   resource_group_name = var.resource_group_name
   dns_prefix          = local.dns_prefix
 
-  kubernetes_version = var.kubernetes_version
+  kubernetes_version = "1.15.12"
 
   linux_profile {
     admin_username = local.linux_profile_admin_username
