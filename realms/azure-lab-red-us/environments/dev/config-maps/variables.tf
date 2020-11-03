@@ -9,3 +9,5 @@ variable "realm_common_tags" {
 variable "environment_common_tags" {
     type = map
 }
+variable "subscription_id" {}
+variable "resource_group_name" {}
