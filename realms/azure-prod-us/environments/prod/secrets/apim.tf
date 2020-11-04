@@ -6,7 +6,7 @@ resource "kubernetes_secret" "apim" {
 
   data = {
     #APIM Open-API
-      "ApimConfiguration__DelegationKey"  = "var.ApimConfiguration__DelegationKey"
-      "ApimConfiguration__ClientSecret"   = "var.ApimConfiguration__ClientSecret"
+      "ApimConfiguration__DelegationKey"  = var.ApimConfiguration__DelegationKey
+      "ApimConfiguration__ClientSecret"   = var.ApimConfiguration__ClientSecret
   }
 }
