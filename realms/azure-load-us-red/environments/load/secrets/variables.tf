@@ -25,3 +25,6 @@ variable "staging_password" {}
 variable "Sisense__SharedSecret" {}
 variable "redis_dashboard_Password"{}
 variable "Sisense__Auth0ClientSecret"{}
+variable "Auth0ManagementApi__ClientSecret" {}
+variable "ApimConfiguration__DelegationKey" {}
+variable "ApimConfiguration__ClientSecret" {}
