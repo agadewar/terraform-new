@@ -372,6 +372,17 @@ rewrite: /sapience/cache/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_openapi_developerportal_delegation_mapping
+prefix: /openapi/delegation/
+service: sapience-openapi-developerportal-delegation
+rewrite: /openapi/delegation/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
   headers: Content-Type, Authorization, v-request-id  
 EOF
     }
