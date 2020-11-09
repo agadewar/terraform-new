@@ -13,15 +13,15 @@ variable "service_principal_password" {}
 
 variable "resource_group_name" {}
 variable "resource_group_location" {}
-variable "api_auth_ips" {}
+#variable "api_auth_ips" {}
 
-variable "kubernetes_red_version" {}
+variable "kubernetes_version" {}
 
 variable "kubernetes_pool01_vm_size" {}
 variable "kubernetes_pool01_os_disk_size_gb" {}
 variable "kubernetes_pool01_os_type" {}
-variable "kubernetes_pool01_min_count" {}
-variable "kubernetes_pool01_max_count" {}
+variable "kubernetes_min_count" {}
+variable "kubernetes_max_count" {}
 variable "kubernetes_pool01_max_pods"  {}
 
 variable "realm_common_tags" {
