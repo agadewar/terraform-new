@@ -27,7 +27,7 @@ email.enabled = false
 email.fromAddress=steve.ardis@banyanhills.com
 
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.datasource.url=jdbc:mysql://sapience-mysql-$${realm}-$${environment}.mysql.database.azure.com:$${database.port:3306}/$${database.name}?verifyServerCertificate=false&useSSL=true
+spring.datasource.url=jdbc:mysql://sapience-mysql-$${realm}-$${environment}.privatelink.mysql.database.azure.com:$${database.port:3306}/$${database.name}?verifyServerCertificate=false&useSSL=true
 spring.datasource.username=$${CANOPY_DATABASE_USERNAME}@sapience-mysql-$${realm}-$${environment}.mysql.database.azure.com
 spring.datasource.password=$${CANOPY_DATABASE_PASSWORD}
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
