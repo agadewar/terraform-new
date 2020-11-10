@@ -101,7 +101,7 @@ resource "azurerm_function_app" "function_app_admin_users" {
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
   app_service_plan_id       = azurerm_app_service_plan.service_plan_admin_users.id
-  app_settings              = var.function_app_admin_users  
+  #app_settings              = var.function_app_admin_users  
   storage_connection_string = azurerm_storage_account.sapience_functions_admin_users.primary_connection_string
   version                   = "3.1"
 
@@ -131,7 +131,7 @@ resource "azurerm_bulk_upload" "bulk_upload" {
   name                      = "azure-bulk-upload-${var.realm}-${var.environment}"
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
-  app_service_plan_id       = azurerm_app_service_plan.service_plan.id
+  app_service_plan_id       = azurerm_bulk_upload_service_plan.service_plan.id
   storage_connection_string = azurerm_storage_account.sapience_bulk_upload.primary_connection_string
   version                   = "~2"
 }
@@ -165,25 +165,5 @@ resource "azurerm_bulk_upload" "bulk_upload_admin_users" {
   storage_connection_string = azurerm_storage_account.sapience_bulk_upload_admin_users.primary_connection_string
   version                   = "3.1"
 
-  {
-      AzureWebJobsStorage           =  " "
-      Connection                    =  " "
-      FUNCTIONS_WORKER_RUNTIME      =  "dotnet"
-      Auth0__Connection             =  "Username-Password-Authentication"
-      Auth0__ManagementApiClientId  =  " "
-      Auth0__ManagementApiIdentifier  = " "
-      Auth0__ManagementApiAudience    =  ""
-      Auth0__ManagementApiSecret      =  ""
-      Sisense__BaseUrl                =  "https://sisense.dev.lab.us.azure.sapienceanalytics.com/"
-      Sisense__UsersUri               =  "api/users?notify=false"
-      Sisense__DefaultGroupUri        =  "api/v1/groups?name="
-      Sisense__DataSecurityUri        =  "api/elasticubes/datasecurity"
-      Sisense__ElasticubesUri         =  "api/v1/elasticubes/getElasticubes"
-      Sisense__DailyDataSource        =  "Sapience-Daily-CompanyId-Env"
-      Sisense__HourlyDataSource       =  "Sapience-Hourly-CompanyId-Env"
-      Sisense__Env                    =  "Dev"
-      Sisense__Secret                 =  ""
-
-  }
 }
 
