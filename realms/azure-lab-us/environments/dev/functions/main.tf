@@ -127,12 +127,12 @@ resource "azurerm_function_app" "function_app_admin_users" {
   }
 }
 
-resource "azurerm_bulk_upload" "bulk_upload" {
+resource "azurerm_function_app" "bulk_upload" {
   name                      = "azure-bulk-upload-${var.realm}-${var.environment}"
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
-  app_service_plan_id       = azurerm_bulk_upload_service_plan.service_plan.id
-  storage_connection_string = azurerm_storage_account.sapience_bulk_upload.primary_connection_string
+  app_service_plan_id       = azurerm_app_service_plan.service_bulk_upload_plan_admin_users.id
+  storage_connection_string = azurerm_storage_account.sapience_bulk_upload_admin_users.primary_connection_string
   version                   = "~2"
 }
 
@@ -157,7 +157,7 @@ resource "azurerm_app_service_plan" "service_bulk_upload_plan_admin_users" {
   }
 }
 
-resource "azurerm_bulk_upload" "bulk_upload_admin_users" {
+resource "azurerm_function_app" "bulk_upload_admin_users" {
   name                      = "azure-bulk-upload-sapience-user-provisioning-${var.realm}-${var.environment}"
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
