@@ -146,7 +146,7 @@ resource "azurerm_storage_account" "sapience_bulk_upload_admin_users" {
   tags = merge(local.common_tags, {})
 }
 
-resource "azurerm_app_service_plan" "service_plan_admin_users" {
+resource "azurerm_app_service_plan" "service_bulk_upload_plan_admin_users" {
   name                = "azure-bulk-upload-service-plan-admin-users-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
@@ -165,7 +165,7 @@ resource "azurerm_bulk_upload" "bulk_upload_admin_users" {
   storage_connection_string = azurerm_storage_account.sapience_bulk_upload_admin_users.primary_connection_string
   version                   = "3.1"
 
-      app_settings                   = {
+  {
       AzureWebJobsStorage           =  " "
       Connection                    =  " "
       FUNCTIONS_WORKER_RUNTIME      =  "dotnet"
