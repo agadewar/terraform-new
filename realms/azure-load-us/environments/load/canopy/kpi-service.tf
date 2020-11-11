@@ -172,23 +172,23 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
           }
           env {
             name  = "spring.datasource.initial-size"
-            value = "10"
+            value = "$${spring.datasource.tomcat.initial-size}"
           }
           env {
             name  = "spring.datasource.max-active"
-            value = "200"
+            value = "$${spring.datasource.tomcat.max-active}"
           }
           env {
             name  = "spring.datasource.min-idle"
-            value = "10"
+            value = "$${spring.datasource.tomcat.min-idle}"
           }
           env {
             name  = "spring.datasource.max-idle"
-            value = "30"
+            value = "$${spring.datasource.tomcat.max-idle}"
           }
           env {
             name  = "spring.datasource.min-evictable-idle-time-millis"
-            value = "5000"
+            value = "$${spring.datasource.tomcat.min-evictable-idle-time-millis}"
           }
 
           env {
