@@ -101,7 +101,7 @@ resource "azurerm_function_app" "function_app_admin_users" {
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
   app_service_plan_id       = azurerm_app_service_plan.service_plan_admin_users.id
-  app_settings              = var.function_app_admin_users  
+  #app_settings              = var.function_app_admin_users  
   storage_connection_string = azurerm_storage_account.sapience_functions_admin_users.primary_connection_string
   version                   = "3.1"
 
@@ -126,3 +126,35 @@ resource "azurerm_function_app" "function_app_admin_users" {
 
   }
 }
+
+resource "azurerm_function_app" "bulk_upload" {
+  name                      = "azure-admin-bulk-upload-${var.realm}-${var.environment}"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  app_service_plan_id       = azurerm_app_service_plan.service_bulk_upload_plan_admin_users.id
+  storage_connection_string = azurerm_storage_account.sapience_bulk_upload_admin_users.primary_connection_string
+  version                   = "~2"
+}
+
+resource "azurerm_storage_account" "sapience_bulk_upload_admin_users" {
+  name                     = "adminfn${replace(lower(var.realm), "-", "")}${var.environment}"
+  resource_group_name      = var.resource_group_name
+  location                 = "eastus2"
+  account_tier             = "Standard"
+  account_replication_type = "GRS"
+
+  tags = merge(local.common_tags, {})
+}
+
+resource "azurerm_app_service_plan" "service_bulk_upload_plan_admin_users" {
+  name                = "azure-bulk-upload-service-plan-admin-users-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+
+  sku {
+    tier = "Standard"
+    size = "S1"
+  }
+}
+
+

@@ -54,8 +54,8 @@ resource "azurerm_storage_container" "leaf_downloads" {
   container_access_type = "blob"
 }
 
-resource "azurerm_storage_account" "bulk_upload" {
-  name                      = "sapiencebu${replace(var.realm, "-", "")}"
+resource "azurerm_storage_account" "bulk_upload_dev" {
+  name                      = "saplabusbudev"
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
   account_tier              = "Standard"
@@ -70,23 +70,55 @@ resource "azurerm_storage_account" "bulk_upload" {
   }
 }
 
-resource "azurerm_storage_container" "bulk_upload_dev" {
-  name                  = "${var.realm}-dev"
+resource "azurerm_storage_container" "sapience-upload-dev" {
+  name                  = "sapience-upload"
   resource_group_name   = var.resource_group_name
-  storage_account_name  = "${azurerm_storage_account.bulk_upload.name}"
+  storage_account_name  = "${azurerm_storage_account.bulk_upload_dev.name}"
   container_access_type = "blob"
 }
 
-resource "azurerm_storage_container" "bulk_upload_qa" {
-  name                  = "${var.realm}-qa"
+resource "azurerm_storage_account" "bulk_upload_demo" {
+  name                      = "saplabusbudemo"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  account_tier              = "Standard"
+  account_replication_type  = "ZRS"
+  account_kind              = "StorageV2"
+  enable_https_traffic_only = "true"
+
+  tags = merge(local.common_tags)
+
+  lifecycle {
+    prevent_destroy = "true"
+  }
+}
+
+resource "azurerm_storage_container" "sapience-upload-demo" {
+  name                  = "sapience-upload"
   resource_group_name   = var.resource_group_name
-  storage_account_name  = "${azurerm_storage_account.bulk_upload.name}"
+  storage_account_name  = "${azurerm_storage_account.bulk_upload_demo.name}"
   container_access_type = "blob"
 }
 
-resource "azurerm_storage_container" "bulk_upload_demo" {
-  name                  = "${var.realm}-demo"
+resource "azurerm_storage_account" "bulk_upload_qa" {
+  name                      = "saplabusbuqa"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  account_tier              = "Standard"
+  account_replication_type  = "ZRS"
+  account_kind              = "StorageV2"
+  enable_https_traffic_only = "true"
+
+  tags = merge(local.common_tags)
+
+  lifecycle {
+    prevent_destroy = "true"
+  }
+}
+
+resource "azurerm_storage_container" "sapience-upload-qa" {
+  name                  = "sapience-upload"
   resource_group_name   = var.resource_group_name
-  storage_account_name  = "${azurerm_storage_account.bulk_upload.name}"
+  storage_account_name  = "${azurerm_storage_account.bulk_upload_qa.name}"
   container_access_type = "blob"
 }

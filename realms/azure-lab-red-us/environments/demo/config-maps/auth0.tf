@@ -31,5 +31,11 @@ resource "kubernetes_config_map" "auth0" {
       "Auth0__ManagementApiBaseUrl" = ""
       "Auth0__ManagementApiAudience" = ""
       "Auth0__ManagementApiClientId" = ""
+
+      #Open-API
+      "Auth0ManagementApi__BaseUrl"  = "https://sapience-lab-us-demo.auth0.com"
+      "Auth0ManagementApi__Audience" = "https://sapience-lab-us-demo.auth0.com/api/v2/"
+      "Auth0ManagementApi__ClientId" = "C9YxJfV5kXSQNqryA536Izc0elUQb4nh"
+      "Auth0ManagementApi__OpenApiAudience" = "https://sapience-lab-us-demo.developer.azure-api.net"
   }
 }

@@ -343,6 +343,18 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  admin_uploads_api_mapping
+prefix: /admin/uploads/
+service: admin-uploads-api
+rewrite: /admin/uploads/
+timeout_ms: 10000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  sapience_openapi_mapping
 prefix: /openapi
 service: sapience-open-api
@@ -369,6 +381,17 @@ name:  sapience_cache_control_mapping
 prefix: /sapience/cache/
 service: sapience-cache-control
 rewrite: /sapience/cache/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_openapi_developerportal_delegation_mapping
+prefix: /openapi/delegation/
+service: sapience-openapi-developerportal-delegation
+rewrite: /openapi/delegation/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS

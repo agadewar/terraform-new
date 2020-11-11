@@ -39,3 +39,26 @@ resource "azurerm_storage_account" "storage_account" {
     prevent_destroy = "true"
   }
 }
+
+resource "azurerm_storage_account" "bulk_upload_prod" {
+  name                      = "sapprodusbuprod"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  account_tier              = "Standard"
+  account_replication_type  = "ZRS"
+  account_kind              = "StorageV2"
+  enable_https_traffic_only = "true"
+
+  tags = merge(local.common_tags)
+
+  lifecycle {
+    prevent_destroy = "true"
+  }
+}
+
+resource "azurerm_storage_container" "sapience-upload-prod" {
+  name                  = "sapience-upload"
+  resource_group_name   = var.resource_group_name
+  storage_account_name  = "${azurerm_storage_account.bulk_upload_prod.name}"
+  container_access_type = "blob"
+}

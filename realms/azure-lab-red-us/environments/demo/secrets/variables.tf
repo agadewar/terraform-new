@@ -27,3 +27,9 @@ variable "machine_learning_service_account_password" {}
 variable "redis_dashboard_Password"{}
 variable "Sisense__SharedSecret"{}
 variable "Sisense__Auth0ClientSecret"{}
+variable "Auth0ManagementApi__ClientSecret" {}
+variable "ApimConfiguration__DelegationKey" {}
+variable "ApimConfiguration__ClientSecret" {}
+variable "UploadBlob__StorageAccountAccessKey" {}
+variable "BulkUploadDbConfig__ConnString" {}
+variable "AzureServiceBus__EndpointEndpoint" {}
