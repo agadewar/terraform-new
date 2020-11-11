@@ -20,6 +20,8 @@ resource "kubernetes_secret" "eventpipeline_leaf_broker" {
     "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
     "canopy.database.username" = var.mysql_canopy_username
     "canopy.database.password" = var.mysql_canopy_password
+    "canopy.service-account.username" = var.canopy_service_account_username
+    "canopy.service-account.password" = var.canopy_service_account_password
     "kafka.username"           = var.kafka_username
     "kafka.password"           = var.kafka_password
   }
@@ -65,8 +67,10 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
 
       spec {
         container {
+          image_pull_policy = "Always"
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.3.25.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.10.0-SNAPSHOT"
           name  = "eventpipeline-leaf-broker"
 
           env { 
@@ -114,6 +118,26 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
               }
             }
           }
+
+          env {
+            name = "CANOPY_SERVICE_ACCOUNT_USERNAME"
+            value_from {
+              secret_key_ref {
+                name = "eventpipeline-leaf-broker"
+                key  = "canopy.service-account.username"
+              }
+            }
+          }
+          env {
+            name = "CANOPY_SERVICE_ACCOUNT_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "eventpipeline-leaf-broker"
+                key  = "canopy.service-account.password"
+              }
+            }
+          }
+          
           env {
             name = "REDIS_PASSWORD"
             value_from {
@@ -124,6 +148,15 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
             }
           }
 
+          env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
+            name  = "canopy.leafbroker.divine-device-ids.enabled"
+            value = "false"
+          }
           env {
             name  = "canopy.security.cookie.enabled"
             value = "true"

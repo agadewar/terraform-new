@@ -2,9 +2,15 @@ variable "global_realm_backend_access_key" {}
 variable "global_realm_backend_storage_account_name" {}
 variable "global_realm_backend_container_name" {}
 
+variable "realm_backend_access_key" {}
+variable "realm_backend_storage_account_name" {}
+variable "realm_backend_container_name" {}
+
 variable "env_backend_access_key" {}
 variable "env_backend_storage_account_name" {}
 variable "env_backend_container_name" {}
+
+variable "resource_group_name" {} 
 
 variable "cloud" {}
 variable "realm" {}
@@ -18,6 +24,9 @@ variable "kafka_password" {}
 
 variable "canopy_container_registry_hostname" {}
 
+variable "canopy_auth0_service_deployment_replicas" {}
+variable "canopy_auth0_service_deployment_request_memory" {}
+variable "canopy_auth0_service_deployment_request_cpu" {}
 variable "canopy_device_service_deployment_replicas" {}
 variable "canopy_device_service_deployment_request_memory" {}
 variable "canopy_device_service_deployment_request_cpu" {}
