@@ -63,7 +63,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   resource_group_name                   = var.resource_group_name
   dns_prefix                            = local.dns_prefix
   #api_server_authorized_ip_ranges       = var.api_auth_ips
-  kubernetes_version                    = var.kubernetes_red_version
+  kubernetes_version                    = var.kubernetes_version
 
   network_profile {
             #dns_service_ip     = "10.0.0.10"
@@ -92,8 +92,8 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     vm_size              = var.kubernetes_pool01_vm_size
     os_disk_size_gb      = var.kubernetes_pool01_os_disk_size_gb
     enable_auto_scaling  = true
-    min_count            = var.kubernetes_pool01_min_count
-    max_count            = var.kubernetes_pool01_max_count
+    min_count            = var.kubernetes_min_count
+    max_count            = var.kubernetes_max_count
     max_pods             = var.kubernetes_pool01_max_pods
     vnet_subnet_id       = data.terraform_remote_state.network.outputs.aks-pool_subnet_id
   }
@@ -130,14 +130,14 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   }
 }
    
-  #data "template_file" "node_resource_group" {
-  #template = file("autoscaler/node_resource_group.tpl")
+  data "template_file" "node_resource_group" {
+  template = file("autoscaler/node_resource_group.tpl")
 
-  #vars = {
-  #  resource_group = azurerm_kubernetes_cluster.kubernetes.resource_group_name
-  #  cluster_name   = azurerm_kubernetes_cluster.kubernetes.name
-  #  location       = azurerm_kubernetes_cluster.kubernetes.location
-  #}
-#}
+  vars = {
+    resource_group = azurerm_kubernetes_cluster.kubernetes.resource_group_name
+    cluster_name   = azurerm_kubernetes_cluster.kubernetes.name
+    location       = azurerm_kubernetes_cluster.kubernetes.location
+  }
+}
    
   
