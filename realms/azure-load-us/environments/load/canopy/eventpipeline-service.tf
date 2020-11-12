@@ -91,9 +91,16 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
 
       spec {
         container {
+          image_pull_policy = "Always"
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.3.6.sapience-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.4.0-SNAPSHOT"
           name  = "eventpipeline-service"
+
+          env { 
+            name = "EVENTPIPELINE_SERVICE_XMX"
+            value = "2048m"
+          }
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
@@ -148,6 +155,30 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
                 key  = "azure.datalake.key"
               }
             }
+          }
+
+          env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
+            name  = "JMS_TYPE"
+            value = "servicebus"
+          }
+
+          // servicebus settings
+          env { 
+            name  = "SERVICEBUS_HOST"
+            value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_hostname
+          }
+          env { 
+            name  = "SERVICEBUS_KEY" 
+            value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
+          }
+          env { 
+            name  = "SERVICEBUS_POLICY"
+            value = "RootManageSharedAccessKey"
           }
 
           readiness_probe {

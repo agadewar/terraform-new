@@ -55,6 +55,14 @@ resource "azurerm_servicebus_queue" "device_registration" {
   enable_partitioning = false
 }
 
+resource "azurerm_servicebus_queue" "canopy_deadend" {
+  name                = "canopy-deadend"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+
+  enable_partitioning = false
+}
+
 # resource "azurerm_servicebus_queue" "event_archive" {
 #   name                = "event-archive"
 #   resource_group_name = var.resource_group_name

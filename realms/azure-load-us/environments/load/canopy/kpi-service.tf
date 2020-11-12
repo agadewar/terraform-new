@@ -82,8 +82,10 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
 
       spec {
         container {
+          image_pull_policy = "Always"
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/kpi-service:2.14.12.docker"
+          image = "${var.canopy_container_registry_hostname}/kpi-service:2.38.0-SNAPSHOT"
           name  = "kpi-service"
 
           env { 
@@ -135,8 +137,17 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
           }
 
           env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
             name  = "com.banyanhills.canopy.kpi.event.inbound.KpiInboundEventPipeLineHandler.disabled"
             value = "true"
+          }
+          env {
+            name  = "canopy.portal.url.versions"
+            value = "[(null):'https://canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com','3':'https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com']"
           }
 
           env {
@@ -158,6 +169,47 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
           env {
             name  = "spring.datasource.tomcat.min-evictable-idle-time-millis"
             value = "5000"
+          }
+          env {
+            name  = "spring.datasource.initial-size"
+            value = "$${spring.datasource.tomcat.initial-size}"
+          }
+          env {
+            name  = "spring.datasource.max-active"
+            value = "$${spring.datasource.tomcat.max-active}"
+          }
+          env {
+            name  = "spring.datasource.min-idle"
+            value = "$${spring.datasource.tomcat.min-idle}"
+          }
+          env {
+            name  = "spring.datasource.max-idle"
+            value = "$${spring.datasource.tomcat.max-idle}"
+          }
+          env {
+            name  = "spring.datasource.min-evictable-idle-time-millis"
+            value = "$${spring.datasource.tomcat.min-evictable-idle-time-millis}"
+          }
+
+          env {
+            name  = "job.executor.threads"
+            value = "10"
+          }
+          env {
+            name  = "job.executor.maxThreads"
+            value = "100"
+          }
+          env {
+            name  = "jms.concurrency"
+            value = "20-20"
+          }
+          env {
+            name  = "server.undertow.io-threads"
+            value = "20"
+          }
+          env {
+            name  = "server.undertow.worker-threads"
+            value = "2000"
           }
 
           env {
@@ -224,7 +276,7 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
             initial_delay_seconds = 15
             period_seconds = 5
             timeout_seconds = 2
-            failure_threshold = 3
+            failure_threshold = 6
           }
 
           liveness_probe {
@@ -235,7 +287,7 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
 
             initial_delay_seconds = 180
             period_seconds = 10
-	          timeout_seconds = 2
+	          timeout_seconds = 5
             failure_threshold = 6
           }
 

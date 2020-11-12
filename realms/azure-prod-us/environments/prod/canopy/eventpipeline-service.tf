@@ -95,7 +95,7 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
           image = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.3.7.sapience-SNAPSHOT"
           name  = "eventpipeline-service"
 
-         env { 
+          env { 
             name = "EVENTPIPELINE_SERVICE_XMX"
             value = "5120m"
           }

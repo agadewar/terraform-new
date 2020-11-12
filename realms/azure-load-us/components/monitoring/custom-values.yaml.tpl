@@ -102,6 +102,14 @@ additionalPrometheusRules:
             annotations:
               summary: "Kubernetes Node disk pressure (instance {{ $labels.instance }})"
               description: "{{ $labels.node }} has DiskPressure condition\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+          - alert: KubernetesPodResourcesCPULimits
+            expr: sum by (namespace, pod) (node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate) > ((sum by (namespace, pod) (kube_pod_container_resource_limits_cpu_cores))*0.9)
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes Pod Resources CPU Limits (instance {{ $labels.instance }})"
+              description: Pod {{ $labels.pod }} CPU limits has crossed 90%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}
 
 grafana:
   adminPassword: ${admin_password}
