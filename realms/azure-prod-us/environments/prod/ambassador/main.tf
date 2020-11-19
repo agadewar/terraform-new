@@ -384,6 +384,17 @@ cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
   headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  admin_dashboard_api_mapping
+prefix: /admin/dashboard/
+service: admin-dashboard-api
+rewrite: /admin/dashboard/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
 EOF
     }
   }
