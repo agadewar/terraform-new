@@ -134,6 +134,18 @@ resource "azurerm_servicebus_subscription" "subscriptions-sisense" {
 
 }
 
+resource "azurerm_servicebus_subscription" "subscriptions-canopy" {
+  name                = "sapience-admin-users-created-subscriptions_canopy"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-created.name
+  
+  max_delivery_count  = 10
+  #auto_delete_on_idle = 10
+  requires_session = false
+
+}
+
 resource "azurerm_servicebus_topic" "sapience-admin-users-deleted" {
   name                = "sapience-admin-users-deleted"
   resource_group_name = var.resource_group_name
@@ -197,6 +209,18 @@ resource "azurerm_servicebus_subscription" "sapience-admin-users-deleted-subscri
 
 }
 
+resource "azurerm_servicebus_subscription" "sapience-admin-users-deleted-subscriptions_canopy" {
+  name                = "sapience-admin-users-deleted-subscriptions_canopy"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-deleted.name
+  
+  max_delivery_count  = 10
+  #auto_delete_on_idle = 10
+  requires_session = false
+
+}
+
 resource "azurerm_servicebus_topic" "sapience-admin-users-updated" {
   name                = "sapience-admin-users-updated"
   resource_group_name = var.resource_group_name
@@ -250,6 +274,18 @@ resource "azurerm_servicebus_subscription" "sapience-admin-users-updated-subscri
 
 resource "azurerm_servicebus_subscription" "sapience-admin-users-updated-subscriptions_sisense" {
   name                = "sapience-admin-users-updated-subscriptions_sisense"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-users-updated.name
+  
+  max_delivery_count  = 10
+  #auto_delete_on_idle = 10
+  requires_session = false
+
+}
+
+resource "azurerm_servicebus_subscription" "sapience-admin-users-updated-subscriptions_canopy" {
+  name                = "sapience-admin-users-updated-subscriptions_canopy"
   resource_group_name = var.resource_group_name
   namespace_name      = azurerm_servicebus_namespace.namespace.name
   topic_name          = azurerm_servicebus_topic.sapience-admin-users-updated.name
