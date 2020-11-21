@@ -46,5 +46,7 @@ resource "kubernetes_config_map" "sisense" {
       #"Sisense__SecurityEndpoint" = "https://sisense-linux-ha.dev.sapienceanalytics.com/api/settings/security"
       #"Sisense__UserSecurityEndpoint" = "https://sisense-linux-ha.dev.sapienceanalytics.com/api/v1/users"
 
+      "Sisense__BaseUrl" = "https://sisense.dev.lab.us.azure.sapienceanalytics.com/"
+
   }
 }
