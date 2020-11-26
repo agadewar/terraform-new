@@ -271,6 +271,7 @@ name:  admin_users_api_mapping
 prefix: /admin/users/
 service: admin-users-api
 rewrite: /admin/users/
+timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
