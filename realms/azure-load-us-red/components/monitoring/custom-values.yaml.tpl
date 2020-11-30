@@ -165,7 +165,7 @@ additionalPrometheusRules:
               severity: critical
             annotations:
               summary: "Kubernetes Pod Resources CPU Limits (instance {{ $labels.instance }})"
-              description: Pod {{ $labels.pod }} CPU limits has crossed 90%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}
+              description: "Pod {{ $labels.pod }} CPU limits has crossed 90%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
 
 grafana:
   adminPassword: ${admin_password}

@@ -335,7 +335,7 @@ name:  admin_uploads_api_mapping
 prefix: /admin/uploads/
 service: admin-uploads-api
 rewrite: /admin/uploads/
-timeout_ms: 10000
+timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -380,6 +380,17 @@ name:  sapience_openapi_developerportal_delegation_mapping
 prefix: /openapi/delegation/
 service: sapience-openapi-developerportal-delegation
 rewrite: /openapi/delegation/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  admin_dashboard_api_mapping
+prefix: /admin/dashboard/
+service: admin-dashboard-api
+rewrite: /admin/dashboard/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
