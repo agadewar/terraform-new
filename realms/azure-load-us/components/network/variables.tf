@@ -17,6 +17,7 @@ variable "subnet_address_prefix_aks_eastus_sisense" {}
 # variable "subnet_address_prefix_demo-application" {}
 # variable "subnet_address_prefix_demo-data" {}
 variable "subnet_address_prefix_aks-pool" {}
+variable "subnet_address_prefix_aks-pool2" {}
 
 variable "subnet_service_endpoints" {
   type = list(string)

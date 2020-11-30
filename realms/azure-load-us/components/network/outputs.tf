@@ -33,3 +33,7 @@ output "netapp_subnet_id" {
 output "aks-pool_subnet_id" {
   value = "${azurerm_subnet.aks-pool.id}"
 }
+
+output "aks-pool2_subnet_id" {
+  value = "${azurerm_subnet.aks-pool2.id}"
+}
