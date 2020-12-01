@@ -48,17 +48,6 @@ resource "azurerm_subnet" "aks-pool" {
   }
 }
 
-resource "azurerm_subnet" "aks-pool2" {
-  name                 = "aks-pool2"
-  resource_group_name  = var.resource_group_name
-  virtual_network_name = azurerm_virtual_network.realm.name
-  address_prefix       = var.subnet_address_prefix_aks-pool2
-  service_endpoints    = var.subnet_service_endpoints
-  lifecycle { 
-    #ignore_changes = [ route_table_id ]
-  }
-}
-
 resource "azurerm_subnet" "aks_eastus_sisense" {
 
   name                 = "aks-eastus-sisense"
