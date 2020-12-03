@@ -104,6 +104,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     enable_auto_scaling  = true
     min_count            = var.kubernetes_pool01_min_count
     max_count            = var.kubernetes_pool01_max_count
+    max_pods             = 250
     vnet_subnet_id       = data.terraform_remote_state.network.outputs.aks-pool_subnet_id
   }
 

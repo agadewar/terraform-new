@@ -32,7 +32,7 @@ data "terraform_remote_state" "network" {
     access_key           = var.realm_backend_access_key
     storage_account_name = var.realm_backend_storage_account_name
     container_name       = var.realm_backend_container_name
-    key                  = "network.tfstate"
+    key                  = "red/network.tfstate"
   }
 }
 
@@ -66,12 +66,8 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   kubernetes_version                    = var.kubernetes_version
 
   network_profile {
-            #dns_service_ip     = "10.0.0.10"
-            #docker_bridge_cidr = "172.17.0.1/16"
             load_balancer_sku  = "Standard"
             network_plugin     = "kubenet"
-            #pod_cidr           = "10.244.0.0/16"
-            #service_cidr       = "10.0.0.0/16"
         }
   role_based_access_control {
     enabled = true
@@ -88,7 +84,6 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   default_node_pool {
     name                 = local.node_pool_profile_name
     type                 = "VirtualMachineScaleSets"
-    #load_balancer_sku    = "standard"
     vm_size              = var.kubernetes_pool01_vm_size
     os_disk_size_gb      = var.kubernetes_pool01_os_disk_size_gb
     enable_auto_scaling  = true
