@@ -50,11 +50,11 @@ data "terraform_remote_state" "network" {
 locals {
   config_path = ".local/kubeconfig"
 
-  cluster_name                 = "${var.realm}"
+  cluster_name                 = "${var.realm}-black"
   node_pool_profile_1_name    = "pool01"
   node_pool_profile_2_name    = "pool02"
   node_pool_profile_3_name    = "pool03"
-  dns_prefix                   = "${var.realm}"
+  dns_prefix                   = "${var.realm}-black"
   linux_profile_admin_username = "sapience"
 
   common_tags = merge(

@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "red/aks-egress.tfstate"
+    key = "black/aks-egress.tfstate"
   }
 }
 
@@ -35,12 +35,12 @@ data "terraform_remote_state" "kubernetes" {
     access_key           = var.realm_backend_access_key
     storage_account_name = var.realm_backend_storage_account_name
     container_name       = var.realm_backend_container_name
-    key                  = "red/kubernetes.tfstate"
+    key                  = "black/kubernetes.tfstate"
   }
 }
 
 resource "azurerm_public_ip" "aks_egress" {
-  name                = "aks-egress-${var.realm}-red"
+  name                = "aks-egress-${var.realm}-black"
   location            = "${data.terraform_remote_state.kubernetes.outputs.kubernetes_location}"
   resource_group_name = "${data.terraform_remote_state.kubernetes.outputs.kubernetes_node_resource_group_name}"
   
