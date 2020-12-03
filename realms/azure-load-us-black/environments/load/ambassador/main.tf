@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "red/ambassador.tfstate"
+    key = "black/ambassador.tfstate"
   }
 }
 
@@ -47,7 +47,7 @@ data "terraform_remote_state" "ingress_controller" {
     access_key           = "${var.realm_backend_access_key}"
     storage_account_name = "${var.realm_backend_storage_account_name}"
 	  container_name       = "${var.realm_backend_container_name}"
-    key                  = "ingress-controller.tfstate"
+    key                  = "black/ingress-controller.tfstate"
   }
 }
 
@@ -68,6 +68,20 @@ resource "kubernetes_ingress" "api" {
   }
 
   spec {
+    rule {
+      host = "api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
+      http {
+        path {
+          backend {
+            service_name = "ambassador"
+            service_port = 80
+          }
+
+          path = "/"
+        }
+      }
+    }
+
     rule {
       host = "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
       http {
@@ -98,6 +112,7 @@ resource "kubernetes_ingress" "api" {
 
     tls {
       hosts = [
+        "api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com",
         "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
         "api.${var.environment}.sapienceanalytics.com"
       ]
@@ -110,7 +125,7 @@ data "template_file" "ambassador-rbac" {
   template = file("templates/ambassador-rbac.yaml.tpl")
 
   vars = {
-    replicas = var.ambassador_rbac_replicas
+    replicas      = var.ambassador_rbac_replicas
     namespace     = var.environment
   }
 }
@@ -212,6 +227,7 @@ kind:  Mapping
 name:  canopy_user_service_mapping
 prefix: /user/
 service: canopy-user-service
+timeout_ms: 60000
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -224,6 +240,18 @@ circuit_breakers:
 - max_connections: 8000
   max_pending_requests: 8000
   max_requests: 8000
+---
+#apiVersion: ambassador/v1
+#kind:  Mapping
+#name:  eventpipeline_leaf_broker_eh_mapping
+#prefix: /leafbroker_eh/
+#service: eventpipeline-leaf-broker-eh
+#timeout_ms: 120000
+#connect_timeout_ms: 120000
+#circuit_breakers:
+#- max_connections: 8000
+#  max_pending_requests: 8000
+#  max_requests: 8000
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -244,6 +272,7 @@ name:  admin_users_api_mapping
 prefix: /admin/users/
 service: admin-users-api
 rewrite: /admin/users/
+timeout_ms: 60000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -273,10 +302,21 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  admin_org_api_mapping
+prefix: /admin/org/
+service: admin-org-api
+rewrite: /admin/org/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  sapience_app_api_mapping
 prefix: /
 service: sapience-app-api
-timeout_ms: 30000
+timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -305,27 +345,6 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
-name:  sapience_app_dashboard_mapping
-prefix: /dashboard/
-service: sapience-app-dashboard
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  admin_org_api_mapping
-prefix: /admin/org/
-service: admin-org-api
-rewrite: /admin/org/
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
----
-apiVersion: ambassador/v1
-kind:  Mapping
 name:  admin_uploads_api_mapping
 prefix: /admin/uploads/
 service: admin-uploads-api
@@ -338,10 +357,10 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
-name:  sapience_cache_control_mapping
-prefix: /sapience/cache/
-service: sapience-cache-control
-rewrite: /sapience/cache/
+name:  sapience_openapi_mapping
+prefix: /openapi
+service: sapience-open-api
+rewrite: /openapi
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -349,10 +368,21 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
-name:  sapience_openapi_developerportal_delegation_mapping
-prefix: /openapi/delegation/
-service: sapience-openapi-developerportal-delegation
-rewrite: /openapi/delegation/
+name:  sapience_app_dashboard_mapping
+prefix: /dashboard/
+service: sapience-app-dashboard
+timeout_ms: 100000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_cache_control_mapping
+prefix: /sapience/cache/
+service: sapience-cache-control
+rewrite: /sapience/cache/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -389,24 +419,6 @@ EOF
       port = 80
     }
   }
-}
-
-resource "azurerm_dns_a_record" "api" {
-  provider = azurerm.global
-
-  name = "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}"
-  zone_name = "sapienceanalytics.com"
-  resource_group_name = "global-us"
-  ttl = 30
-  # TF-UPGRADE-TODO: In Terraform v0.10 and earlier, it was sometimes necessary to
-  # force an interpolation expression to be interpreted as a list by wrapping it
-  # in an extra set of list brackets. That form was supported for compatibilty in
-  # v0.11, but is no longer supported in Terraform v0.12.
-  #
-  # If the expression in the following list itself returns a list, remove the
-  # brackets to avoid interpretation as a list of lists. If the expression
-  # returns a single list item then leave it as-is and remove this TODO comment.
-  records = [data.terraform_remote_state.ingress_controller.outputs.nginx_ingress_controller_ip]
 }
 
 # resource "kubernetes_deployment" "statsd_sink" {

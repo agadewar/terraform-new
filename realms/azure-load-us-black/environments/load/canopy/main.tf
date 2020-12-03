@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "red/canopy.tfstate"
+    key = "black/canopy.tfstate"
   }
 }
 
