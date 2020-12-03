@@ -212,6 +212,7 @@ kind:  Mapping
 name:  canopy_user_service_mapping
 prefix: /user/
 service: canopy-user-service
+timeout_ms: 20000
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
