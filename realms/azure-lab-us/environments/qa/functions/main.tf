@@ -124,7 +124,7 @@ resource "azurerm_function_app" "function_app_admin_users" {
       Sisense__ElasticubesUri         =  "api/v1/elasticubes/getElasticubes"
       Sisense__DailyDataSource        =  "Sapience-Daily-CompanyId-Env"
       Sisense__HourlyDataSource       =  "Sapience-Hourly-CompanyId-Env"
-      Sisense__Env                    =  "Qa"
+      Sisense__Env                    =  "QA"
       Sisense__Secret                 =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNWRiMWE4ZDZmYjZkMTEyMjMwMzJjYTQ5IiwiYXBpU2VjcmV0IjoiNmZhNzY2N2EtOWYxOC0zYTAwLWI4MGEtZmMxMmJjMDc5NTFjIiwiaWF0IjoxNTcxOTI0MzM3fQ.zLLGdMAri0s_NcGei3S8JYg956qPPHnNVneIZLprbno"
       Canopy__Auth0Url                =  "https://api.qa.sapienceanalytics.com/auth0/v1/integrations/auth0"
       Canopy__Credentials             =  "Sapience:sapience_AdminServices:H#Qx6qbmafdafd112415##!w8#vKKs3"
