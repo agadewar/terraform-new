@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "red/kured.tfstate"
+    key = "black/kured.tfstate"
   }
 }
 
