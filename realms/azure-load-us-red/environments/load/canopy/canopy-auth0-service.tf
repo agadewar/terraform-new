@@ -41,7 +41,7 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
   }
 
   spec {
-    replicas = 1
+    replicas = var.canopy_auth0_service_deployment_replicas
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
@@ -64,8 +64,10 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
 
       spec {
         container {
+          image_pull_policy = "Always"
+          
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-auth0-service:1.1.7.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-auth0-service:1.3.0-SNAPSHOT"
           name  = "canopy-auth0-service"
 
           env { 
@@ -117,6 +119,16 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
           }
 
           env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
+            name  = "canopy.sso.redirect-to-canopyV3"
+            value = "https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
+          }
+
+          env {
             name  = "canopy.sso.service-base-url"
             value = "https://api.${var.environment}.sapienceanalytics.com/auth0"
           }
@@ -155,10 +167,16 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
             failure_threshold = 6
           }
 
+          # resources {
+          #   requests {
+          #     memory = "512M"
+          #     cpu    = "150m"
+          #   }
+          # }
           resources {
             requests {
-              memory = "512M"
-              cpu    = "150m"
+              memory = var.canopy_auth0_service_deployment_request_memory
+              cpu    = var.canopy_auth0_service_deployment_request_cpu
             }
           }
 
