@@ -19,10 +19,10 @@ variable "kubernetes_version" {}
 
 variable "kubernetes_pool01_vm_size" {}
 variable "kubernetes_pool01_os_disk_size_gb" {}
-variable "kubernetes_pool01_os_type" {}
+#variable "kubernetes_pool01_os_type" {}
 variable "kubernetes_min_count" {}
 variable "kubernetes_max_count" {}
-variable "kubernetes_pool01_max_pods"  {}
+#variable "kubernetes_pool01_max_pods"  {}
 
 variable "realm_common_tags" {
   type = map(string)
