@@ -32,4 +32,3 @@ variable "ApimConfiguration__DelegationKey" {}
 variable "ApimConfiguration__ClientSecret" {}
 variable "UploadBlob__StorageAccountAccessKey" {}
 variable "BulkUploadDbConfig__ConnString" {}
-variable "AzureServiceBus__EndpointEndpoint" {}
