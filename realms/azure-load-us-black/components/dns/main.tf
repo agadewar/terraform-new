@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "red/dns.tfstate"
+    key = "black/dns.tfstate"
   }
 }
 
@@ -35,15 +35,15 @@ locals {
 }
 
 resource "azurerm_private_dns_zone" "sapienceanalytics_com" {
-  name                = "${var.dns_realm}.${var.region}.${var.cloud}.internal.sapienceanalytics.com"
+  name                = "${var.dns_realm}-black.${var.region}.${var.cloud}.internal.sapienceanalytics.com"
   resource_group_name  = var.resource_group_name
 }
 
-resource "azurerm_private_dns_zone_virtual_network_link" "realm" {
-  depends_on            = [azurerm_private_dns_zone.sapienceanalytics_com]
-
-  name                  = var.dns_realm
-  resource_group_name   = var.resource_group_name
-  private_dns_zone_name = azurerm_private_dns_zone.sapienceanalytics_com.name
-  virtual_network_id    = data.terraform_remote_state.network.outputs.realm_network_id
-}
+#resource "azurerm_private_dns_zone_virtual_network_link" "realm" {
+#  depends_on            = [azurerm_private_dns_zone.sapienceanalytics_com]
+#
+#  name                  = var.dns_realm
+#  resource_group_name   = var.resource_group_name
+#  private_dns_zone_name = azurerm_private_dns_zone.sapienceanalytics_com.name
+#  virtual_network_id    = data.terraform_remote_state.network.outputs.realm_network_id
+#}
