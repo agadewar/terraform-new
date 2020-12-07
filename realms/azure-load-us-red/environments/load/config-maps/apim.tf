@@ -6,7 +6,6 @@ resource "kubernetes_config_map" "apim" {
 
   data = {
     #APIM Open-API
-      "ApimConfiguration__AccessToken"    = "SharedAccessSignature integration&202012031227&CMFM+JMRYP09Bliptj42J658eDfc6iJPDcZOsiBULD9fZxaUOAh8DCXifH1olmd8ZFFblPxOPAKZZw6rRQnXgQ=="
       "ApimConfiguration__AzureApiUri"    = "https://sapience-load-us-load.management.azure-api.net"
       "ApimConfiguration__HomeUrl"        = "https://sapience-load-us-load.developer.azure-api.net"
       "ApimConfiguration__ResourceGroup"  = var.resource_group_name
