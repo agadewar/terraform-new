@@ -19,6 +19,8 @@ resource "kubernetes_secret" "canopy_notification_service" {
   data = {
     "canopy.database.username" = var.mysql_canopy_username
     "canopy.database.password" = var.mysql_canopy_password
+    "canopy.service-account.username" = var.canopy_service_account_username
+    "canopy.service-account.password" = var.canopy_service_account_password
   }
 
   type = "Opaque"
@@ -62,8 +64,10 @@ resource "kubernetes_deployment" "canopy_notification_service_deployment" {
 
       spec {
         container {
+          image_pull_policy = "Always"
+          
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-notification-service:1.3.0.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-notification-service:1.9.0-SNAPSHOT"
           name  = "canopy-notification-service"
 
           env { 
@@ -86,6 +90,30 @@ resource "kubernetes_deployment" "canopy_notification_service_deployment" {
           }
 
           env {
+            name = "CANOPY_SERVICE_ACCOUNT_USERNAME"
+            value_from {
+              secret_key_ref {
+                name = "canopy-user-service"
+                key  = "canopy.service-account.username"
+              }
+            }
+          }
+          env {
+            name = "CANOPY_SERVICE_ACCOUNT_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "canopy-user-service"
+                key  = "canopy.service-account.password"
+              }
+            }
+          }
+
+          env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
             name  = "notification.sms.amazonsns.topicarn"
             value = "dummy"
           }
@@ -100,7 +128,7 @@ resource "kubernetes_deployment" "canopy_notification_service_deployment" {
 
           env {
             name  = "jms.queues"
-            value = "canopy-notification-email,canopy-notification-push-notification,canopy-notification-sms,canopy-notification-twilio"
+            value = "canopy-notification-email,canopy-notification-email-failed,canopy-notification-inapp,canopy-notification-push-notification,canopy-notification-setting-organization-profile-created,canopy-notification-setting-organization-profile-updated,canopy-notification-sms,canopy-notification-twilio"
           }
           env {
             name  = "jms.type"
@@ -123,12 +151,28 @@ resource "kubernetes_deployment" "canopy_notification_service_deployment" {
 
           // queues
           env {
+            name  = "canopy.notification.email.failed"
+            value = "canopy-notification-email-failed"
+          }
+          env {
             name  = "canopy.notification.email.queue"
             value = "canopy-notification-email"
           }
           env {
+            name  = "canopy.notification.in-app.queue"
+            value = "canopy-notification-inapp"
+          }
+          env {
             name  = "canopy.notification.push-notification.queue"
             value = "canopy-notification-push-notification"
+          }
+          env {
+            name  = "canopy.queue.settingOrganizationProfileCreated"
+            value = "canopy-notification-setting-organization-profile-created"
+          }
+          env {
+            name  = "canopy.queue.settingOrganizationProfileUpdated"
+            value = "canopy-notification-setting-organization-profile-updated"
           }
           env {
             name  = "canopy.notification.sms.queue"

@@ -68,8 +68,10 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
 
       spec {
         container {
+          image_pull_policy = "Always"
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.28.6.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.44.0-SNAPSHOT"
           name  = "canopy-device-service"
 
           env { 
@@ -157,12 +159,51 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
           }
 
           env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
             name  = "com.banyanhills.canopy.device.eventhandler.AllDeviceEventHandler.disabled"
             value = "true"
           }
           env {
             name  = "canopy.security.userDetailsCacheEnabled"
             value = "true"
+          }
+
+          env {
+            name  = "canopy.portal.url.versions"
+            value = "[(null):'https://canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com','3':'https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com']"
+          }
+
+          env {
+            name  = "messaging.enabled"
+            value = "false"
+          }
+          env {
+            name  = "messaging.password"
+            value = "dummy"
+          }
+          env {
+            name  = "messaging.server"
+            value = "dummy"
+          }
+          env {
+            name  = "messaging.username"
+            value = "dummy"
+          }
+          env {
+            name  = "schemaregistry.password"
+            value = "dummy"
+          }
+          env {
+            name  = "schemaregistry.url"
+            value = "dummy"
+          }
+          env {
+            name  = "schemaregistry.username"
+            value = "dummy"
           }
 
           env {
@@ -190,6 +231,26 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             name  = "spring.datasource.tomcat.min-evictable-idle-time-millis"
             value = "5000"
           }
+          env {
+            name  = "spring.datasource.initial-size"
+            value = "$${spring.datasource.tomcat.initial-size}"
+          }
+          env {
+            name  = "spring.datasource.max-active"
+            value = "$${spring.datasource.tomcat.max-active}"
+          }
+          env {
+            name  = "spring.datasource.min-idle"
+            value = "$${spring.datasource.tomcat.min-idle}"
+          }
+          env {
+            name  = "spring.datasource.max-idle"
+            value = "$${spring.datasource.tomcat.max-idle}"
+          }
+          env {
+            name  = "spring.datasource.min-evictable-idle-time-millis"
+            value = "$${spring.datasource.tomcat.min-evictable-idle-time-millis}"
+          }
           
           env {
             name  = "jms.queues"
@@ -206,7 +267,7 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_hostname
           }
           env { 
-            name  = "servicebus.key"   // 
+            name  = "servicebus.key" 
             value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
           }
           env { 
@@ -270,7 +331,15 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             value = "false"
           }
           env {
+            name  = "homedepot.enabled"
+            value = "false"
+          }
+          env {
             name  = "ipa.enabled"
+            value = "false"
+          }
+          env {
+            name  = "kiosk.enabled"
             value = "false"
           }
           env {

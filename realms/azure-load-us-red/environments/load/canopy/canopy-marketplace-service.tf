@@ -41,7 +41,7 @@ resource "kubernetes_deployment" "canopy_marketplace_service_deployment" {
   }
 
   spec {
-    replicas = 1
+    replicas = 0
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
@@ -64,8 +64,10 @@ resource "kubernetes_deployment" "canopy_marketplace_service_deployment" {
 
       spec {
         container {
+          image_pull_policy = "Always"
+          
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-marketplace-service:1.2.0.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-marketplace-service:1.3.0-SNAPSHOT"
           name  = "canopy-marketplace-service"
 
           env { 
@@ -104,6 +106,11 @@ resource "kubernetes_deployment" "canopy_marketplace_service_deployment" {
                 key  = "canopy.service-account.password"
               }
             }
+          }
+
+          env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
           }
 
           readiness_probe {

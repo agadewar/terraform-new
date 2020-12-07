@@ -68,8 +68,10 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
 
       spec {
         container {
+          image_pull_policy = "Always"
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-user-service:2.5.6.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-user-service:2.14.0-SNAPSHOT"
           name  = "canopy-user-service"
 
           env { 
@@ -155,7 +157,17 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
           # env {
           #   name  = "cache.token.ttl-seconds"
           #   value = "300"
-          # }     
+          # }
+
+          env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
+            name  = "canopy.portal.url.versions"
+            value = "[(null):'https://canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com','3':'https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com']"
+          }
 
           env {
             name  = "canopy.security.userDetailsCacheEnabled"
@@ -206,6 +218,26 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
           env {
             name  = "spring.datasource.tomcat.min-evictable-idle-time-millis"
             value = "5000"
+          }
+          env {
+            name  = "spring.datasource.initial-size"
+            value = "$${spring.datasource.tomcat.initial-size}"
+          }
+          env {
+            name  = "spring.datasource.max-active"
+            value = "$${spring.datasource.tomcat.max-active}"
+          }
+          env {
+            name  = "spring.datasource.min-idle"
+            value = "$${spring.datasource.tomcat.min-idle}"
+          }
+          env {
+            name  = "spring.datasource.max-idle"
+            value = "$${spring.datasource.tomcat.max-idle}"
+          }
+          env {
+            name  = "spring.datasource.min-evictable-idle-time-millis"
+            value = "$${spring.datasource.tomcat.min-evictable-idle-time-millis}"
           }
 
           readiness_probe {
