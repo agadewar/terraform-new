@@ -241,8 +241,8 @@ metadata:
 spec:
   replicas: ${replicas}
   selector:
-      matchLabels:
-        service: ambassador
+    matchLabels:
+      service: ambassador
   template:
     metadata:
       annotations:
