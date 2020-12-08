@@ -13,7 +13,7 @@ provider "helm" {
     config_path = local.config_path
   }
 
-  service_account = "tiller"
+  #service_account = "tiller"
 }
 
 provider "kubernetes" {

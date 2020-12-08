@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "red/log-analytics-workspace.tfstate"
+    key = "black/log-analytics-workspace.tfstate"
   }
 }
 
@@ -23,7 +23,7 @@ locals {
 }
 
 resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
-  name                = "sapience-${var.realm}"
+  name                = "sapience-${var.realm}-black"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
   sku                 = "PerGB2018"
