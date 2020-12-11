@@ -81,6 +81,20 @@ resource "kubernetes_ingress" "api" {
         }
       }
     }
+  
+    rule {
+      host = "api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
+      http {
+        path {
+          backend {
+            service_name = "ambassador"
+            service_port = 80
+          }
+
+          path = "/"
+        }
+      }
+    }
 
     rule {
       host = "api.${var.environment}.sapienceanalytics.com"
@@ -114,6 +128,7 @@ resource "kubernetes_ingress" "api" {
       hosts = [
         "api.sapienceanalytics.com",
         "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
+        "api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com",
         "api.${var.environment}.sapienceanalytics.com",
       ]
       secret_name = "ambassador-certs"
@@ -126,6 +141,7 @@ data "template_file" "ambassador-rbac" {
 
   vars = {
     replicas = var.ambassador_rbac_replicas
+    namespace     = var.environment
   }
 }
 

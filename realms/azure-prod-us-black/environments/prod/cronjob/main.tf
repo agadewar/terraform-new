@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "red/cronjob.tfstate"
+    key = "black/cronjob.tfstate"
   }
 }
 
@@ -50,5 +50,16 @@ resource "null_resource" "cronjob_canopy_container_registry_credential_helper" {
 
   provisioner "local-exec" {
     command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f ./config/canopy-container-registry-credential-helper.yaml"
+  }
+}
+
+resource "null_resource" "Service_Account" {
+
+  triggers = {
+    config_changed = "${sha1(file("./config/service-account.yaml"))}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply --kubeconfig=${local.config_path} -n ${local.namespace} -f ./config/service-account.yaml"
   }
 }
