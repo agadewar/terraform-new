@@ -35,7 +35,7 @@ locals {
 }
 
 resource "azurerm_private_dns_zone" "sapienceanalytics_com" {
-  name                = "${var.dns_realm}.${var.region}.${var.cloud}.internal.sapienceanalytics.com"
+  name                = "${var.dns_realm}-black.${var.region}.${var.cloud}.internal.sapienceanalytics.com"
   resource_group_name  = var.resource_group_name
 }
 

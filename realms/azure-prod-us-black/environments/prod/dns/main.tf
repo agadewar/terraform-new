@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key = "dns.tfstate"
+    key = "black/dns.tfstate"
   }
 }
 
@@ -19,7 +19,7 @@ data "terraform_remote_state" "ingress_controller" {
     access_key           = var.realm_backend_access_key
     storage_account_name = var.realm_backend_storage_account_name
 	  container_name       = var.realm_backend_container_name
-    key                  = "ingress-controller.tfstate"
+    key                  = "black/ingress-controller.tfstate"
   }
 }
 

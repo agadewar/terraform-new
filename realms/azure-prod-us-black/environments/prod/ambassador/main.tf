@@ -47,7 +47,7 @@ data "terraform_remote_state" "ingress_controller" {
     access_key           = "${var.realm_backend_access_key}"
     storage_account_name = "${var.realm_backend_storage_account_name}"
 	  container_name       = "${var.realm_backend_container_name}"
-    key                  = "ingress-controller.tfstate"
+    key                  = "black/ingress-controller.tfstate"
   }
 }
 
@@ -296,6 +296,7 @@ name:  admin_app_activity_api_mapping
 prefix: /admin/specs/
 service: admin-app-activity-api
 rewrite: /admin/specs/
+timeout_ms: 10000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
