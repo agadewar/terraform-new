@@ -55,7 +55,8 @@ resource "helm_release" "efk" {
   name       = "efk"
   namespace  = local.namespace
   repository = data.helm_repository.akomljen_charts.name
-  chart      = "akomljen-charts/efk"
+  #chart      = "akomljen-charts/efk"
+  chart      = "stable/elastic-stack"
 
   set {
     name  = "elasticsearch.spec.data-volume-size"

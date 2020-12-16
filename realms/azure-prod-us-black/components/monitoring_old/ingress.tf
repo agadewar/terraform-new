@@ -14,7 +14,7 @@ resource "kubernetes_ingress" "grafana" {
 
   spec {
     rule {
-      host = "monitoring.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
+      host = "monitoring.prod-us.sapienceanalytics.com"
       http {
         path {
           backend {
@@ -29,7 +29,7 @@ resource "kubernetes_ingress" "grafana" {
 
     tls {
       hosts = [ 
-        "monitoring.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
+        "monitoring.prod-us.sapienceanalytics.com",
       ]
       secret_name = "grafana-ui-certs"
     }

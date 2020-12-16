@@ -29,6 +29,7 @@ resource "kubernetes_config_map" "sisense" {
 
       #SISENSE EXTERNAL ENDPOINTS
       "ENVIRONMENT_SISENSE_URL" = "https://sisense.demo.lab.us.azure.sapienceanalytics.com"
+      "ENVIRONMENT_SISENSE_JS_PLATFORM"  =  "windows"
 
       #SISENSE INTERNAL ENDPOINTS
       "Sisense__BaseHost" = "http://sisense.demo.lab.red.us.azure.internal.sapienceanalytics.com:8081/"

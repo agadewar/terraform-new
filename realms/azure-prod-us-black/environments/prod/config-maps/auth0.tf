@@ -27,6 +27,11 @@ resource "kubernetes_config_map" "auth0" {
       "Auth0__ManagementApiBaseUrl" = "https://sapience-prod-us-prod.auth0.com"
       "Auth0__ManagementApiAudience" = "https://sapience-prod-us-prod.auth0.com/api/v2/"
       "Auth0__ManagementApiClientId" = "Dx5iLm0c6p2i4rgS60RKzVNglsuz1f6d"
+
+      #Open-API
+      "Auth0ManagementApi__BaseUrl"  = "https://sapience-prod-us-prod.auth0.com"
+      "Auth0ManagementApi__Audience" = "https://sapience-prod-us-prod.auth0.com/api/v2/"
+      "Auth0ManagementApi__ClientId" = "HfQ8y3WywURrxDU2JEgYgQlP0da12Ihv"
       "Auth0ManagementApi__OpenApiAudience" = "https://sapience-prod-us-prod.developer.azure-api.net"
   }
 }

@@ -1,4 +1,46 @@
 # Depending on which DNS solution you have installed in your cluster enable the right exporter
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: alertmanager-prod-us-red
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.107.8.4
+    path: 10.107.8.4:/alertmanager-load-us-red
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: grafana-prod-us-red
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.107.8.4
+    path: 10.107.8.4:/grafana-load-us-red
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prometheus-prod-us-red
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.107.8.4
+    path: 10.107.8.4:/prometheus-load-us-red
+
 coreDns:
   enabled: false
 
@@ -30,7 +72,7 @@ alertmanager:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 200Gi
+              storage: 50Gi
 
 prometheus:
   prometheusSpec:
@@ -40,7 +82,7 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 200Gi
+              storage: 100Gi
 
 additionalPrometheusRules:
   - name: custom-rules-file
@@ -150,7 +192,7 @@ grafana:
   persistence:
     enabled: true
     accessModes: ["ReadWriteOnce"]
-    size: 200Gi
+    size: 100Gi
   grafana.ini:
     auth.azuread:
       name: Azure AD
@@ -162,9 +204,8 @@ grafana:
       auth_url: https://login.microsoftonline.com/9c5c9da2-8ba9-4f91-8fa6-2c4382395477/oauth2/v2.0/authorize
       token_url: https://login.microsoftonline.com/9c5c9da2-8ba9-4f91-8fa6-2c4382395477/oauth2/v2.0/token
     server:
-      domain: monitoring.prod.prod.us.azure.sapienceanalytics.com
+      domain: monitoring.prod-us.sapienceanalytics.com
       enforce_domain: false
       serve_from_sub_path: false
-      root_url: https://monitoring.prod.prod.us.azure.sapienceanalytics.com
+      root_url: https://monitoring.prod-us.sapienceanalytics.com
 
-  
