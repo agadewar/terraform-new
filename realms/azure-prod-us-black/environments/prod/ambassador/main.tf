@@ -361,9 +361,9 @@ cors:
 apiVersion: ambassador/v1
 kind:  Mapping
 name:  sapience_openapi_mapping
-prefix: /openapi
+prefix: /openapi/
 service: sapience-open-api
-rewrite: /openapi
+rewrite: /openapi/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
