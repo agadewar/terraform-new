@@ -132,7 +132,7 @@ grafana:
   adminPassword: ${admin_password}
   image:
     repository: grafana/grafana
-    tag: 6.7.3
+    tag: 7.3.6
     sha: ""
     pullPolicy: IfNotPresent
 

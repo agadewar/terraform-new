@@ -11,6 +11,7 @@ resource "kubernetes_secret" "databases" {
       staging     = var.connectionstring_staging
       edw         = var.connectionstring_edw
       mongodb     = var.connectionstring_notification_mongodb
+      dashboarddb   = var.connectionstring_dashboard_mongodb
       machine_learning_service_account_password = var.machine_learning_service_account_password
   }
 }
