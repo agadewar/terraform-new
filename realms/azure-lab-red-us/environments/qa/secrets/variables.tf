@@ -15,6 +15,7 @@ variable "connectionstring_mad" {}
 variable "connectionstring_edw" {}
 variable "connectionstring_staging" {}
 variable "cosmosdb_key_dashboard" {}
+variable "connectionstring_dashboard_mongodb" {}
 variable "cosmosdb_key_alerts" {}
 variable "sisense_secret" {}
 variable "auth0_secret" {}
