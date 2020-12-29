@@ -163,22 +163,29 @@ resource "azurerm_cosmosdb_account" "lab_us_qa" {
   }
 }
 
-#resource "azurerm_cosmosdb_account" "lab_us_qa_dashboard_mongodb" {
-#  name                = "sapience-app-dashboard-mongodb-${var.realm}-${var.environment}"
-#  resource_group_name = var.resource_group_name
-#  location            = var.resource_group_location
-#  offer_type          = "Standard"
-#  kind                = "MongoDB"
+resource "azurerm_cosmosdb_account" "lab_us_qa_dashboard_mongodb" {
+  name                = "sapience-app-dashboard-mongodb-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+  offer_type          = "Standard"
+  kind                = "MongoDB"
 
-#  consistency_policy {
-#    consistency_level = "Strong"
-#  }
+  capabilities  {
+    name = "EnableAggregationPipeline"
+  }
+  capabilities  {
+    name = "MongoDBv3.4"
+  }
 
-#  geo_location {
-#    location          = local.cosmos_failover_location
-#    failover_priority = 0
-#  }
-#}
+  consistency_policy {
+    consistency_level = "Strong"
+  }
+
+  geo_location {
+    location          = local.cosmos_failover_location
+    failover_priority = 0
+  }
+}
 
 
 #resource "azurerm_cosmosdb_account" "lab_us_qa_alerts" {
