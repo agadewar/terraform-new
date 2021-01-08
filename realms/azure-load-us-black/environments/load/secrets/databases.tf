@@ -12,5 +12,6 @@ resource "kubernetes_secret" "databases" {
       mongodb = var.connectionstring_mongo
       edw = var.connectionstring_edw
       machine_learning_service_account_password = var.machine_learning_service_account_password
+      dashboarddb   = var.connectionstring_dashboard_mongodb
   }
 }

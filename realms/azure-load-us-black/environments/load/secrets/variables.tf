@@ -31,3 +31,4 @@ variable "ApimConfiguration__ClientSecret" {}
 variable "UploadBlob__StorageAccountAccessKey" {}
 variable "BulkUploadDbConfig__ConnString" {}
 variable "AzureServiceBus__EndpointEndpoint" {}
+variable "connectionstring_dashboard_mongodb" {}
