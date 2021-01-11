@@ -80,6 +80,14 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
 
   kubernetes_version = var.kubernetes_version
 
+  network_profile {
+            load_balancer_sku  = "Standard"
+            network_plugin     = "kubenet"
+        }
+  role_based_access_control {
+    enabled = true
+  }
+
   linux_profile {
     admin_username = local.linux_profile_admin_username
 
@@ -97,6 +105,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     enable_auto_scaling  = true
     min_count            = var.kubernetes_pool01_min_count
     max_count            = var.kubernetes_pool01_max_count
+    max_pods             = 250
     vnet_subnet_id       = data.terraform_remote_state.network.outputs.aks-pool_subnet_id
   }
 
@@ -126,6 +135,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "pool02" {
   enable_auto_scaling   = true
   min_count             = var.kubernetes_pool02_min_count
   max_count             = var.kubernetes_pool02_max_count
+  max_pods             = 250
   vnet_subnet_id        = data.terraform_remote_state.network.outputs.aks-pool_subnet_id #ALL NODES MUST BELONG TO THE SAME SUBNET
 }
 
