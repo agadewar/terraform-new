@@ -349,7 +349,7 @@ name:  admin_uploads_api_mapping
 prefix: /admin/uploads/
 service: admin-uploads-api
 rewrite: /admin/uploads/
-timeout_ms: 20000
+timeout_ms: 30000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS

@@ -117,7 +117,7 @@ resource "azurerm_function_app" "function_app_admin_users" {
       Auth0__ManagementApiAudience    =  "https://qa-sapienceanalytics.auth0.com/api/v2/"
       Auth0__ManagementApiBaseUrl     =  "https://qa-sapienceanalytics.auth0.com"
       Auth0__ManagementApiSecret      =  "KQiCawIg9O6LzN7r-ABbvq4kkaE0WfosK6nBhkW9uAwx5_lpe8BsB2HtTZMqE0Ka"
-      Sisense__BaseUrl                =  "https://sisense.qa.lab.us.azure.sapienceanalytics.com/"
+      Sisense__BaseUrl                =  "https://sisense-linux.qa.sapienceanalytics.com/"
       Sisense__UsersUri               =  "api/users?email="
       Sisense__DefaultGroupUri        =  "api/v1/groups?name="
       Sisense__DataSecurityUri        =  "api/elasticubes/datasecurity"
@@ -125,7 +125,7 @@ resource "azurerm_function_app" "function_app_admin_users" {
       Sisense__DailyDataSource        =  "Sapience-Daily-CompanyId-Env"
       Sisense__HourlyDataSource       =  "Sapience-Hourly-CompanyId-Env"
       Sisense__Env                    =  "QA"
-      Sisense__Secret                 =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNWRiMWE4ZDZmYjZkMTEyMjMwMzJjYTQ5IiwiYXBpU2VjcmV0IjoiNmZhNzY2N2EtOWYxOC0zYTAwLWI4MGEtZmMxMmJjMDc5NTFjIiwiaWF0IjoxNTcxOTI0MzM3fQ.zLLGdMAri0s_NcGei3S8JYg956qPPHnNVneIZLprbno"
+      Sisense__Secret                 =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNWRiMTQwZTU2ZDY4MWQyMjQwYjhjYTk0IiwiYXBpU2VjcmV0IjoiMzBhMDNlZGUtZDU4OS0zMzcxLWYxZjktMDMyZjBiZGQ2MzdkIiwiaWF0IjoxNjA5ODQ2MTQ1fQ.NSNHwaCIfVl6YCmyvFCMuf_oD-EFNRb0IR4dCeNaAlg"
       Canopy__Auth0Url                =  "https://api.qa.sapienceanalytics.com/auth0/v1/integrations/auth0"
       Canopy__Credentials             =  "Sapience:sapience_AdminServices:H#Qx6qbmafdafd112415##!w8#vKKs3"
       Canopy__UserServiceUrl          =  "https://api.qa.sapienceanalytics.com/user/v1/users/"
@@ -152,6 +152,11 @@ resource "azurerm_function_app" "bulk_upload" {
   app_service_plan_id       = azurerm_app_service_plan.service_bulk_upload_plan_admin_users.id
   storage_connection_string = azurerm_storage_account.sapience_bulk_upload_admin_users.primary_connection_string
   version                   = "~2"
+
+  app_settings                   = {
+           "WEBSITE_ENABLE_SYNC_UPDATE_SITE" = "true"
+           "WEBSITE_RUN_FROM_PACKAGE"        = "1"
+        }
 }
 
 resource "azurerm_storage_account" "sapience_bulk_upload_admin_users" {
