@@ -5,7 +5,7 @@ resource "kubernetes_config_map" "users" {
   }
 
   data = {
-      "AzureServiceBus__UseAzureServiceBus"      =  false
+      "AzureServiceBus__UseAzureServiceBus"      =  true
       "AzureServiceBus__EntityPath"              = "sapience-admin-users-created"
       "AzureServiceBus__Endpoint"                = "Endpoint=sb://sapience-lab-us-demo.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=C1jCY7iv2MNAQTyseqdZLeAFNLFILXsapvnNJ4xP7Qc="
       "AzureServiceBus__EditEntityPath"          = "sapience-admin-users-updated"
