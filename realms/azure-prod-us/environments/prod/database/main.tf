@@ -113,17 +113,6 @@ resource "azurerm_sql_database" "Admin" {
   tags = merge(local.common_tags, {})
 }
 
-resource "azurerm_sql_database" "admin_import" {
-  name                             = "adminimport"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_adminimport_edition
-  requested_service_objective_name = var.sql_database_adminimport_requested_service_objective_name
-
-  tags = merge(local.common_tags, {})
-}
-
 resource "azurerm_sql_database" "mad" {
   name                             = "mad"
   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
@@ -131,18 +120,6 @@ resource "azurerm_sql_database" "mad" {
   server_name                      = azurerm_sql_server.sapience.name
   edition                          = var.sql_database_mad_edition
   requested_service_objective_name = var.sql_database_mad_requested_service_objective_name
-
-  tags = merge(local.common_tags, {})
-}
-
-resource "azurerm_sql_database" "staging" {
-  name                             = "Staging"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_staging_edition
-  requested_service_objective_name = var.sql_database_staging_requested_service_objective_name
-  read_scale                       = true
 
   tags = merge(local.common_tags, {})
 }

@@ -47,17 +47,6 @@ resource "azurerm_sql_server" "sapience" {
   tags = merge(local.common_tags, {})
 }
 
-# resource "azurerm_sql_database" "sedw" {
-#   name                             = "sedw"
-#   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-#   location                         = azurerm_sql_server.sapience.location
-#   server_name                      = azurerm_sql_server.sapience.name
-#   edition                          = "DataWarehouse"
-#   requested_service_objective_name = var.sql_database_sedw_requested_service_objective_name
-
-#   tags = merge(local.common_tags, {})
-# }
-
 resource "azurerm_mysql_database" "marketplace" {
   name                = "marketplace"
   resource_group_name = var.resource_group_name
@@ -96,17 +85,6 @@ resource "azurerm_sql_database" "mad" {
   server_name                      = azurerm_sql_server.sapience.name
   edition                          = var.sql_database_mad_edition
   requested_service_objective_name = var.sql_database_mad_requested_service_objective_name
-
-  tags = merge(local.common_tags, {})
-}
-
-resource "azurerm_sql_database" "staging" {
-  name                             = "Staging"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_staging_edition
-  requested_service_objective_name = var.sql_database_staging_requested_service_objective_name
 
   tags = merge(local.common_tags, {})
 }
@@ -186,24 +164,6 @@ resource "azurerm_cosmosdb_account" "lab_us_qa_dashboard_mongodb" {
     failover_priority = 0
   }
 }
-
-
-#resource "azurerm_cosmosdb_account" "lab_us_qa_alerts" {
-#  name                = "sapience-app-alerts-${var.realm}-${var.environment}"
-#  resource_group_name = var.resource_group_name
-#  location            = var.resource_group_location
-#  offer_type          = "Standard"
-#  kind                = "GlobalDocumentDB"
-
-#  consistency_policy {
-#    consistency_level = "Strong"
-#  }
-
-#  geo_location {
-#    location          = local.cosmos_failover_location
-#    failover_priority = 0
-#  }
-#}
 
 resource "azurerm_cosmosdb_account" "lab_us_qa_alerts_mongodb" {
   name                = "sapience-app-alerts-mongodb-${var.realm}-${var.environment}"
@@ -290,47 +250,6 @@ resource "azurerm_cosmosdb_account" "canopy_settings_mongodb" {
     failover_priority = 0
   }
 }
-
-# resource "azurerm_cosmosdb_account" "sapience_graph" {
-#   name                = "sapience-graph-${var.environment}"
-#   resource_group_name = var.resource_group_name
-#   location            = var.resource_group_location
-#   offer_type          = "Standard"
-#   kind                = "GlobalDocumentDB"
-
-#   capabilities {
-#     name = "EnableGremlin"
-#   }
-
-#   consistency_policy {
-#     consistency_level = "Strong"
-#   }
-
-#   geo_location {
-#     location          = local.cosmos_failover_location
-#     failover_priority = 0
-#   }
-# }
-
-# resource "azurerm_cosmosdb_account" "event_archive" {
-#   name                = "sapience-event-archive-${var.environment}"
-#   resource_group_name = var.resource_group_name
-#   location            = var.resource_group_location
-#   offer_type          = "Standard"
-
-#   capabilities {
-#     name = "EnableCassandra"
-#   }
-
-#   consistency_policy {
-#     consistency_level = "Eventual"
-#   }
-
-#   geo_location {
-#     location          = local.cosmos_failover_location
-#     failover_priority = 0
-#   }
-# }
 
 resource "azurerm_mysql_firewall_rule" "aks_egress" {
   name                = "aks-egress"

@@ -47,17 +47,6 @@ resource "azurerm_sql_server" "sapience" {
   tags = merge(local.common_tags, {})
 }
 
-# resource "azurerm_sql_database" "sedw" {
-#   name                             = "sedw"
-#   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-#   location                         = azurerm_sql_server.sapience.location
-#   server_name                      = azurerm_sql_server.sapience.name
-#   edition                          = "DataWarehouse"
-#   requested_service_objective_name = var.sql_database_sedw_requested_service_objective_name
-
-#   tags = merge(local.common_tags, {})
-# }
-
 resource "azurerm_sql_database" "Admin" {
   name                             = "Admin"
   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
@@ -65,17 +54,6 @@ resource "azurerm_sql_database" "Admin" {
   server_name                      = azurerm_sql_server.sapience.name
   edition                          = var.sql_database_admin_edition
   requested_service_objective_name = var.sql_database_admin_requested_service_objective_name
-
-  tags = merge(local.common_tags, {})
-}
-
-resource "azurerm_sql_database" "admin_import" {
-  name                             = "adminimport"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_adminimport_edition
-  requested_service_objective_name = var.sql_database_adminimport_requested_service_objective_name
 
   tags = merge(local.common_tags, {})
 }
@@ -91,16 +69,6 @@ resource "azurerm_sql_database" "EDW" {
   tags = merge(local.common_tags, {})
 }
 
-#resource "azurerm_sql_database" "EDW_new" {
-#  name                             = "EDW_new"
-#  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-# location                         = azurerm_sql_server.sapience.location
-#  server_name                      = azurerm_sql_server.sapience.name
-#  edition                          = var.sql_database_edw_new_edition
-#  requested_service_objective_name = var.sql_database_edw_new_requested_service_objective_name
-
-#  tags = merge(local.common_tags, {})
-#}
 
 resource "azurerm_sql_database" "mad" {
   name                             = "mad"
@@ -112,40 +80,6 @@ resource "azurerm_sql_database" "mad" {
 
   tags = merge(local.common_tags, {})
 }
-
-resource "azurerm_sql_database" "staging" {
-  name                             = "Staging"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_staging_edition
-  requested_service_objective_name = var.sql_database_staging_requested_service_objective_name
-
-  tags = merge(local.common_tags, {})
-}
-
-
-/* resource "azurerm_sql_database" "EDW" {
-  name                             = "EDW"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = "DataWarehouse"
-  requested_service_objective_name = "DW100c"
-
-  tags = merge(local.common_tags, {})
-}  */
-
-#resource "azurerm_sql_database" "staging_scott_kowalczyk" {
-#  name                             = "Staging-Scott-Kowalczyk"
-#  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-#  location                         = azurerm_sql_server.sapience.location
-#  server_name                      = azurerm_sql_server.sapience.name
-#  edition                          = var.sql_database_staging_edition
-#  requested_service_objective_name = var.sql_database_staging_requested_service_objective_name
-
-#  tags = merge(local.common_tags, {})
-#}
 
 resource "azurerm_sql_firewall_rule" "aks_egress" {
   name                = "aks-egress"

@@ -371,7 +371,7 @@ kind:  Mapping
 name:  sapience_app_dashboard_mapping
 prefix: /dashboard/
 service: sapience-app-dashboard
-timeout_ms: 100000
+timeout_ms: 200000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
