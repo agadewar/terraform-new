@@ -7,7 +7,7 @@ resource "kubernetes_config_map" "users" {
   data = {
       "AzureServiceBus__UseAzureServiceBus"      =  true
       "AzureServiceBus__EntityPath"              = "sapience-admin-users-created"
-      "AzureServiceBus__Endpoint"                = "Endpoint=sb://sapience-load-us-load.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=pU/3MPo29mnx9B7eoxh0D4IGO7UpxqMFmhsnXtAmTAQ="
+      "AzureServiceBus__Endpoint"                = "Endpoint=sb://sapience-load-us-load.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=KzggZ7ksDIiPqA2tBPC4dKhVEyx/tFjbwNOgfScVzzU="
       "AzureServiceBus__EditEntityPath"          = "sapience-admin-users-updated"
       "AzureServiceBus__EditEndpoint"            = "Endpoint=sb://sapience-load-us-load.servicebus.windows.net/;SharedAccessKeyName=Full;SharedAccessKey=uMRxh0FkdvxoMc0uPguwrBoJHNh/1wiRZLOPcbu+MfM="
       "AzureServiceBus__DeleteEntityPath"        = "sapience-admin-users-deleted"
