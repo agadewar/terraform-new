@@ -294,6 +294,7 @@ name:  admin_app_activity_api_mapping
 prefix: /admin/specs/
 service: admin-app-activity-api
 rewrite: /admin/specs/
+timeout_ms: 30000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS

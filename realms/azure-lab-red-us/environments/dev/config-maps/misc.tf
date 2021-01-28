@@ -5,6 +5,7 @@ resource "kubernetes_config_map" "misc" {
   }
 
   data = {
+      "ENVIRONMENT_ADMIN_ENABLE_INTEGRATIONS"  = true
       "ASPNETCORE_ENVIRONMENT"     =  "Development"
       "ENVIRONMENT_API_URL"        =  "https://api.dev.lab.us.azure.sapienceanalytics.com"
       "LocalSwagger"               =  "false"
