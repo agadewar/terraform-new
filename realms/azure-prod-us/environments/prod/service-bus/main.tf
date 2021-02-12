@@ -68,7 +68,12 @@ resource "azurerm_servicebus_topic" "sapience-admin-users-created" {
   resource_group_name = var.resource_group_name
   namespace_name      = azurerm_servicebus_namespace.namespace.name
 
-  enable_partitioning = true
+  enable_batched_operations       = false
+  enable_express                  = false
+  requires_duplicate_detection    = false
+  support_ordering                = false
+
+  enable_partitioning = false
 
 }
 
@@ -281,6 +286,195 @@ resource "azurerm_servicebus_subscription" "sapience-admin-users-updated-subscri
   resource_group_name = var.resource_group_name
   namespace_name      = azurerm_servicebus_namespace.namespace.name
   topic_name          = azurerm_servicebus_topic.sapience-admin-users-updated.name
+  
+  max_delivery_count  = 10
+  #auto_delete_on_idle = 10
+  requires_session = false
+
+}
+
+resource "azurerm_servicebus_topic" "sapience-admin-teams-created" {
+  name                = "sapience-admin-teams-created"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+
+  enable_partitioning = false
+
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-teams-created-publish" {
+  name                = "Publish"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-created.name
+  resource_group_name = var.resource_group_name
+  listen              = false
+  send                = true
+  manage              = false
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-teams-created-subscribe" {
+  name                = "Subscribe"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-created.name
+  resource_group_name = var.resource_group_name
+  listen              = true
+  send                = false
+  manage              = false
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-teams-created-full" {
+  name                = "Full"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-created.name
+  resource_group_name = var.resource_group_name
+  listen              = true
+  send                = true
+  manage              = true
+}
+
+resource "azurerm_servicebus_subscription" "sapience-admin-teams-created-subscriptions_auth0" {
+  name                = "sapience-admin-teams-created-subscriptions_auth0"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-created.name
+  
+  max_delivery_count  = 10
+  #auto_delete_on_idle = 10
+  requires_session = false
+
+}
+
+resource "azurerm_servicebus_subscription" "sapience-admin-teams-created-subscriptions_sisense" {
+  name                = "sapience-admin-teams-created-subscriptions_sisense"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-created.name
+  
+  max_delivery_count  = 10
+  #auto_delete_on_idle = 10
+  requires_session = false
+
+}
+
+resource "azurerm_servicebus_topic" "sapience-admin-teams-updated" {
+  name                = "sapience-admin-teams-updated"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+
+  enable_partitioning = false
+
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-teams-updated-publish" {
+  name                = "Publish"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-updated.name
+  resource_group_name = var.resource_group_name
+  listen              = false
+  send                = true
+  manage              = false
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-teams-updated-subscribe" {
+  name                = "Subscribe"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-updated.name
+  resource_group_name = var.resource_group_name
+  listen              = true
+  send                = false
+  manage              = false
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-teams-updated-full" {
+  name                = "Full"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-updated.name
+  resource_group_name = var.resource_group_name
+  listen              = true
+  send                = true
+  manage              = true
+}
+
+resource "azurerm_servicebus_subscription" "sapience-admin-teams-updated-subscriptions_auth0" {
+  name                = "sapience-admin-teams-updated-subscriptions_auth0"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-updated.name
+  
+  max_delivery_count  = 10
+  #auto_delete_on_idle = 10
+  requires_session = false
+
+}
+
+resource "azurerm_servicebus_subscription" "sapience-admin-teams-updated-subscriptions_sisense" {
+  name                = "sapience-admin-teams-updated-subscriptions_sisense"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-updated.name
+  
+  max_delivery_count  = 10
+  #auto_delete_on_idle = 10
+  requires_session = false
+
+}
+
+resource "azurerm_servicebus_topic" "sapience-admin-teams-deleted" {
+  name                = "sapience-admin-teams-deleted"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+
+  enable_partitioning = false
+
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-teams-deleted-publish" {
+  name                = "Publish"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-deleted.name
+  resource_group_name = var.resource_group_name
+  listen              = false
+  send                = true
+  manage              = false
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-teams-deleted-subscribe" {
+  name                = "Subscribe"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-deleted.name
+  resource_group_name = var.resource_group_name
+  listen              = true
+  send                = false
+  manage              = false
+}
+
+resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-teams-deleted-full" {
+  name                = "Full"
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-deleted.name
+  resource_group_name = var.resource_group_name
+  listen              = true
+  send                = true
+  manage              = true
+}
+
+resource "azurerm_servicebus_subscription" "sapience-admin-teams-deleted-subscriptions_auth0" {
+  name                = "sapience-admin-teams-deleted-subscriptions_auth0"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-deleted.name
+  
+  max_delivery_count  = 10
+  #auto_delete_on_idle = 10
+  requires_session = false
+
+}
+
+resource "azurerm_servicebus_subscription" "sapience-admin-teams-deleted-subscriptions_sisense" {
+  name                = "sapience-admin-teams-deleted-subscriptions_sisense"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  topic_name          = azurerm_servicebus_topic.sapience-admin-teams-deleted.name
   
   max_delivery_count  = 10
   #auto_delete_on_idle = 10

@@ -115,7 +115,7 @@ resource "azurerm_function_app" "function_app_admin_users" {
       Auth0__ManagementApiAudience             =  "https://dev-piin5umt.auth0.com/api/v2/"
       Auth0__ManagementApiSecret               =  "qYXiPQxH_fHXUU_uR6q7KWu8Eu2PrrkHnwW9WqGYx75IZZ9aMrrycaJwDf5EfNbI"
       Sisense__BaseUrl                         =  "https://sisense-linux-ha.dev.sapienceanalytics.com/"
-      Sisense__UsersUri                        =  "api/users?email="
+      Sisense__UsersUri                        =  "api/v1/users/bulk"
       Sisense__DefaultGroupUri                 =  "api/v1/groups?name="
       Sisense__DataSecurityUri                 =  "api/elasticubes/datasecurity"
       Sisense__ElasticubesUri                  =  "api/v1/elasticubes/getElasticubes"
@@ -138,7 +138,8 @@ resource "azurerm_function_app" "function_app_admin_users" {
       "Sisense:GetDesignerRolesUri"            =  "api/roles/contributor"
       "Sisense:GetUserUri"                     =  "api/v1/users?email="
       "Sisense:GetViewerRolesUri"              =  "api/roles/consumer"
-      Sisense__DeleteUserUri                   =  "api/v1/users/"
+      "Sisense__DeleteUserUri"                 =  "api/v1/users/"
+      "Sisense__OperatingSystem"               =  "linux"
 
   }
 }

@@ -164,3 +164,65 @@ data "template_file" "node_resource_group" {
     location       = azurerm_kubernetes_cluster.kubernetes.location
   }
 }  
+
+resource "azurerm_kubernetes_cluster" "kubernetes-load-test" {
+  lifecycle {
+    #ignore_changes  = [node_pool_profile[0].count]
+    prevent_destroy = "false"
+  }
+
+  name                = "sisense-load-test"
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group_name
+  dns_prefix          = "sisense-load-test"
+
+  kubernetes_version = "1.17.16"
+
+  network_profile {
+            load_balancer_sku  = "Standard"
+            network_plugin     = "kubenet"
+        }
+  role_based_access_control {
+    enabled = true
+  }
+
+  linux_profile {
+    admin_username = local.linux_profile_admin_username
+
+    ssh_key {
+      key_data = file("../../../../config/${var.cloud}-${var.realm}/id_rsa.pub")
+    }
+  }
+
+  default_node_pool {
+    name                  = local.node_pool_profile_1_name
+    type                  = "VirtualMachineScaleSets"
+    #vm_size              = var.kubernetes_pool01_vm_size
+    #os_type              = var.kubernetes_pool01_os_type
+    os_disk_size_gb       = var.kubernetes_pool01_os_disk_size_gb
+    enable_auto_scaling   = false
+    node_count            = 1
+    vm_size               = "Standard_B4ms"
+    #min_count            = var.kubernetes_pool01_min_count
+    #max_count            = var.kubernetes_pool01_max_count
+    max_pods              = 250
+    #vnet_subnet_id       = data.terraform_remote_state.network.outputs.aks-eastus-sisense_subnet_id
+    vnet_subnet_id        = "/subscriptions/b78a61e7-f2ed-4cb0-8f48-6548408935e9/resourceGroups/sisense-load-us/providers/Microsoft.Network/virtualNetworks/sisense-load-us/subnets/aks-eastus-sisense"
+  }
+
+  addon_profile {
+    kube_dashboard { enabled = true }
+
+    oms_agent {
+      enabled = false
+      # log_analytics_workspace_id = data.terraform_remote_state.log_analytics_workspace.outputs.log_analytics_workspace_id   # https://github.com/terraform-providers/terraform-provider-azurerm/issues/3457
+    }
+  } 
+
+  service_principal {
+    client_id     = var.service_principal_app_id
+    client_secret = var.service_principal_password
+  }
+
+  tags = merge(local.common_tags, {})
+}

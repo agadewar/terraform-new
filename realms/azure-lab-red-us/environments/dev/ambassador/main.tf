@@ -334,9 +334,9 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
-name:  sapience_meeting_mapping
+name:  sapience_external_integration
 prefix: /external/integration/
-service: sapience-meeting
+service: sapience-third-party-integration-api
 rewrite: /external/integration/
 cors:
   origins: "*"
@@ -427,6 +427,7 @@ name:  admin_dashboard_api_mapping
 prefix: /admin/dashboard/
 service: admin-dashboard-api
 rewrite: /admin/dashboard/
+timeout_ms: 100000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
