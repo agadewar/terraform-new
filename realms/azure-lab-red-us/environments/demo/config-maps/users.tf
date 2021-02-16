@@ -14,5 +14,8 @@ resource "kubernetes_config_map" "users" {
       "AzureServiceBus__DeleteEndpoint"          = "Endpoint=sb://sapience-lab-us-demo.servicebus.windows.net/;SharedAccessKeyName=Full;SharedAccessKey=VaCNsnPSvUGW6o2EzxYH8RQxn4TQuZursIVncP3bnOY="
       "AzureServiceBus__DeletedUsersEndPoint"    = "Endpoint=sb://sapience-lab-us-demo.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=C6j0bHH+E1xWeWWekjrbZd7QKFyjHuixO/lu35b2AtQ="
       "AzureServiceBus__DeletedUsersEntityPath"  = "sapience-admin-users-deleted"
+      "TeamCreatedConnection"                    = "Endpoint=sb://sapience-lab-us-demo.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=1eDGhk9qginL+3QCP8rjUDD+RRzMvDRiTcLTbMPh6C0=;"
+      "TeamDeletedConnection"                    = "Endpoint=sb://sapience-lab-us-demo.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=IzcL1CHxRiiSIj69le7kN/pxGt5YZGXWxQjOIbsMxOM=;"
+      "TeamUpdatedConnection"                    = "Endpoint=sb://sapience-lab-us-demo.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=+wLPT9rSQO3Y2r8r+nPmB9RHT5uB/B7QdJWJnLPB3Y8=;"
   }
 }
