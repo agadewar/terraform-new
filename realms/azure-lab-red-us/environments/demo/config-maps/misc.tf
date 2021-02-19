@@ -18,5 +18,6 @@ resource "kubernetes_config_map" "misc" {
       "ENVIRONMENT_NAME"            =  "demo"
       "ENVIRONMENT_SISENSETYPE"     = "js"
       "ENVIRONMENT_ENABLE_ADMIN_REPORTS"     =  false
+      "ENVIRONMENT_ENABLE_ADMIN_DASHBOARD"   =  false
   }
 }
