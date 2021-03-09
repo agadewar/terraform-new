@@ -395,6 +395,29 @@ resource "azurerm_mysql_database" "user" {
   collation           = "latin1_swedish_ci"
 }
 
+resource "azurerm_cosmosdb_account" "sapience-integration-mongodb-lab-us-dev" {
+  name                = "sapience-integration-mongodb-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+  offer_type          = "Standard"
+  kind                = "MongoDB"
+
+  capabilities  {
+    name = "EnableAggregationPipeline"
+  }
+  capabilities  {
+    name = "MongoDBv3.4"
+  }
+  consistency_policy {
+    consistency_level = "Strong"
+  }
+
+  geo_location {
+    location          = local.cosmos_failover_location
+    failover_priority = 0
+  }
+}
+
 #resource "azurerm_cosmosdb_account" "integrations_mongodb" {
 #  name                = "sapience-integrations-mongodb-${var.realm}-${var.environment}"
 #  resource_group_name = var.resource_group_name
