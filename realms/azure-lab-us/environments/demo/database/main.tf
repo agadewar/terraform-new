@@ -196,7 +196,7 @@ resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
 }
 
 resource "azurerm_cosmosdb_account" "sapience-integration-mongodb-lab-us-demo" {
-  name                = "sapience-integration-mongodb-demo-${var.realm}-${var.environment}"
+  name                = "sapience-integration-mongodb-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
   offer_type          = "Standard"
