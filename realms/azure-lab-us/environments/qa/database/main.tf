@@ -155,7 +155,7 @@ resource "azurerm_cosmosdb_account" "lab_us_qa_dashboard_mongodb" {
 }
 
 resource "azurerm_cosmosdb_account" "sapience-integration-mongodb-lab-us-qa" {
-  name                = "sapience-integration-mongodb-qa-${var.realm}-${var.environment}"
+  name                = "sapience-integration-mongodb-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
   offer_type          = "Standard"
