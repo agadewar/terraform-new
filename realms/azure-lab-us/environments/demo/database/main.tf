@@ -195,6 +195,29 @@ resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
   }
 }
 
+resource "azurerm_cosmosdb_account" "sapience-integration-mongodb-lab-us-demo" {
+  name                = "sapience-integration-mongodb-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+  offer_type          = "Standard"
+  kind                = "MongoDB"
+
+  capabilities  {
+    name = "EnableAggregationPipeline"
+  }
+  capabilities  {
+    name = "MongoDBv3.4"
+  }
+  consistency_policy {
+    consistency_level = "Strong"
+  }
+
+  geo_location {
+    location          = local.cosmos_failover_location
+    failover_priority = 0
+  }
+}
+
 resource "azurerm_cosmosdb_account" "canopy_settings_mongodb" {
   name                = "canopy-settings-mongodb-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
