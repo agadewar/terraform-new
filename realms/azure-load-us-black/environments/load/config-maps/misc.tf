@@ -12,10 +12,11 @@ resource "kubernetes_config_map" "misc" {
       "ENVIRONMENT_VUE_URL"                    =  "https://app.load.sapienceanalytics.com"
       "ENVIRONMENT_VUE_HELP_URL"               =   "https://help.load.load.us.azure.sapienceanalytics.com"
       "ENVIRONMENT_CANOPY_URL"                 =  "https://canopy.load.load.us.azure.sapienceanalytics.com/#/sso?path=%2FSapience"
-      "LocalSwagger"                           = "false"
+      "ENVIRONMENT_CANOPY_V3_URL"              =  "https://canopyv3.load.load.us.azure.sapienceanalytics.com/#/sso?path=%2FSapience"
+      "LocalSwagger"                           =  "false"
       "ENVIRONMENT_NAME"                       =  "load"
       "ENVIRONMENT_SISENSETYPE"                =  "js"
-      "ENVIRONMENT_ENABLE_ADMIN_REPORTS"       =  false
-      "ENVIRONMENT_ENABLE_ADMIN_DASHBOARD"     =  false
+      "ENVIRONMENT_ENABLE_ADMIN_REPORTS"       =  true
+      "ENVIRONMENT_ENABLE_ADMIN_DASHBOARD"     =  true
   }
 }
