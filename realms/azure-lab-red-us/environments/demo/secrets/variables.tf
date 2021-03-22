@@ -33,3 +33,6 @@ variable "ApimConfiguration__ClientSecret" {}
 variable "UploadBlob__StorageAccountAccessKey" {}
 variable "BulkUploadDbConfig__ConnString" {}
 variable "connectionstring_dashboard_mongodb" {}
+variable "Mongodb_integration_password" {}
+variable "cyclr_client_id" {}
+variable "cyclr_client_secret" {}
