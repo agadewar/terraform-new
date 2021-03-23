@@ -5,8 +5,8 @@ resource "kubernetes_config_map" "cyclr" {
   }
 
   data = {
-      "CyclrSettings__BaseHost"         =  "https://api.integrations.nonprod.sapienceanalytics.com"
+      "CyclrSettings__BaseHost"         =  "https://api.integrations.sapienceanalytics.com"
       "CyclrSettings__GrantType"        =  "client_credentials"
-      "CyclrSettings__OAuthRedirectUrl" =  "https://prod.integrations.nonprod.sapienceanalytics.com/connectorauth/updateaccountconnectoroauth"
+      "CyclrSettings__OAuthRedirectUrl" =  "https://integrations.sapienceanalytics.com/connectorauth/updateaccountconnectoroauth"
         }
 }
