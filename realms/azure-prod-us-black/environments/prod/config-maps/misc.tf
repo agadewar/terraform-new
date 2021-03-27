@@ -16,7 +16,7 @@ resource "kubernetes_config_map" "misc" {
       "ENVIRONMENT_CANOPY_V3_URL"              =  "https://canopyv3.prod.prod.us.azure.sapienceanalytics.com/#/sso?path=%2FSapience"
       "ENVIRONMENT_NAME"                       =  "prod"
       "ENVIRONMENT_SISENSETYPE"                =  "js"
-      "ENVIRONMENT_ENABLE_ADMIN_REPORTS"       =  false
-      "ENVIRONMENT_ENABLE_ADMIN_DASHBOARD"     =  false
+      "ENVIRONMENT_ENABLE_ADMIN_REPORTS"       =  true
+      "ENVIRONMENT_ENABLE_ADMIN_DASHBOARD"     =  true
   }
 }

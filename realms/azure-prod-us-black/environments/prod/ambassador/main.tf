@@ -408,6 +408,7 @@ name:  admin_reports_api_mapping
 prefix: /admin/reports/
 service: admin-reports-api
 rewrite: /admin/reports/
+timeout_ms: 10000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
