@@ -37,12 +37,24 @@ locals {
 
 resource "null_resource" "sonatype-nexus" {
   provisioner "local-exec" {
-    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f deployment.yaml"
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f deployment.yaml -refresh=true"
+  }
+
+    provisioner "local-exec" {
+    when = destroy
+
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete -f deployment.yaml --ignore-not-found"
   }
 }
 
 resource "null_resource" "sonatype-nexus-service" {
   provisioner "local-exec" {
-    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f service.yaml"
+    command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} apply -f service.yaml -refresh=true"
+  }
+
+  provisioner "local-exec" {
+  when = destroy
+
+  command = "kubectl --kubeconfig=${local.config_path} -n ${local.namespace} delete -f service.yaml --ignore-not-found"
   }
 }
