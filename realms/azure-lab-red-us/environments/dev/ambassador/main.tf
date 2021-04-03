@@ -413,6 +413,18 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  admin_app_activity_uploads_api
+prefix: /admin/uploads/appurls/
+service: admin-app-activity-uploads-api
+rewrite: /admin/uploads/appurls/
+timeout_ms: 100000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  admin_dashboard_api_mapping
 prefix: /admin/dashboard/
 service: admin-dashboard-api
