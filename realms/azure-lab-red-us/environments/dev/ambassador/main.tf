@@ -414,9 +414,9 @@ cors:
 apiVersion: ambassador/v1
 kind:  Mapping
 name:  admin_app_activity_uploads_api
-prefix: /admin/uploads/appurls/
+prefix: /admin/upload/appurls/
 service: admin-app-activity-uploads-api
-rewrite: /admin/uploads/appurls/
+rewrite: /admin/upload/appurls/
 timeout_ms: 100000
 cors:
   origins: "*"

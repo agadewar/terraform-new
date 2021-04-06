@@ -6,10 +6,14 @@ resource "kubernetes_config_map" "misc" {
 
   data = {
       "ENVIRONMENT_ADMIN_ENABLE_INTEGRATIONS"  = true
-      "ASPNETCORE_ENVIRONMENT"               =  "Development"
-      "ENVIRONMENT_API_URL"                  =  "https://api.dev.lab.us.azure.sapienceanalytics.com"
-      "LocalSwagger"                         =  "false"
-      "API_URL"                              =  "http://sapience-app-alerts/alertrules/company/eval"
+      "ASPNETCORE_ENVIRONMENT"                 =  "Development"
+      "ENVIRONMENT_API_URL"                    =  "https://api.dev.lab.us.azure.sapienceanalytics.com"
+      "LocalSwagger"                           =  "false"
+      "API_URL"                                =  "http://sapience-app-alerts/alertrules/company/eval"
+      "MicroserviceUrls__AdminSettingBaseUrl"  =  "https://api.dev.sapienceanalytics.com/admin/settings/"
+
+      #UI
+
       "ENVIRONMENT_VUE_URL"                  =  "https://app.dev.sapienceanalytics.com"
       "ENVIRONMENT_ADMIN_URL"                =  "https://manage.dev.sapienceanalytics.com"
       "ENVIRONMENT_VUE_HELP_URL"             =  "https://help.dev.lab.us.azure.sapienceanalytics.com"
