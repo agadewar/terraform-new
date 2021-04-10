@@ -5,7 +5,7 @@ resource "kubernetes_config_map" "misc" {
   }
 
   data = {
-      "ENVIRONMENT_ADMIN_ENABLE_INTEGRATIONS"  = false
+      "ENVIRONMENT_ADMIN_ENABLE_INTEGRATIONS"  = true
       "ASPNETCORE_ENVIRONMENT"                 =   "Production"
       "ENVIRONMENT_API_URL"                    =   "https://api.prod.prod.us.azure.sapienceanalytics.com"
       "ENVIRONMENT_VUE_URL"                    =   "https://app.sapienceanalytics.com"

@@ -178,3 +178,72 @@ resource "azurerm_app_service_plan" "service_bulk_upload_plan_admin_users" {
     size = "S1"
   }
 }
+
+resource "azurerm_storage_account" "sapience_functions_tenant_teardown" {
+  name                     = "sapteardownfn${replace(lower(var.realm), "-", "")}${var.environment}"
+  resource_group_name      = var.resource_group_name
+  location                 = "eastus2"
+  account_tier             = "Standard"
+  account_replication_type = "GRS"
+
+  tags = merge(local.common_tags, {})
+}
+
+resource "azurerm_app_service_plan" "service_plan_sapience_tenant_teardown" {
+  name                = "azure-fun-service-plan-sap-tenant-teardown-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+
+  sku {
+    tier = "Standard"
+    size = "S1"
+  }
+}
+
+resource "azurerm_function_app" "function_app_sapience_tenant_teardown" {
+  name                        = "azure-functions-app-sapience-tenant-teardown-${var.realm}-${var.environment}"
+  resource_group_name         = var.resource_group_name
+  location                    = var.resource_group_location
+  app_service_plan_id         = azurerm_app_service_plan.service_plan_sapience_tenant_teardown.id
+  #app_settings               = var.function_app_admin_users  
+  storage_connection_string   = azurerm_storage_account.sapience_functions_tenant_teardown.primary_connection_string
+  version                     = "3.1"
+
+      app_settings                            = {
+      APPINSIGHTS_INSTRUMENTATIONKEY          =  "7d7584bc-a5f2-42b1-a4d1-ef786665144b"
+      APPLICATIONINSIGHTS_CONNECTION_STRING   =  "InstrumentationKey=7d7584bc-a5f2-42b1-a4d1-ef786665144b;IngestionEndpoint=https://eastus-1.in.applicationinsights.azure.com/"  
+      Connection                              =  "Endpoint=sb://sapience-lab-us-demo.servicebus.windows.net/;SharedAccessKeyName=Subscribe;SharedAccessKey=+wfJ2wzqZ86aeVC3GIhdEOvGgn6Qc1dJFOzWPJdKubg="
+      ConnectionString                        =  "Data Source=sapience-lab-us-demo.database.windows.net;Database=Admin;User=appsvc_api_user;Password=kfguJEk29khwkKgi;"  
+      FUNCTIONS_WORKER_RUNTIME                =  "dotnet"
+      Auth0__Connection                       =  "Username-Password-Authentication"
+      Auth0__ManagementApiClientId            =  "TSACznk8kE9PG6uWFq02zdSN4jB3OpkU"
+      Auth0__ManagementApiIdentifier          =  "https://api.sapienceanalytics.com"
+      Auth0__ManagementApiAudience            =  "https://sapience-lab-us-demo.auth0.com/api/v2/"
+      Auth0__ManagementApiBaseUrl             =  "https://sapience-lab-us-demo.auth0.com"
+      Auth0__ManagementApiSecret              =  "oJEkTc-Q0TFjqdLsoIxKTmHwW_ohdhPqQy0PCzV27mSvOBWtcBA85BPwaPjJH0I6"
+      Sisense__BaseUrl                        =  "https://sisense.demo.lab.us.azure.sapienceanalytics.com/"
+      Sisense__UsersUri                       =  "api/users?email="
+      Sisense__DefaultGroupUri                =  "api/v1/groups?name="
+      Sisense__DataSecurityUri                =  "api/elasticubes/datasecurity"
+      Sisense__ElasticubesUri                 =  "api/v1/elasticubes/getElasticubes"
+      Sisense__DailyDataSource                =  "Sapience-Daily-CompanyId-Env"
+      Sisense__HourlyDataSource               =  "Sapience-Hourly-CompanyId-Env"
+      Sisense__Env                            =  "Demo"
+      Sisense__Secret                         =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNWRiODNjNmVlNzc5YWYwNTk4YmZiYjg2IiwiYXBpU2VjcmV0IjoiNTZlOTIxZWUtODA4Zi0yZTFkLTYyZWQtYWVjMGU3MTVmMzQ5IiwiaWF0IjoxNTcyMzU1MzExfQ.-K_t519lW-cevSB0V6-PTtLYRlTeBw2mU9l5pL1O7CM"
+      Canopy__Auth0Url                        =  "https://api.demo.sapienceanalytics.com/auth0/v1/integrations/auth0"
+      Canopy__Credentials                     =  "Sapience:sapience_AdminServices:H#Qx6qbmafdafd112415##!w8#vKKs3"
+      Canopy__UserServiceUrl                  =  "https://api.demo.sapienceanalytics.com/user/v1/users/"
+      DeleteConnection                        =  "Endpoint=sb://sapience-lab-us-demo.servicebus.windows.net/;SharedAccessKeyName=Full;SharedAccessKey=VaCNsnPSvUGW6o2EzxYH8RQxn4TQuZursIVncP3bnOY="
+      EditConnection                          =  "Endpoint=sb://sapience-lab-us-demo.servicebus.windows.net/;SharedAccessKeyName=Full;SharedAccessKey=UxCI+/JDBtT0rx7jB8af0XLkQRY4J2D0fS+6l7mzekE="
+      "Sisense:EditUserUri"                   =  "api/v1/users/"
+      "Sisense:GetDesignerRolesUri"           =  "api/roles/contributor"
+      "Sisense:GetUserUri"                    =  "api/v1/users?email="
+      "Sisense:GetViewerRolesUri"             =  "api/roles/consumer" 
+      Sisense__DeleteUserUri                  =  "api/v1/users/"
+      Sisense__EditUserUri                    =  "api/v1/users/"
+      Sisense__GetUserUri                     =  "api/v1/users?email="
+      WEBSITE_ENABLE_SYNC_UPDATE_SITE         =  true 
+      WEBSITE_RUN_FROM_PACKAGE                =  "1" 
+
+  }
+}

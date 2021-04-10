@@ -302,6 +302,18 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  sapience_external_integration
+prefix: /external/integration/
+service: sapience-third-party-integration-api
+rewrite: /external/integration/
+timeout_ms: 10000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  admin_org_api_mapping
 prefix: /admin/org/
 service: admin-org-api
@@ -327,17 +339,6 @@ kind:  Mapping
 name:  sapience_app_alerts_mapping
 prefix: /alerts/
 service: sapience-app-alerts
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  sapience_meeting_mapping
-prefix: /external/integration/
-service: sapience-meeting
-rewrite: /external/integration/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
