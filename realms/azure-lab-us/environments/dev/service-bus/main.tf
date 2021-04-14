@@ -758,7 +758,7 @@ resource "azurerm_servicebus_topic_authorization_rule" "sapience-admin-users-act
 }
 
 resource "azurerm_servicebus_subscription" "sapience-admin-users-activated-sub_auth0" {
-  name                = "ssapience-admin-users-activated-sub_auth0"
+  name                = "sapience-admin-users-activated-sub_auth0"
   resource_group_name = var.resource_group_name
   namespace_name      = azurerm_servicebus_namespace.namespace.name
   topic_name          = azurerm_servicebus_topic.sapience-admin-users-activated.name
