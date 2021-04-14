@@ -53,7 +53,7 @@ spec:
             - containerPort: 8080
           volumeMounts:
             - name: tomcat-pv-storage
-              mountPath: /tomcat-data
+              mountPath: /tomcat-data/webapps
       volumes:
         - name: tomcat-pv-storage
           persistentVolumeClaim:
