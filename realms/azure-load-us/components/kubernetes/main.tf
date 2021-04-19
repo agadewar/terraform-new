@@ -79,6 +79,13 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   dns_prefix          = local.dns_prefix
 
   kubernetes_version = var.kubernetes_version
+  network_profile {
+            load_balancer_sku  = "Standard"
+            network_plugin     = "kubenet"
+        }
+  role_based_access_control {
+    enabled = true
+  }
 
   linux_profile {
     admin_username = local.linux_profile_admin_username
@@ -97,6 +104,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     enable_auto_scaling  = true
     min_count            = var.kubernetes_pool01_min_count
     max_count            = var.kubernetes_pool01_max_count
+    max_pods             = 250
     vnet_subnet_id       = data.terraform_remote_state.network.outputs.aks-pool_subnet_id
   }
 
@@ -145,12 +153,12 @@ resource "null_resource" "kubeconfig" {
   }
 }
 
-#data "template_file" "node_resource_group" {
-#  template = file("templates/node_resource_group.tpl")
-#
-#  vars = {
-#    resource_group = azurerm_kubernetes_cluster.kubernetes.resource_group_name
-#    cluster_name   = azurerm_kubernetes_cluster.kubernetes.name
-#    location       = azurerm_kubernetes_cluster.kubernetes.location
-#  }
-#}  
+data "template_file" "node_resource_group" {
+  template = file("templates/node_resource_group.tpl")
+
+  vars = {
+    resource_group = azurerm_kubernetes_cluster.kubernetes.resource_group_name
+    cluster_name   = azurerm_kubernetes_cluster.kubernetes.name
+    location       = azurerm_kubernetes_cluster.kubernetes.location
+  }
+}  

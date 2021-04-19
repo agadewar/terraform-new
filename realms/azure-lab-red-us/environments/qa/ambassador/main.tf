@@ -254,6 +254,18 @@ circuit_breakers:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  sapience_external_integration
+prefix: /external/integration/
+service: sapience-third-party-integration-api
+rewrite: /external/integration/
+timeout_ms: 10000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  eventpipeline_service_mapping
 prefix: /eventpipeline/
 service: eventpipeline-service
@@ -275,7 +287,7 @@ timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -286,7 +298,7 @@ rewrite: /admin/settings/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -297,7 +309,7 @@ rewrite: /admin/specs/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -305,10 +317,11 @@ name:  admin_org_api_mapping
 prefix: /admin/org/
 service: admin-org-api
 rewrite: /admin/org/
+timeout_ms: 10000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -319,7 +332,7 @@ timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -329,18 +342,7 @@ service: sapience-app-alerts
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  sapience_meeting_mapping
-prefix: /external/integration/
-service: sapience-meeting
-rewrite: /external/integration/
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -352,7 +354,7 @@ timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -363,18 +365,18 @@ rewrite: /openapi
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
 name:  sapience_app_dashboard_mapping
 prefix: /dashboard/
 service: sapience-app-dashboard
-timeout_ms: 10000
+timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -385,7 +387,7 @@ rewrite: /sapience/cache/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -396,7 +398,7 @@ rewrite: /openapi/delegation/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -407,7 +409,7 @@ rewrite: /admin/reports/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -418,7 +420,7 @@ rewrite: /admin/dashboard/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 EOF
     }
   }

@@ -9,16 +9,16 @@ data "terraform_remote_state" "storage_account" {
   }
 }
 
-resource "azurerm_storage_container" "canopy_setting_service" {
-  name                  = "canopy-setting-service-${var.environment}"
-  resource_group_name   = var.resource_group_name
-  storage_account_name  = data.terraform_remote_state.storage_account.outputs.storage_account_name
-  container_access_type = "blob"
+#resource "azurerm_storage_container" "canopy_setting_service" {
+#  name                  = "canopy-setting-service-${var.environment}"
+#  resource_group_name   = var.resource_group_name
+#  storage_account_name  = data.terraform_remote_state.storage_account.outputs.storage_account_name
+#  container_access_type = "blob"
 
-  lifecycle {
-    prevent_destroy = "true"
-  }
-}
+#  lifecycle {
+#    prevent_destroy = "true"
+#  }
+#}
 
 resource "kubernetes_config_map" "canopy_setting_service" {
   metadata {
@@ -145,7 +145,8 @@ resource "kubernetes_deployment" "canopy_setting_service_deployment" {
           }
           env {
             name  = "azure.canopy.branding.container"
-            value = azurerm_storage_container.canopy_setting_service.name
+            #value = azurerm_storage_container.canopy_setting_service.name
+            value = "canopy-settings-service-load"
           }
 
           env {

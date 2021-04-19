@@ -294,6 +294,19 @@ name:  admin_app_activity_api_mapping
 prefix: /admin/specs/
 service: admin-app-activity-api
 rewrite: /admin/specs/
+timeout_ms: 30000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_external_integration
+prefix: /external/integration/
+service: sapience-third-party-integration-api
+rewrite: /external/integration/
+timeout_ms: 10000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -326,17 +339,6 @@ kind:  Mapping
 name:  sapience_app_alerts_mapping
 prefix: /alerts/
 service: sapience-app-alerts
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  sapience_meeting_mapping
-prefix: /external/integration/
-service: sapience-meeting
-rewrite: /external/integration/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -404,6 +406,7 @@ name:  admin_reports_api_mapping
 prefix: /admin/reports/
 service: admin-reports-api
 rewrite: /admin/reports/
+timeout_ms: 10000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS

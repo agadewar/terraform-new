@@ -47,61 +47,6 @@ resource "azurerm_sql_server" "sapience" {
   tags = merge(local.common_tags, {})
 }
 
-# resource "azurerm_sql_database" "sedw" {
-#   name                             = "sedw"
-#   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-#   location                         = azurerm_sql_server.sapience.location
-#   server_name                      = azurerm_sql_server.sapience.name
-#   edition                          = "DataWarehouse"
-#   requested_service_objective_name = var.sql_database_sedw_requested_service_objective_name
-
-#   tags = merge(local.common_tags, {})
-# }
-
-# resource "azurerm_sql_database" "canopy_device" {
-#   name                             = "canopy-device"
-#   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-#   location                         = azurerm_sql_server.sapience.location
-#   server_name                      = azurerm_sql_server.sapience.name
-#   edition                          = var.sql_database_canopy_device_edition
-#   requested_service_objective_name = var.sql_database_canopy_device_requested_service_objective_name
-
-#   tags = merge(local.common_tags, {})
-# }
-
-# resource "azurerm_sql_database" "canopy_eventpipeline" {
-#   name                             = "canopy-eventpipeline"
-#   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-#   location                         = azurerm_sql_server.sapience.location
-#   server_name                      = azurerm_sql_server.sapience.name
-#   edition                          = var.sql_database_canopy_eventpipeline_edition
-#   requested_service_objective_name = var.sql_database_canopy_eventpipeline_requested_service_objective_name
-
-#   tags = merge(local.common_tags, {})
-# }
-
-# resource "azurerm_sql_database" "canopy_leafbroker" {
-#   name                             = "canopy-leafbroker"
-#   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-#   location                         = azurerm_sql_server.sapience.location
-#   server_name                      = azurerm_sql_server.sapience.name
-#   edition                          = var.sql_database_canopy_leafbroker_edition
-#   requested_service_objective_name = var.sql_database_canopy_leafbroker_requested_service_objective_name
-
-#   tags = merge(local.common_tags, {})
-# }
-
-# resource "azurerm_sql_database" "canopy_user" {
-#   name                             = "canopy-user"
-#   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-#   location                         = azurerm_sql_server.sapience.location
-#   server_name                      = azurerm_sql_server.sapience.name
-#   edition                          = var.sql_database_canopy_user_edition
-#   requested_service_objective_name = var.sql_database_canopy_user_requested_service_objective_name
-
-#   tags = merge(local.common_tags, {})
-# }
-
 resource "azurerm_sql_database" "Admin" {
   name                             = "Admin"
   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
@@ -124,40 +69,6 @@ resource "azurerm_sql_database" "EDW" {
 
   tags = merge(local.common_tags, {})
 }
-
-resource "azurerm_sql_database" "mad" {
-  name                             = "mad"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_mad_edition
-  requested_service_objective_name = var.sql_database_mad_requested_service_objective_name
-
-  tags = merge(local.common_tags, {})
-}
-
-resource "azurerm_sql_database" "staging" {
-  name                             = "Staging"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_staging_edition
-  requested_service_objective_name = var.sql_database_staging_requested_service_objective_name
-  read_scale                       = true
-
-  tags = merge(local.common_tags, {})
-}
-
-# resource "azurerm_sql_database" "EDW" {
-#   name                             = "EDW"
-#   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-#   location                         = azurerm_sql_server.sapience.location
-#   server_name                      = azurerm_sql_server.sapience.name
-#   edition                          = var.sql_database_edw_edition
-#   requested_service_objective_name = var.sql_database_edw_requested_service_objective_name
-
-#   tags = merge(local.common_tags, {})
-# }
 
 resource "azurerm_sql_firewall_rule" "aks_egress" {
   name                = "aks-egress"
@@ -183,6 +94,14 @@ resource "azurerm_sql_firewall_rule" "ip_sapience_pune_office" {
   end_ip_address      = var.ip_sapience_pune_office
 }
 
+resource "azurerm_sql_firewall_rule" "ip_sapience_pune2_office" {
+  name                = "ip-sapience-pune2-office"
+  resource_group_name = azurerm_sql_server.sapience.resource_group_name
+  server_name         = azurerm_sql_server.sapience.name
+  start_ip_address    = var.ip_sapience_pune2_office
+  end_ip_address      = var.ip_sapience_pune2_office
+}
+
 resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
   name                = "sapience-canopy-hierarchy-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
@@ -194,6 +113,29 @@ resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
     name = "EnableGremlin"
   }
 
+  consistency_policy {
+    consistency_level = "Strong"
+  }
+
+  geo_location {
+    location          = local.cosmos_failover_location
+    failover_priority = 0
+  }
+}
+
+resource "azurerm_cosmosdb_account" "load_us_bulk_upload_mongodb" {
+  name                = "sapience-bulk-upload-mongodb-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+  offer_type          = "Standard"
+  kind                = "MongoDB"
+
+  capabilities  {
+    name = "EnableAggregationPipeline"
+  }
+  capabilities  {
+    name = "MongoDBv3.4"
+  }
   consistency_policy {
     consistency_level = "Strong"
   }
@@ -295,6 +237,29 @@ resource "azurerm_cosmosdb_account" "canopy_settings_mongodb" {
   }
 }
 
+resource "azurerm_cosmosdb_account" "sapience-integration-mongodb-load-us-load" {
+  name                = "sapience-integration-mongodb-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+  offer_type          = "Standard"
+  kind                = "MongoDB"
+
+  capabilities  {
+    name = "EnableAggregationPipeline"
+  }
+  capabilities  {
+    name = "MongoDBv3.4"
+  }
+  consistency_policy {
+    consistency_level = "Strong"
+  }
+
+  geo_location {
+    location          = local.cosmos_failover_location
+    failover_priority = 0
+  }
+}
+
 # resource "azurerm_cosmosdb_account" "sapience_graph" {
 #   name                = "sapience-graph-${var.environment}"
 #   resource_group_name = var.resource_group_name
@@ -358,6 +323,14 @@ resource "azurerm_mysql_firewall_rule" "sapience-pune-office" {
   server_name         = azurerm_mysql_server.sapience.name
   start_ip_address    = var.ip_sapience_pune_office
   end_ip_address      = var.ip_sapience_pune_office
+}
+
+resource "azurerm_mysql_firewall_rule" "sapience-pune2-office" {
+  name                = "Sapience-Pune2-Office"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  start_ip_address    = var.ip_sapience_pune2_office
+  end_ip_address      = var.ip_sapience_pune2_office
 }
 
 resource "azurerm_mysql_server" "sapience" {

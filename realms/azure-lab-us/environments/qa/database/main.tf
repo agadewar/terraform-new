@@ -47,17 +47,6 @@ resource "azurerm_sql_server" "sapience" {
   tags = merge(local.common_tags, {})
 }
 
-# resource "azurerm_sql_database" "sedw" {
-#   name                             = "sedw"
-#   resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-#   location                         = azurerm_sql_server.sapience.location
-#   server_name                      = azurerm_sql_server.sapience.name
-#   edition                          = "DataWarehouse"
-#   requested_service_objective_name = var.sql_database_sedw_requested_service_objective_name
-
-#   tags = merge(local.common_tags, {})
-# }
-
 resource "azurerm_mysql_database" "marketplace" {
   name                = "marketplace"
   resource_group_name = var.resource_group_name
@@ -85,28 +74,6 @@ resource "azurerm_sql_database" "Admin" {
   server_name                      = azurerm_sql_server.sapience.name
   edition                          = var.sql_database_admin_edition
   requested_service_objective_name = var.sql_database_admin_requested_service_objective_name
-
-  tags = merge(local.common_tags, {})
-}
-
-resource "azurerm_sql_database" "mad" {
-  name                             = "mad"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_mad_edition
-  requested_service_objective_name = var.sql_database_mad_requested_service_objective_name
-
-  tags = merge(local.common_tags, {})
-}
-
-resource "azurerm_sql_database" "staging" {
-  name                             = "Staging"
-  resource_group_name              = azurerm_sql_server.sapience.resource_group_name
-  location                         = azurerm_sql_server.sapience.location
-  server_name                      = azurerm_sql_server.sapience.name
-  edition                          = var.sql_database_staging_edition
-  requested_service_objective_name = var.sql_database_staging_requested_service_objective_name
 
   tags = merge(local.common_tags, {})
 }
@@ -144,6 +111,14 @@ resource "azurerm_sql_firewall_rule" "ip_sapience_pune_office" {
   server_name         = azurerm_sql_server.sapience.name
   start_ip_address    = var.ip_sapience_pune_office
   end_ip_address      = var.ip_sapience_pune_office
+}
+
+resource "azurerm_sql_firewall_rule" "ip_sapience_pune2_office" {
+  name                = "ip-sapience-pune2-office"
+  resource_group_name = azurerm_sql_server.sapience.resource_group_name
+  server_name         = azurerm_sql_server.sapience.name
+  start_ip_address    = var.ip_sapience_pune2_office
+  end_ip_address      = var.ip_sapience_pune2_office
 }
 
 resource "azurerm_cosmosdb_account" "lab_us_qa" {
@@ -187,23 +162,28 @@ resource "azurerm_cosmosdb_account" "lab_us_qa_dashboard_mongodb" {
   }
 }
 
+resource "azurerm_cosmosdb_account" "sapience-integration-mongodb-lab-us-qa" {
+  name                = "sapience-integration-mongodb-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+  offer_type          = "Standard"
+  kind                = "MongoDB"
 
-#resource "azurerm_cosmosdb_account" "lab_us_qa_alerts" {
-#  name                = "sapience-app-alerts-${var.realm}-${var.environment}"
-#  resource_group_name = var.resource_group_name
-#  location            = var.resource_group_location
-#  offer_type          = "Standard"
-#  kind                = "GlobalDocumentDB"
+  capabilities  {
+    name = "EnableAggregationPipeline"
+  }
+  capabilities  {
+    name = "MongoDBv3.4"
+  }
+  consistency_policy {
+    consistency_level = "Strong"
+  }
 
-#  consistency_policy {
-#    consistency_level = "Strong"
-#  }
-
-#  geo_location {
-#    location          = local.cosmos_failover_location
-#    failover_priority = 0
-#  }
-#}
+  geo_location {
+    location          = local.cosmos_failover_location
+    failover_priority = 0
+  }
+}
 
 resource "azurerm_cosmosdb_account" "lab_us_qa_alerts_mongodb" {
   name                = "sapience-app-alerts-mongodb-${var.realm}-${var.environment}"
@@ -291,47 +271,6 @@ resource "azurerm_cosmosdb_account" "canopy_settings_mongodb" {
   }
 }
 
-# resource "azurerm_cosmosdb_account" "sapience_graph" {
-#   name                = "sapience-graph-${var.environment}"
-#   resource_group_name = var.resource_group_name
-#   location            = var.resource_group_location
-#   offer_type          = "Standard"
-#   kind                = "GlobalDocumentDB"
-
-#   capabilities {
-#     name = "EnableGremlin"
-#   }
-
-#   consistency_policy {
-#     consistency_level = "Strong"
-#   }
-
-#   geo_location {
-#     location          = local.cosmos_failover_location
-#     failover_priority = 0
-#   }
-# }
-
-# resource "azurerm_cosmosdb_account" "event_archive" {
-#   name                = "sapience-event-archive-${var.environment}"
-#   resource_group_name = var.resource_group_name
-#   location            = var.resource_group_location
-#   offer_type          = "Standard"
-
-#   capabilities {
-#     name = "EnableCassandra"
-#   }
-
-#   consistency_policy {
-#     consistency_level = "Eventual"
-#   }
-
-#   geo_location {
-#     location          = local.cosmos_failover_location
-#     failover_priority = 0
-#   }
-# }
-
 resource "azurerm_mysql_firewall_rule" "aks_egress" {
   name                = "aks-egress"
   resource_group_name = var.resource_group_name
@@ -354,6 +293,14 @@ resource "azurerm_mysql_firewall_rule" "sapience-pune-office" {
   server_name         = azurerm_mysql_server.sapience.name
   start_ip_address    = var.ip_sapience_pune_office
   end_ip_address      = var.ip_sapience_pune_office
+}
+
+resource "azurerm_mysql_firewall_rule" "sapience-pune2-office" {
+  name                = "Sapience-Pune2-Office"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  start_ip_address    = var.ip_sapience_pune2_office
+  end_ip_address      = var.ip_sapience_pune2_office
 }
 
 resource "azurerm_mysql_server" "sapience" {
