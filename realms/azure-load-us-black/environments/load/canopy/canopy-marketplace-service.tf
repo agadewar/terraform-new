@@ -41,7 +41,7 @@ resource "kubernetes_deployment" "canopy_marketplace_service_deployment" {
   }
 
   spec {
-    replicas = 0
+    replicas = var.canopy_marketplace_service_deployment_replicas
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
@@ -67,7 +67,7 @@ resource "kubernetes_deployment" "canopy_marketplace_service_deployment" {
           image_pull_policy = "Always"
           
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-marketplace-service:1.3.0-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-marketplace-service:1.3.0"
           name  = "canopy-marketplace-service"
 
           env { 
@@ -139,8 +139,8 @@ resource "kubernetes_deployment" "canopy_marketplace_service_deployment" {
 
           resources {
             requests {
-              memory = "512M"
-              cpu    = "150m"
+              memory = var.canopy_marketplace_service_deployment_request_memory
+              cpu    = var.canopy_marketplace_service_deployment_request_cpu
             }
           }
 

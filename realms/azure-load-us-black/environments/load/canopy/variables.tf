@@ -36,6 +36,9 @@ variable "canopy_hierarchy_service_deployment_request_cpu" {}
 variable "canopy_location_service_deployment_replicas" {}
 variable "canopy_location_service_deployment_request_memory" {}
 variable "canopy_location_service_deployment_request_cpu" {}
+variable "canopy_marketplace_service_deployment_replicas" {}
+variable "canopy_marketplace_service_deployment_request_memory" {}
+variable "canopy_marketplace_service_deployment_request_cpu" {}
 variable "canopy_notification_service_deployment_replicas" {}
 variable "canopy_notification_service_deployment_request_memory" {}
 variable "canopy_notification_service_deployment_request_cpu" {}
@@ -77,6 +80,8 @@ variable "mysql_canopy_password" {}
 
 variable "canopy_service_account_username" {}
 variable "canopy_service_account_password" {}
+
+variable "canopy_security_jwt_secret" {}
 
 variable "google_api_key" {
   default = ""

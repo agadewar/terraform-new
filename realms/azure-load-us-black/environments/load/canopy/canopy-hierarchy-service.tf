@@ -76,7 +76,7 @@ resource "kubernetes_deployment" "canopy_hierarchy_service_deployment" {
           image_pull_policy = "Always"
           
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.16.0-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.19.0.jwt-SNAPSHOT"
           name  = "canopy-hierarchy-service"
 
           env {
@@ -113,10 +113,10 @@ resource "kubernetes_deployment" "canopy_hierarchy_service_deployment" {
             value = "centralized-logging"
           }
 
-          env {
-            name  = "canopy.security.userDetailsCacheEnabled"
-            value = "true"
-          }
+          # env {
+          #   name  = "canopy.security.userDetailsCacheEnabled"
+          #   value = "true"
+          # }
 
           env {
             name  = "logging.level.com.banyanhills.canopy.hierarchy"

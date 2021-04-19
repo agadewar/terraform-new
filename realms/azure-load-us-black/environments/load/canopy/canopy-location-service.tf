@@ -71,7 +71,7 @@ resource "kubernetes_deployment" "canopy_location_service_deployment" {
           image_pull_policy = "Always"
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-location-service:1.35.0-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-location-service:1.39.2"
           name  = "canopy-location-service"
 
           env { 
@@ -125,6 +125,11 @@ resource "kubernetes_deployment" "canopy_location_service_deployment" {
           env {
             name  = "SPRING_PROFILES_ACTIVE"
             value = "centralized-logging"
+          }
+
+          env {
+            name  = "messaging.enabled"
+            value = "false"
           }
 
           env {

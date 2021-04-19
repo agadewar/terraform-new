@@ -70,7 +70,7 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
           image_pull_policy = "Always"
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.10.0-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.11.0.jwt-SNAPSHOT"
           name  = "eventpipeline-leaf-broker"
 
           env { 
@@ -154,6 +154,15 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
           }
 
           env {
+            name  = "camel.io.canopy.leaf.broker.service.eventservice.producer.event-ingestion-target"
+            value = "log:io.canopy.leaf.broker.service.EventServiceKakfa?showHeaders=true&level=ERROR"
+          }
+          env {
+            name  = "camel.io.canopy.leaf.broker.service.eventservice.producer.event-ingestion-target-legacy"
+            value = "kafka://canopy-eventpipeline?brokers=$${kafka.bootstrap.servers}&securityProtocol=SASL_SSL&saslMechanism=PLAIN&saslJaasConfig=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$${KAFKA_USERNAME}\" password=\"$${KAFKA_PASSWORD}\";&sslEndpointAlgorithm=https"
+          }
+
+          env {
             name  = "canopy.leafbroker.divine-device-ids.enabled"
             value = "false"
           }
@@ -161,10 +170,10 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
             name  = "canopy.security.cookie.enabled"
             value = "true"
           }
-          env {
-            name  = "canopy.security.userDetailsCacheEnabled"
-            value = "true"
-          }
+          #env {
+          #  name  = "canopy.security.userDetailsCacheEnabled"
+          #  value = "true"
+          #}
           # env {
           #   name  = "logging.level.io.canopy.leaf.broker"
           #   value = "DEBUG"

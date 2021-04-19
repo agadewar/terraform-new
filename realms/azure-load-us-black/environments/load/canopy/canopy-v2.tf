@@ -69,7 +69,7 @@ resource "kubernetes_deployment" "canopy_v2_deployment" {
           image_pull_policy = "Always"
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-v2:0.2.6"
+          image = "${var.canopy_container_registry_hostname}/canopy-v2:3.49.2"
           name  = "canopy-v2"
 
           env {

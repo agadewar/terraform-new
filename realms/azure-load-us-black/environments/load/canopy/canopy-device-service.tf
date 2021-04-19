@@ -71,8 +71,13 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
           image_pull_policy = "Always"
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.44.0-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.53.0.jwt-SNAPSHOT"
           name  = "canopy-device-service"
+
+          # env {
+          #   name  = "logging.level.com.banyanhills.canopy.device"
+          #   value = "DEBUG"
+          # }
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
@@ -167,9 +172,13 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             name  = "com.banyanhills.canopy.device.eventhandler.AllDeviceEventHandler.disabled"
             value = "true"
           }
+          # env {
+          #   name  = "canopy.security.userDetailsCacheEnabled"
+          #   value = "true"
+          # }
           env {
-            name  = "canopy.security.userDetailsCacheEnabled"
-            value = "true"
+            name  = "canopy.device.persist-devices-to-hierarchy"
+            value = "false"
           }
 
           env {
@@ -301,6 +310,14 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             value = "canopy-device-heartbeat"
           }
           env {
+            name  = "canopy.queue.inventoryEvent"
+            value = "canopy-device-inventory-event"
+          }
+          env {
+            name  = "canopy.queue.leafActions"
+            value = "canopy-device-leaf-actions"
+          }
+          env {
             name  = "canopy.queue.leafVersions"
             value = "canopy-device-leaf-versions"
           }
@@ -356,6 +373,10 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
           }
           env {
             name  = "pti.enabled"
+            value = "false"
+          }
+          env {
+            name  = "revel.enabled"
             value = "false"
           }
           env {
