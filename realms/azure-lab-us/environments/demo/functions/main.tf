@@ -247,3 +247,44 @@ resource "azurerm_function_app" "function_app_sapience_tenant_teardown" {
 
   }
 }
+
+resource "azurerm_app_service_plan" "service_plan_admin_support_api" {
+  name                = "azure-fun-service-plan-sap-admin-support-api-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+
+  sku {
+    tier = "Standard"
+    size = "S1"
+  }
+}
+
+resource "azurerm_function_app" "function_app_sapience_admin_support_api" {
+  name                        = "azure-functions-app-sapience-admin-support-api-${var.realm}-${var.environment}"
+  resource_group_name         = var.resource_group_name
+  location                    = var.resource_group_location
+  app_service_plan_id         = azurerm_app_service_plan.service_plan_admin_support_api.id
+  #app_settings               = var.function_app_admin_users  
+  storage_connection_string   = azurerm_storage_account.sapience_functions_admin_support_api.primary_connection_string
+  version                     = "3.1"
+
+      app_settings                             = {
+      AzureWebJobsStorage                      =  "UseDevelopmentStorage=true"
+      FUNCTIONS_WORKER_RUNTIME                 =  "dotnet"
+      APPINSIGHTS_INSTRUMENTATIONKEY           =  "7d7584bc-a5f2-42b1-a4d1-ef786665144b"
+      APPLICATIONINSIGHTS_CONNECTION_STRING    =  "InstrumentationKey=7d7584bc-a5f2-42b1-a4d1-ef786665144b;IngestionEndpoint=https://eastus-1.in.applicationinsights.azure.com/"
+      ConnectionString                        =  "Data Source=sapience-lab-us-demo.database.windows.net;Database=Admin;User=appsvc_api_user;Password=kfguJEk29khwkKgi;"  
+
+  }
+}
+
+resource "azurerm_storage_account" "sapience_functions_admin_support_api" {
+  name                     = "sapadminsupapifn${replace(lower(var.realm), "-", "")}${var.environment}"
+  resource_group_name      = var.resource_group_name
+  location                 = "eastus2"
+  account_tier             = "Standard"
+  account_kind             = "Storage"
+  account_replication_type = "GRS"
+
+  tags = merge(local.common_tags, {})
+}
