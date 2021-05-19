@@ -68,7 +68,12 @@ resource "kubernetes_deployment" "canopy_portal_deployment" {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
           #image = "${var.canopy_container_registry_hostname}/canopy-portal:3.4.3-beta.20210115172046899"
-          image = "${var.canopy_container_registry_hostname}/canopy-portal:3.9.1-beta.1617118618"
+          # image = "${var.canopy_container_registry_hostname}/canopy-portal:3.9.1-beta.1617118618"
+          # image = "${var.canopy_container_registry_hostname}/canopy-portal:3.9.1-jwt-beta.1619633118"
+          # image = "${var.canopy_container_registry_hostname}/canopy-portal:3.9.1-jwt-beta.1620140691"  --- this is the last one that should work, but isn't
+          # image = "${var.canopy_container_registry_hostname}/canopy-portal:3.13.0-SNAPSHOT-alpha.1620163453"
+          image = "${var.canopy_container_registry_hostname}/canopy-portal:3.9.1-jwt-beta.1620220931"
+          # image = "${var.canopy_container_registry_hostname}/canopy-portal:3.0.0rc1-alpha.20200723204619860"
           name  = "canopy-portal"
 
           env {
