@@ -178,17 +178,19 @@ resource "azurerm_function_app" "function_app_sapience_admin_support_api" {
   version                     = "3.1"
 
       app_settings                             = {
-      AzureWebJobsStorage                      =  "UseDevelopmentStorage=true"
+      #AzureWebJobsStorage                     =  "UseDevelopmentStorage=true"
       FUNCTIONS_WORKER_RUNTIME                 =  "dotnet"
-      APPINSIGHTS_INSTRUMENTATIONKEY           =  "7d7584bc-a5f2-42b1-a4d1-ef786665144b"
-      APPLICATIONINSIGHTS_CONNECTION_STRING    =  "InstrumentationKey=7d7584bc-a5f2-42b1-a4d1-ef786665144b;IngestionEndpoint=https://eastus-1.in.applicationinsights.azure.com/"
+      APPINSIGHTS_INSTRUMENTATIONKEY           =  "288fac0d-84e8-400a-b23e-f3f3a6103cac"
+      APPLICATIONINSIGHTS_CONNECTION_STRING    =  "InstrumentationKey=288fac0d-84e8-400a-b23e-f3f3a6103cac;IngestionEndpoint=https://eastus-1.in.applicationinsights.azure.com/"
       ConnectionString                         =  "Data Source=sapience-load-us-load.database.windows.net;Database=Admin;User=appsvc_api_user;Password=Khm8f426GxXf3x;"  
+      WEBSITE_ENABLE_SYNC_UPDATE_SITE          =  "true"
+      WEBSITE_RUN_FROM_PACKAGE                 =  "1"
 
   }
 }
 
 resource "azurerm_storage_account" "sapience_functions_admin_support_api" {
-  name                     = "sapadminsupapifn${replace(lower(var.realm), "-", "")}${var.environment}"
+  name                     = "sapadminsupapi${replace(lower(var.realm), "-", "")}${var.environment}"
   resource_group_name      = var.resource_group_name
   location                 = "eastus2"
   account_tier             = "Standard"
