@@ -255,3 +255,42 @@ resource "azurerm_storage_account" "sapience_functions_admin_support_api" {
 
   tags = merge(local.common_tags, {})
 }
+
+resource "azurerm_storage_account" "sapience_functions_notifications" {
+  name                     = "sapiencenotifn${replace(lower(var.realm), "-", "")}${var.environment}"
+  resource_group_name      = var.resource_group_name
+  location                 = "eastus2"
+  account_tier             = "Standard"
+  account_kind             = "Storage"
+  account_replication_type = "GRS"
+
+  tags = merge(local.common_tags, {})
+}
+
+resource "azurerm_app_service_plan" "service_plan_notifications" {
+  name                = "azure-function-service-plan-sap-notifications-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+
+  sku {
+    tier = "Standard"
+    size = "S1"
+  }
+}
+
+resource "azurerm_function_app" "function_app_sapience_notifications" {
+  name                        = "azure-functions-app-sapience-notifications-${var.realm}-${var.environment}"
+  resource_group_name         = var.resource_group_name
+  location                    = var.resource_group_location
+  app_service_plan_id         = azurerm_app_service_plan.service_plan_notifications.id
+  #app_settings               = var.function_app_admin_users  
+  storage_connection_string   = azurerm_storage_account.sapience_functions_notifications.primary_connection_string
+  version                     = "3.1"
+
+      app_settings                             = {
+      "ActivityDeletedConnection"              = "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Subscribe;SharedAccessKey=qvwdEjNGQCye1K/aw7MW0F8ogU1+qHqy/TV/njtsdqw=;EntityPath=sapience-admin-activity-deleted"
+      "ActivityUpdatedConnection"              = "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Subscribe;SharedAccessKey=efuxOL5Kuv9wWy6gJhm2C6FRzDADcs/Nwp6vK3pBvzk=;EntityPath=sapience-admin-activity-updated"
+      "DepartmentDeletedConnection"            = "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Subscribe;SharedAccessKey=51uwsDqKnGyK+iuTLMy+XHY9b5MUPxXuTkMgeYkBNpI=;EntityPath=sapience-admin-departments-deleted"
+      "DepartmentUpdatedConnection"            = "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Subscribe;SharedAccessKey=jhw0svhiKbHcqa9N1zFAkbIl1YtrTpRa6HshsxEy64M=;EntityPath=sapience-admin-departments-updated"
+  }
+}
