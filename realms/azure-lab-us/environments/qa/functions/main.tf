@@ -331,3 +331,64 @@ resource "azurerm_function_app" "function_app_sapience_notifications" {
       "DepartmentUpdatedConnection"            = "Endpoint=sb://sapience-lab-us-qa.servicebus.windows.net/;SharedAccessKeyName=Subscribe;SharedAccessKey=SUI+iQWMS5JRwl+f53agq00aML2RBun0HCrmXCpLvJE=;EntityPath=sapience-admin-departments-updated"
   }
 }
+
+resource "azurerm_storage_account" "sapience_functions_admin_int_api" {
+  name                     = "sapadminintapifn${replace(lower(var.realm), "-", "")}${var.environment}"
+  resource_group_name      = var.resource_group_name
+  location                 = "eastus2"
+  account_tier             = "Standard"
+  account_kind             = "Storage"
+  enable_https_traffic_only = false
+  account_replication_type = "GRS"
+
+  tags = merge(local.common_tags, {})
+}
+
+resource "azurerm_app_service_plan" "service_plan_sapience_admin_integrations_api" {
+  name                = "azure-fun-service-plan-sap-admin_int_api-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+
+  sku {
+    tier = "Standard"
+    size = "S1"
+  }
+}
+
+resource "azurerm_function_app" "function_app_sapience_admin_integrations_api" {
+  name                        = "azure-func-app-sapience-admin-integrations-api-${var.realm}-${var.environment}"
+  resource_group_name         = var.resource_group_name
+  location                    = var.resource_group_location
+  app_service_plan_id         = azurerm_app_service_plan.service_plan_sapience_admin_integrations_api.id
+  storage_connection_string   = azurerm_storage_account.sapience_functions_admin_int_api.primary_connection_string
+  version                     = "3.1"
+
+      app_settings                             = {
+      APPINSIGHTS_INSTRUMENTATIONKEY           =  "7d7584bc-a5f2-42b1-a4d1-ef786665144b"
+      APPLICATIONINSIGHTS_CONNECTION_STRING    =  "InstrumentationKey=7d7584bc-a5f2-42b1-a4d1-ef786665144b;IngestionEndpoint=https://eastus-1.in.applicationinsights.azure.com/"
+      WEBSITE_ENABLE_SYNC_UPDATE_SITE          =  true
+      WEBSITE_RUN_FROM_PACKAGE                 =  1
+      "AzureServiceBus:Endpoint"                 =  "Endpoint=sb://sapience-lab-us-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=jEcxjwnTChnuMisdsw7xgBUIANE+Kris1IA2Urxmndg="
+      "AzureServiceBus:EntityPath"               =  "sapience-admin-users-created"
+      "AzureServiceBus:DeletedUsersEndPoint"     =  "Endpoint=sb://sapience-lab-us-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=kdbQ/M3CZzEIagskM8/JetX3LMuePgnF2xbcYgfIGAE="
+      "AzureServiceBus:DeletedUsersEntityPath"   =  "sapience-admin-users-deleted"
+      "IdentityProvider:Issuer"                  =  "https://login.dev.lab.sapienceanalytics.com/"
+      "IdentityProvider:Audience"                =  "https://api.sapienceanalytics.com"
+      "Auth0:Authority"                          =  "https://login.dev.lab.sapienceanalytics.com/"
+      "Auth0:Audience"                           =  "https://api.sapienceanalytics.com"
+      "Auth0:ClientId"                           =  "gEurUe965S21CvJyQtArQ3z8TahgC20K"
+      "Auth0:Connection"                         =  "Username-Password-Authentication"
+      "Auth0:PingUri"                            =  "https://login.dev.lab.sapienceanalytics.com/test"
+      "Sisense:BaseUrl"                          =  "https://sisense.dev.lab.us.azure.sapienceanalytics.com/"
+      "Sisense:Secret"                           =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNWY3ZDc3YjVkNmYwZjcyY2NjNmNkYTgzIiwiYXBpU2VjcmV0IjoiZTM4MmZjODAtMDNjYy1hNWYzLTgzMzItYzYzMDdjZThiZjljIiwiaWF0IjoxNjAyMDU4MTgyfQ._f8WkHANdTUkQDy9FLapthTHn_YoFKFqPpekSMezzGs"
+      "ConnectionStrings:Admin"                  =  "Data Source=sapience-lab-us-dev.database.windows.net;Database=Admin;User=appsvc_api_user;Password=3HvaNxQEFvWThiZG"
+      "UploadBlob:Container"                     = "sapience-upload"
+      "UploadBlob:StorageAccountAccessKey"       =  "DefaultEndpointsProtocol=https;AccountName=saplabusbudev;AccountKey=qyTqudSpn0Fcn5UxCoGxcqRcsYVUdwk8b+AdwC+cbop8hdADOgPCGl/Y1ZREZdaLxrlHX89yiSjTKB245syNHg==;EndpointSuffix=core.windows.net"
+      "BulkUploadDbConfig:ConnString"            =  "mongodb://sapience-bulk-upload-mongodb-lab-us-dev:pHv2SDPSjUBawX8naxFUjscBddy4OtAGYAoV6NaKfFac4XENl9g5Cm7akCZaoabaY2WpRDaCFSzYAuceXjbthg==@sapience-bulk-upload-mongodb-lab-us-dev.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
+      "BulkUploadDbConfig:DatabaseName"          =  "BulkUploadWorkflow"
+      "BulkUploadDbConfig:Events"                =  "BulkUploadEvents"
+      "Integration:ConnString"                   =  "AccountEndpoint=mongodb+srv://vueintegrationpoc-integration1:NXWgN53WZph6Y0xEugvdRI0Kboqr6Y44GhqqkDwXYy60xGrvlCqAM2aIK0l4cwyWqAggBEpFZ4KRteCnxlyi2g==@vueintegrationpoc-integration1.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@vueintegrationpoc-integration1@;AccountKey=NXWgN53WZph6Y0xEugvdRI0Kboqr6Y44GhqqkDwXYy60xGrvlCqAM2aIK0l4cwyWqAggBEpFZ4KRteCnxlyi2g=="
+      "Integration:DatabaseName"                =  "Test"
+      "Integration:Collections:IntegrationEvents" =  "Integration_Events"
+  }
+}
