@@ -98,7 +98,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     vnet_subnet_id       = data.terraform_remote_state.network.outputs.aks-pool_subnet_id
   }
   addon_profile {
-    kube_dashboard { enabled = true }
+    #kube_dashboard { enabled = false }
 
     oms_agent {
       enabled = false
