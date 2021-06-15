@@ -54,8 +54,8 @@ resource "azurerm_storage_container" "leaf_downloads" {
   container_access_type = "blob"
 }
 
-resource "azurerm_storage_account" "bulk_upload_dev" {
-  name                      = "saplabusbudev"
+resource "azurerm_storage_account" "bulk_upload" {
+  name                      = "sap${replace(var.realm, "-", "")}bu${replace(var.environment, "-", "")}"
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
   account_tier              = "Standard"
@@ -70,61 +70,15 @@ resource "azurerm_storage_account" "bulk_upload_dev" {
   }
 }
 
-resource "azurerm_storage_container" "sapience-upload-dev" {
+resource "azurerm_storage_container" "sapience-upload" {
   name                  = "sapience-upload"
   resource_group_name   = var.resource_group_name
-  storage_account_name  = "${azurerm_storage_account.bulk_upload_dev.name}"
-  container_access_type = "blob"
-}
-
-resource "azurerm_storage_account" "bulk_upload_demo" {
-  name                      = "saplabusbudemo"
-  resource_group_name       = var.resource_group_name
-  location                  = var.resource_group_location
-  account_tier              = "Standard"
-  account_replication_type  = "ZRS"
-  account_kind              = "StorageV2"
-  enable_https_traffic_only = "true"
-
-  tags = merge(local.common_tags)
-
-  lifecycle {
-    prevent_destroy = "true"
-  }
-}
-
-resource "azurerm_storage_container" "sapience-upload-demo" {
-  name                  = "sapience-upload"
-  resource_group_name   = var.resource_group_name
-  storage_account_name  = "${azurerm_storage_account.bulk_upload_demo.name}"
-  container_access_type = "blob"
-}
-
-resource "azurerm_storage_account" "bulk_upload_qa" {
-  name                      = "saplabusbuqa"
-  resource_group_name       = var.resource_group_name
-  location                  = var.resource_group_location
-  account_tier              = "Standard"
-  account_replication_type  = "ZRS"
-  account_kind              = "StorageV2"
-  enable_https_traffic_only = "true"
-
-  tags = merge(local.common_tags)
-
-  lifecycle {
-    prevent_destroy = "true"
-  }
-}
-
-resource "azurerm_storage_container" "sapience-upload-qa" {
-  name                  = "sapience-upload"
-  resource_group_name   = var.resource_group_name
-  storage_account_name  = "${azurerm_storage_account.bulk_upload_qa.name}"
+  storage_account_name  = "${azurerm_storage_account.bulk_upload.name}"
   container_access_type = "blob"
 }
 
 resource "azurerm_storage_account" "talend_storage_account" {
-  name                      = "talend${replace(var.realm, "-", "")}dev"
+  name                      = "talend${replace(var.realm, "-", "")}${replace(var.environment, "-", "")}"
   resource_group_name       = var.resource_group_name
   location                  = var.resource_group_location
   account_tier              = "Standard"
@@ -140,7 +94,7 @@ resource "azurerm_storage_account" "talend_storage_account" {
 }
 
 resource "azurerm_storage_container" "talend_storage_account" {
-  name                  = "talend-${replace(var.realm, "-", "")}-dev"
+  name                  = "talend-${replace(var.realm, "-", "")}-${replace(var.environment, "-", "")}"
   resource_group_name   = var.resource_group_name
   storage_account_name  = azurerm_storage_account.talend_storage_account.name
   container_access_type = "blob"
