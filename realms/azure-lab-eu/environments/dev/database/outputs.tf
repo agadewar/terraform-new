@@ -9,5 +9,5 @@ output "canopy_hierarchy_cosmos_password" {
 
 output "canopy_settings_mongodb_cosmos_password" {
   description = "Cosmos password for Canopy Settings MongoDB"
-  value       = azurerm_cosmosdb_account.lab_us_dev_canopy_settings_mongodb.primary_master_key
+  value       = azurerm_cosmosdb_account.lab_eu_dev_canopy_settings_mongodb.primary_master_key
 }

@@ -21,11 +21,11 @@ data "terraform_remote_state" "aks_egress" {
 }
 
 locals {
-  sql_server_version                    = "12.0"
-  sql_server_administrator_login        = var.sql_server_administrator_login
-  sql_server_administrator_password     = var.sql_server_administrator_password
+  sql_server_version                      = "12.0"
+  sql_server_administrator_login          = var.sql_server_administrator_login
+  sql_server_administrator_password       = var.sql_server_administrator_password
   # sedw_requested_service_objective_name = var.sedw_requested_service_objective_name
-  cosmos_failover_location              = "eastus2"
+  cosmos_failover_location                = var.failover_location
 
   common_tags = merge(
     var.realm_common_tags,
@@ -122,7 +122,7 @@ resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
   }
 }
 
-resource "azurerm_cosmosdb_account" "lab_us_dev" {
+resource "azurerm_cosmosdb_account" "lab_eu_dev" {
   name                = "sapience-app-dashboard-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
@@ -139,7 +139,7 @@ resource "azurerm_cosmosdb_account" "lab_us_dev" {
   }
 }
 
-#resource "azurerm_cosmosdb_account" "lab_us_dev_dashboard_mongodb" {
+#resource "azurerm_cosmosdb_account" "lab_eu_dev_dashboard_mongodb" {
 #  name                = "sapience-app-dashboard-mongodb-${var.realm}-${var.environment}"
 #  resource_group_name = var.resource_group_name
 #  location            = var.resource_group_location
@@ -156,7 +156,7 @@ resource "azurerm_cosmosdb_account" "lab_us_dev" {
 #  }
 #}
 
-#resource "azurerm_cosmosdb_account" "lab_us_dev_alerts" {
+#resource "azurerm_cosmosdb_account" "lab_eu_dev_alerts" {
 #  name                = "sapience-app-alerts-${var.realm}-${var.environment}"
 #  resource_group_name = var.resource_group_name
 #  location            = var.resource_group_location
@@ -173,7 +173,7 @@ resource "azurerm_cosmosdb_account" "lab_us_dev" {
 #  }
 #}
 
-resource "azurerm_cosmosdb_account" "lab_us_dev_alerts_mongodb" {
+resource "azurerm_cosmosdb_account" "lab_eu_dev_alerts_mongodb" {
   name                = "sapience-app-alerts-mongodb-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
@@ -196,7 +196,7 @@ resource "azurerm_cosmosdb_account" "lab_us_dev_alerts_mongodb" {
   }
 }
 
-resource "azurerm_cosmosdb_account" "lab_us_dev_app_dashboard_mongodb" {
+resource "azurerm_cosmosdb_account" "lab_eu_dev_app_dashboard_mongodb" {
   name                = "sapience-app-dashboard-mongodb-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
@@ -219,7 +219,7 @@ resource "azurerm_cosmosdb_account" "lab_us_dev_app_dashboard_mongodb" {
   }
 }
 
-resource "azurerm_cosmosdb_account" "lab_us_dev_bulk_upload_mongodb" {
+resource "azurerm_cosmosdb_account" "lab_eu_dev_bulk_upload_mongodb" {
   name                = "sapience-bulk-upload-mongodb-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
@@ -242,7 +242,7 @@ resource "azurerm_cosmosdb_account" "lab_us_dev_bulk_upload_mongodb" {
   }
 }
 
-resource "azurerm_cosmosdb_account" "lab_us_dev_canopy_settings_mongodb" {
+resource "azurerm_cosmosdb_account" "lab_eu_dev_canopy_settings_mongodb" {
   name                = "canopy-settings-mongodb-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
@@ -411,7 +411,7 @@ resource "azurerm_mysql_database" "user" {
   collation           = "latin1_swedish_ci"
 }
 
-resource "azurerm_cosmosdb_account" "sapience-integration-mongodb-lab-us-dev" {
+resource "azurerm_cosmosdb_account" "sapience-integration-mongodb-lab-eu-dev" {
   name                = "sapience-integration-mongodb-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
