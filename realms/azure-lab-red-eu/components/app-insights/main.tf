@@ -22,7 +22,7 @@ locals {
   )
 }
 resource "azurerm_application_insights" "app_insights" {
-  name                = "${var.realm}"
+  name                = "${var.realm}-red"
   location            = "${var.resource_group_location}"
   resource_group_name = "${var.resource_group_name}"
   application_type    = "web"

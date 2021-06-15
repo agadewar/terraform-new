@@ -16,7 +16,7 @@ data "terraform_remote_state" "aks_egress" {
     access_key           = var.realm_backend_access_key
     storage_account_name = var.realm_backend_storage_account_name
     container_name       = var.realm_backend_container_name
-    key                  = "aks-egress.tfstate"
+    key                  = "../azure-red-eu/red/aks-egress.tfstate"
   }
 }
 
@@ -111,23 +111,6 @@ resource "azurerm_cosmosdb_account" "sapience_canopy_hierarchy" {
   capabilities {
     name = "EnableGremlin"
   }
-
-  consistency_policy {
-    consistency_level = "Strong"
-  }
-
-  geo_location {
-    location          = local.cosmos_failover_location
-    failover_priority = 0
-  }
-}
-
-resource "azurerm_cosmosdb_account" "lab_eu_dev" {
-  name                = "sapience-app-dashboard-${var.realm}-${var.environment}"
-  resource_group_name = var.resource_group_name
-  location            = var.resource_group_location
-  offer_type          = "Standard"
-  kind                = "GlobalDocumentDB"
 
   consistency_policy {
     consistency_level = "Strong"
