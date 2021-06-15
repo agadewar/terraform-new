@@ -22,9 +22,9 @@ output "aks_eastus_sisense_netapp" {
   value = azurerm_subnet.aks_eastus_sisense_netapp.id
 }
 
-output "aks-pool01_subnet_id" {
-  value = "${azurerm_subnet.aks-pool01.id}"
-}
+# output "aks-pool01_subnet_id" {
+#   value = "${azurerm_subnet.aks-pool01.id}"
+# }
 
 /* output "aks-pool02_subnet_id" {
   value = "${azurerm_subnet.aks-pool02.id}"

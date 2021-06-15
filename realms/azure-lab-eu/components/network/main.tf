@@ -52,13 +52,13 @@ resource "azurerm_subnet" "aks_eastus_sisense_netapp" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.realm.name
   address_prefix       = var.subnet_address_prefix_aks_eastus_sisense_netapp
-  delegation { 
-    name               = "netapp" 
-    service_delegation {
-      name             = "Microsoft.Netapp/volumes"
-      actions          = ["Microsoft.Network/networkinterfaces/*", "Microsoft.Network/virtualNetworks/subnets/join/action"]
-    }
-  }
+  # delegation { 
+  #   name               = "netapp" 
+  #   service_delegation {
+  #     name             = "Microsoft.Netapp/volumes"
+  #     actions          = ["Microsoft.Network/networkinterfaces/*", "Microsoft.Network/virtualNetworks/subnets/join/action"]
+  #   }
+  # }
 }
 
 resource "azurerm_subnet" "aks_eastus_sisense" {
@@ -69,14 +69,14 @@ resource "azurerm_subnet" "aks_eastus_sisense" {
   service_endpoints    = var.subnet_service_endpoints
 }
 
-resource "azurerm_subnet" "aks-pool01" {
-  name                 = "aks-pool01"
-  resource_group_name  = var.resource_group_name
-  virtual_network_name = azurerm_virtual_network.realm.name
-  address_prefix       = var.subnet_address_prefix_aks-pool01
-  service_endpoints    = var.subnet_service_endpoints
-  route_table_id       = "/subscriptions/b78a61e7-f2ed-4cb0-8f48-6548408935e9/resourceGroups/MC_lab-us_lab-us-black_eastus/providers/Microsoft.Network/routeTables/aks-agentpool-34839511-routetable"
-}
+# resource "azurerm_subnet" "aks-pool01" {
+#   name                 = "aks-pool01"
+#   resource_group_name  = var.resource_group_name
+#   virtual_network_name = azurerm_virtual_network.realm.name
+#   address_prefix       = var.subnet_address_prefix_aks-pool01
+#   service_endpoints    = var.subnet_service_endpoints
+#   route_table_id       = "/subscriptions/b78a61e7-f2ed-4cb0-8f48-6548408935e9/resourceGroups/MC_lab-us_lab-us-black_eastus/providers/Microsoft.Network/routeTables/aks-agentpool-34839511-routetable"
+# }
 
 /* resource "azurerm_subnet" "aks-pool02" {
   name                 = "aks-pool02"
