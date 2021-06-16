@@ -4,7 +4,7 @@ terraform {
   }
 
   required_providers {
-    helm = "= 1.0.0"
+    helm = "= 2.0.0"
   }
 }
 
@@ -46,7 +46,8 @@ locals {
 resource "helm_release" "influxdb" {
   name      = "influxdb"
   namespace = var.environment
-  chart     = "stable/influxdb"
+  repository = "https://charts.helm.sh/stable"
+  chart     = "influxdb"
 
   set {
     name  = "persistence.enabled"
