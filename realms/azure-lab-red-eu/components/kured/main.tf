@@ -28,5 +28,6 @@ locals {
 resource "helm_release" "kured" {
   name      = "kured"
   namespace = "kube-system"
-  chart     = "stable/kured"
+  repository = "https://charts.helm.sh/stable"
+  chart     = "kured"
 }

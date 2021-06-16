@@ -102,7 +102,8 @@ resource "helm_release" "prometheus" {
 
   name      = "prometheus"
   namespace = local.namespace
-  chart     = "stable/prometheus-operator"
+  repository = "https://charts.helm.sh/stable"
+  chart     = "prometheus-operator"
   values = [
     data.template_file.custom_values.rendered,
   ]
