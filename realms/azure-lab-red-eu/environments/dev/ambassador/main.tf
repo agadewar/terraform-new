@@ -69,7 +69,7 @@ resource "kubernetes_ingress" "api" {
 
   spec {
     rule {
-      host = "api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
+      host = "api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com"
       http {
         path {
           backend {
@@ -96,25 +96,10 @@ resource "kubernetes_ingress" "api" {
       }
     }
 
-    rule {
-      host = "api.${var.environment}.sapienceanalytics.com"
-      http {
-        path {
-          backend {
-            service_name = "ambassador"
-            service_port = 80
-          }
-
-          path = "/"
-        }
-      }
-    }
-
     tls {
       hosts = [
-        "api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com",
-        "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
-        "api.${var.environment}.sapienceanalytics.com"
+        "api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com",
+        "api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
       ]
       secret_name = "ambassador-certs"
     }

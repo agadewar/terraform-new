@@ -24,36 +24,6 @@ locals {
   )
 }
 
-resource "azurerm_storage_account" "storage_account" {
-  name                      = "sapience${replace(var.realm, "-", "")}"
-  resource_group_name       = var.resource_group_name
-  location                  = var.resource_group_location
-  account_tier              = "Standard"
-  account_replication_type  = "ZRS"
-  account_kind              = "StorageV2"
-  enable_https_traffic_only = "true"
-
-  tags = merge(local.common_tags)
-
-  lifecycle {
-    prevent_destroy = "true"
-  }
-}
-
-resource "azurerm_storage_container" "leaf_uploads" {
-  name                  = "leaf-uploads"
-  resource_group_name   = var.resource_group_name
-  storage_account_name  = "${azurerm_storage_account.storage_account.name}"
-  container_access_type = "blob"
-}
-
-resource "azurerm_storage_container" "leaf_downloads" {
-  name                  = "leaf-downloads"
-  resource_group_name   = var.resource_group_name
-  storage_account_name  = "${azurerm_storage_account.storage_account.name}"
-  container_access_type = "blob"
-}
-
 resource "azurerm_storage_account" "bulk_upload" {
   name                      = "sap${replace(var.realm, "-", "")}bu${replace(var.environment, "-", "")}"
   resource_group_name       = var.resource_group_name

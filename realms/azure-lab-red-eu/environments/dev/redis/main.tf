@@ -31,7 +31,9 @@ locals {
 resource "helm_release" "redis" {
   name      = "redis"
   namespace = var.environment
+  repository = "https://github.com/helm/charts/find/master"
   chart     = "stable/redis"
+  verify    = false
 
   set {
     name  = "usePassword"
