@@ -138,7 +138,7 @@ resource "azurerm_managed_disk" "talend" {
 
 resource "azurerm_public_ip" "talend" {
   name                         = "talend-${var.realm}-${var.environment}"
-  location                     = "East US"
+  location                     = "northeurope"
   resource_group_name          = var.resource_group_name
   public_ip_address_allocation = "Static"
 }
@@ -156,19 +156,4 @@ resource "azurerm_network_interface" "talend" {
     public_ip_address_id          = azurerm_public_ip.talend.id
     private_ip_address_allocation = "Dynamic"
   }
-}
-
-resource "azurerm_recovery_services_protected_vm" "talend" {
-  resource_group_name = "${var.resource_group_name}"
-  recovery_vault_name = "${data.terraform_remote_state.backup.outputs.vault}"
-  source_vm_id        = "${azurerm_virtual_machine.talend.id}"
-  backup_policy_id    = "${data.terraform_remote_state.backup.outputs.id_daily_14}"
-}
-
-resource "azurerm_private_dns_a_record" "talend" {
-  name                = "talend.${var.environment}"
-  zone_name           = data.terraform_remote_state.dns_realm.outputs.private_dns_zone_name
-  resource_group_name = var.resource_group_name
-  ttl                 = 300
-  records             = [azurerm_network_interface.talend.private_ip_address]
 }

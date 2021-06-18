@@ -22,34 +22,12 @@ variable "realm_common_tags" {
   type = map(string)
 }
 
-# PASSWORDS FOR OLD VMs IN THE WRONG SUBNET
-// variable "sisense_appquery_01_admin_username" {}
-// variable "sisense_appquery_01_admin_password" {}
-// variable "sisense_appquery_02_admin_username" {}
-// variable "sisense_appquery_02_admin_password" {}
-// variable "sisense_build_admin_username" {}
-// variable "sisense_build_admin_password" {}
-
-# PASSWORDS FOR NEW VMs IN THE CORRECT SUBNET
-variable "sisense_appquery_001_admin_username" {}
-variable "sisense_appquery_001_admin_password" {}
-variable "sisense_appquery_002_admin_username" {}
-variable "sisense_appquery_002_admin_password" {}
-variable "sisense_build_001_admin_username" {}
-variable "sisense_build_001_admin_password" {}
-
-variable "sisense_linux_admin_username" {}
-variable "sisense_linux_admin_password" {}
-
 variable "talend_admin_username" {}
 variable "talend_admin_password" {}
 
 variable "ip_sapience_dallas_office" {}
 variable "ip_sapience_pune_office" {}
-variable "ip_banyan_office" {}
-variable "ip_benjamin_john_home" {}
-variable "ip_steve_ardis_home" {}
-variable "ip_milind_kadbane_home" {}
+variable "ip_sapience_pune2_office" {}
 
 variable "environment_common_tags" {
   type = map(string)
