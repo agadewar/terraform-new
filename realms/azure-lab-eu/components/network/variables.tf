@@ -9,8 +9,8 @@ variable "virtual_network_address_space" { type = list(string) }
 variable "subnet_address_prefix_default" {}
 variable "subnet_address_prefix_aks-pool" {}
 variable "subnet_address_prefix_aks-pool01" {}
-variable "subnet_address_prefix_aks_eastus_sisense" {}
-variable "subnet_address_prefix_aks_eastus_sisense_netapp" {}
+variable "subnet_address_prefix_aks_northeu_sisense" {}
+variable "subnet_address_prefix_aks_northeu_sisense_netapp" {}
 /* variable "subnet_address_prefix_aks-pool02" {}
 variable "subnet_address_prefix_aks-pool03" {}
 variable "subnet_address_prefix_aks-pool04" {} */

@@ -14,12 +14,12 @@ output "aks-pool_subnet_id" {
   value = "${azurerm_subnet.aks-pool.id}"
 }
 
-output "aks_eastus_sisense_subnet_id" {
-  value = azurerm_subnet.aks_eastus_sisense.id
+output "aks_northeu_sisense_subnet_id" {
+  value = azurerm_subnet.aks_northeu_sisense.id
 }
 
-output "aks_eastus_sisense_netapp" {
-  value = azurerm_subnet.aks_eastus_sisense_netapp.id
+output "aks_northeu_sisense_netapp" {
+  value = azurerm_subnet.aks_northeu_sisense_netapp.id
 }
 
 # output "aks-pool01_subnet_id" {
