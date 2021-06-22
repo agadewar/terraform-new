@@ -72,43 +72,43 @@ resource "kubernetes_deployment" "canopy_portal_deployment" {
 
           env {
             name = "ENVIRONMENT_AUTH0_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/auth0"
+            value = "https://api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com/auth0"
           }
           env { 
             name = "ENVIRONMENT_DEVICE_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/device"
+            value = "https://api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com/device"
           }
           env { 
             name = "ENVIRONMENT_HIERARCHY_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/hierarchy"
+            value = "https://api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com/hierarchy"
           }
           env { 
             name = "ENVIRONMENT_KPI_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/kpi"
+            value = "https://api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com/kpi"
           }
           env { 
             name = "ENVIRONMENT_LOCATION_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/location"
+            value = "https://api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com/location"
           }
           env {
             name = "ENVIRONMENT_MARKETPLACE_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/marketplace"
+            value = "https://api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com/marketplace"
           }
           env { 
             name = "ENVIRONMENT_NOTIFICATION_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/notification"
+            value = "https://api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com/notification"
           }
           env { 
             name = "ENVIRONMENT_SETTING_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/setting"
+            value = "https://api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com/setting"
           }
           env { 
             name = "ENVIRONMENT_SETTINGS_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/settings"
+            value = "https://api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com/settings"
           }
           env { 
             name = "ENVIRONMENT_USER_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/user"
+            value = "https://api.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com/user"
           }
           env { 
             name  = "ENVIRONMENT_APPEND_PATH_PREFIX_ON_MODALS"
@@ -291,7 +291,7 @@ resource "kubernetes_ingress" "canopy_portal" {
 
   spec {
     rule {
-      host = "canopyv3.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
+      host = "canopyv3.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com"
       http {
         path {
           backend {
@@ -334,7 +334,7 @@ resource "kubernetes_ingress" "canopy_portal" {
 
     tls {
       hosts = [
-        "canopyv3.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com",
+        "canopyv3.${var.environment}.${var.dns_realm}-red.${var.region}.${var.cloud}.sapienceanalytics.com",
         "canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
         "canopyv3.${var.environment}.sapienceanalytics.com"
       ]

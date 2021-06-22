@@ -47,11 +47,11 @@ resource "azurerm_subnet" "aks-pool" {
   service_endpoints    = var.subnet_service_endpoints
 }
 
-resource "azurerm_subnet" "aks_eastus_sisense_netapp" {
-  name                 = "aks-eastus-sisense-netapp"
+resource "azurerm_subnet" "aks_northeu_sisense_netapp" {
+  name                 = "aks-northeu-sisense-netapp"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.realm.name
-  address_prefix       = var.subnet_address_prefix_aks_eastus_sisense_netapp
+  address_prefix       = var.subnet_address_prefix_aks_northeu_sisense_netapp
   # delegation { 
   #   name               = "netapp" 
   #   service_delegation {
@@ -61,11 +61,11 @@ resource "azurerm_subnet" "aks_eastus_sisense_netapp" {
   # }
 }
 
-resource "azurerm_subnet" "aks_eastus_sisense" {
-  name                 = "aks-eastus-sisense"
+resource "azurerm_subnet" "aks_northeu_sisense" {
+  name                 = "aks-northeu-sisense"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.realm.name
-  address_prefix       = var.subnet_address_prefix_aks_eastus_sisense
+  address_prefix       = var.subnet_address_prefix_aks_northeu_sisense
   service_endpoints    = var.subnet_service_endpoints
 }
 
