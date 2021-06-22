@@ -72,7 +72,7 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
           image_pull_policy = "Always"
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-user-service:2.16.0.jwt-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-user-service:2.16.0.a.jwt-SNAPSHOT"
           name  = "canopy-user-service"
 
           env { 
@@ -191,7 +191,7 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
           # }
 
           # env {
-          #   name  = "logging.level.com.banyanhills.canopy.user.cache.Cache"
+          #   name  = "logging.level.com.banyanhills.canopy.user"
           #   value = "DEBUG"
           # }
 
