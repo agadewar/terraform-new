@@ -105,13 +105,13 @@ network_profile {
     #os_type             = var.kubernetes_pool01_os_type
     os_disk_size_gb      = var.kubernetes_pool01_os_disk_size_gb
     enable_auto_scaling  = true
+    max_pods              = 250
     min_count            = var.kubernetes_pool01_min_count
     max_count            = var.kubernetes_pool01_max_count
     vnet_subnet_id       = data.terraform_remote_state.network.outputs.aks-pool_subnet_id
   }
 
   addon_profile {
-    kube_dashboard { enabled = true }
 
     oms_agent {
       enabled = false
@@ -134,6 +134,7 @@ network_profile {
   os_type               = var.kubernetes_pool02_os_type
   os_disk_size_gb       = var.kubernetes_pool02_os_disk_size_gb
   enable_auto_scaling   = true
+  max_pods              = 250
   min_count             = var.kubernetes_pool02_min_count
   max_count             = var.kubernetes_pool02_max_count
   vnet_subnet_id        = data.terraform_remote_state.network.outputs.aks-pool_subnet_id #ALL NODES MUST BELONG TO THE SAME SUBNET

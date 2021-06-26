@@ -88,12 +88,12 @@ resource "azurerm_subnet" "netapp" {
 }
 
 
-resource "azurerm_subnet" "aks_eastus_sisense" {
+resource "azurerm_subnet" "aks_northeu_sisense" {
 
-  name                 = "aks-eastus-sisense"
+  name                 = "aks-northeu-sisense"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.realm.name
-  address_prefix       = var.subnet_address_prefix_aks_eastus_sisense
+  address_prefix       = var.subnet_address_prefix_aks_northeu_sisense
 
 }
 

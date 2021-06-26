@@ -11,7 +11,7 @@ output "default_subnet_id" {
 }
 
 output "aks_eastus_sisense_subnet_id" {
-  value = "${azurerm_subnet.aks_eastus_sisense.id}"
+  value = "${azurerm_subnet.aks_northeu_sisense.id}"
 }
 
 output "netapp_subnet_id" {
