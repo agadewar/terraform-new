@@ -7,17 +7,17 @@ resource "kubernetes_config_map" "users" {
   data = {
       "AzureServiceBus__UseAzureServiceBus"      =  true
       "AzureServiceBus__EntityPath"              =  "sapience-admin-users-created"
-      "AzureServiceBus__Endpoint"                =  "Endpoint=sb://sapience-lab-us-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=jEcxjwnTChnuMisdsw7xgBUIANE+Kris1IA2Urxmndg="
+      "AzureServiceBus__Endpoint"                =  "Endpoint=sb://sapience-lab-eu-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=uAyfQQRRJiyGDDw16SEpNideMyE9r5zGakbOrbPf/Is=;"
       "AzureServiceBus__EditEntityPath"          =  "sapience-admin-users-updated"
-      "AzureServiceBus__EditEndpoint"            =  "Endpoint=sb://sapience-lab-us-dev.servicebus.windows.net/;SharedAccessKeyName=Full;SharedAccessKey=sUJBkqJpE8ouK0eagOSsigPA59ifpRPKbf032bXHRKo="
+      "AzureServiceBus__EditEndpoint"            =  "Endpoint=sb://sapience-lab-eu-dev.servicebus.windows.net/;SharedAccessKeyName=Full;SharedAccessKey=/6yoEBHUmSPSKvH9UibZhqz0nlL8lBoXwGNHIqzMl5c=;"
       "AzureServiceBus__DeleteEntityPath"        =  "sapience-admin-users-deleted"
-      "AzureServiceBus__DeleteEndpoint"          =  "Endpoint=sb://sapience-lab-us-dev.servicebus.windows.net/;SharedAccessKeyName=Full;SharedAccessKey=73LAxHOhxt4vPv91vUxDr5nq5djY0Nftsk3yGzQqs1A="
-      "AzureServiceBus__DeletedUsersEndPoint"    =  "Endpoint=sb://sapience-lab-us-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=kdbQ/M3CZzEIagskM8/JetX3LMuePgnF2xbcYgfIGAE=;"
+      "AzureServiceBus__DeleteEndpoint"          =  "Endpoint=sb://sapience-lab-eu-dev.servicebus.windows.net/;SharedAccessKeyName=Full;SharedAccessKey=N7U9mVBlvjv4E4GhDyWkqDxxrXJhbCURFEW4QLIoo9k=;"
+      "AzureServiceBus__DeletedUsersEndPoint"    =  "Endpoint=sb://sapience-lab-eu-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=wi0T3iamELCeA9ekczpALDMKRBQUmp1AGHeC59w8Fso=;"
       "AzureServiceBus__DeletedUsersEntityPath"  =  "sapience-admin-users-deleted"
-      "AzureServiceBus__DeactivateEndpoint"      =  "Endpoint=sb://sapience-lab-us-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=eHXbRzk793rBhXvBsLnZsWwefqeHbHUXUzSA3+/TlWA="
-      "AzureServiceBus__ActivateEndpoint"        =  "Endpoint=sb://sapience-lab-us-dev.servicebus.windows.net/;SharedAccessKeyName=publish;SharedAccessKey=XyW35jJ4tiub8u6/534TsHGDQh9R+KWpYgeiqcg2GGg=;"
-      "AzureServiceBus__TeamCreatedConnection"   =  "Endpoint=sb://sapience-lab-us-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=leQbckeauyGd+EWoSFu6lDpUKp6iV8f+iGwpF/ilQIs=;"
-      "TeamDeletedConnection"                    =  "Endpoint=sb://sapience-lab-us-dev.servicebus.windows.net/;SharedAccessKeyName=publish;SharedAccessKey=4v0D0eo8siBNMRngjEi/95pyG6GyclXJn7BE+4Mklak=;"
-      "TeamUpdatedConnection"                    =  "Endpoint=sb://sapience-lab-us-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=LGu3q9Ex0CThsy8k1aMTCAcS6blWHMd3/riJhs4WZnE=;"
+      "AzureServiceBus__DeactivateEndpoint"      =  "Endpoint=sb://sapience-lab-eu-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=woFV2HY5IX8B9DaSXqWGmawgDq1arXUu9KUhRtp760A=;"
+      "AzureServiceBus__ActivateEndpoint"        =  "Endpoint=sb://sapience-lab-eu-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=+YT+nlH1b0beV4ETCoOYF+3SQoOMHPHUXRsxDsK0wyU=;"
+      "AzureServiceBus__TeamCreatedConnection"   =  "Endpoint=sb://sapience-lab-eu-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=SB+mct+pEGB4v2tgZHLHVjUoRfs6h4hRoUgb+nKr7z8=;"
+      "TeamDeletedConnection"                    =  "Endpoint=sb://sapience-lab-eu-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=IlvVzcozKpHzufCV/OUQKgEKvAmcuyCNyB/wbJyEwGE=;"
+      "TeamUpdatedConnection"                    =  "Endpoint=sb://sapience-lab-eu-dev.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=2FpK+DYotik1rCttQFcyLd7ANJTmOZq9PCCdLdpTK4A=;"
   }
 }
