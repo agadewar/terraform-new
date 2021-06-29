@@ -28,7 +28,7 @@ resource "kubernetes_config_map" "sisense" {
       "Sisense_UsersUri" = "api/users?notify=false"
 
       #SISENSE EXTERNAL ENDPOINTS
-      "ENVIRONMENT_SISENSE_URL" = "https://sapiencebi.dev.eu.azure.sapienceanalytics.com/"
+      "ENVIRONMENT_SISENSE_URL" = "https://sapiencebi.dev.eu.azure.sapienceanalytics.com"
       "ENVIRONMENT_SISENSE_JS_PLATFORM"  =  "linux"
   
       #SISENSE LINUX INTERNAL ENDPOINTS
