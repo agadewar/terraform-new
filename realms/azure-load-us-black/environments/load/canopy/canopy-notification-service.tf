@@ -67,7 +67,7 @@ resource "kubernetes_deployment" "canopy_notification_service_deployment" {
           image_pull_policy = "Always"
           
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-notification-service:1.11.1"
+          image = "${var.canopy_container_registry_hostname}/canopy-notification-service:1.11.5"
           name  = "canopy-notification-service"
 
           env { 

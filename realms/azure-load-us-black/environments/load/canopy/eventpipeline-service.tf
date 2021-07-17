@@ -94,7 +94,7 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
           image_pull_policy = "Always"
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.4.0-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.5.1"
           name  = "eventpipeline-service"
 
           env { 

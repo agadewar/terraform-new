@@ -70,7 +70,7 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
           image_pull_policy = "Always"
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.11.0.jwt-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.10.0"
           name  = "eventpipeline-leaf-broker"
 
           env { 

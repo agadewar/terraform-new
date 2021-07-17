@@ -87,7 +87,7 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
           # image = "${var.canopy_container_registry_hostname}/kpi-service:2.43.0-SNAPSHOT"
-          image = "${var.canopy_container_registry_hostname}/kpi-service:2.48.0"
+          image = "${var.canopy_container_registry_hostname}/kpi-service:2.52.0"
           name  = "kpi-service"
 
           # env {
