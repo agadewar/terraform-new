@@ -42,7 +42,8 @@ locals {
 resource "helm_release" "nginx_ingress" {
   name      = "nginx-ingress"
   namespace = "kube-system"
-  chart     = "stable/nginx-ingress"
+  repository = "https://charts.helm.sh/stable"
+  chart     = "nginx-ingress"
 
   set {
     name  = "controller.replicaCount"
@@ -62,6 +63,11 @@ resource "helm_release" "nginx_ingress" {
   set {
     name  = "controller.resources.requests.memory"
     value = var.nginx_ingress_resource_requests_memory
+  }
+
+  set {
+    name  = "controller.admissionWebhooks.enabled"
+    value = true
   }
 
   timeout = 600
