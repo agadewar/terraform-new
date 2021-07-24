@@ -62,7 +62,8 @@ locals {
 resource "helm_release" "nginx_ingress" {
   name      = "nginx-ingress"
   namespace = local.namespace
-  chart     = "stable/nginx-ingress"
+  repository = "https://charts.helm.sh/stable"
+  chart     = "nginx-ingress"
 
   set {
     name  = "controller.replicaCount"
@@ -93,6 +94,11 @@ resource "helm_release" "nginx_ingress" {
   set {
     name  = "controller.resources.requests.memory"
     value = "100Mi"
+  }
+
+set {
+    name  = "controller.admissionWebhooks.enabled"
+    value = true
   }
 
   timeout = 600

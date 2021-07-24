@@ -320,7 +320,7 @@ timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id, SisenseToken
+  headers: Content-Type, Authorization, v-request-id, SisenseToken, Origin
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
