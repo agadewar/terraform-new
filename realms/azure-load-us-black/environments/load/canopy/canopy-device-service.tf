@@ -68,8 +68,7 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
 
       spec {
         container {
-          image_pull_policy = "Always"
-
+          
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
           image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.59.0"
           name  = "canopy-device-service"

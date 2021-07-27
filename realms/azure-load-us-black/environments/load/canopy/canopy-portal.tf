@@ -66,7 +66,6 @@ resource "kubernetes_deployment" "canopy_portal_deployment" {
 
       spec {
         container {
-          image_pull_policy = "Always"
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
           image = "${var.canopy_container_registry_hostname}/canopy-portal:3.16.0-beta.20210721200507807"
