@@ -263,7 +263,7 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
           
           env {
             name  = "jms.queues"
-            value = "canopy-device-agent-info,canopy-device-device-event,canopy-device-device-component,canopy-device-file-version,canopy-device-generic-data-info,canopy-device-heartbeat,canopy-device-leaf-versions,canopy-device-software-update,canopy-device-system-info,canopy-device-system-utilization"
+            value = "canopy-device-agent-info,canopy-device-device-event,canopy-device-device-component,canopy-device-file-version,canopy-device-generic-data-info,canopy-device-heartbeat,canopy-device-leaf-versions,canopy-device-schedule,canopy-device-software-update,canopy-device-system-info,canopy-device-system-utilization"
           }
           env {
             name  = "jms.type"
@@ -320,6 +320,14 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
           env {
             name  = "canopy.queue.leafVersions"
             value = "canopy-device-leaf-versions"
+          }
+          env {
+            name  = "canopy.queue.populateAttributesEvents"
+            value = "canopy-device-populate-attributes-events"
+          }
+          env {
+            name  = "canopy.queue.schedule"
+            value = "canopy-device-schedule"
           }
           env {
             name  = "canopy.queue.softwareUpdate"
