@@ -1,18 +1,18 @@
-resource "kubernetes_config_map" "canopy_auth0_service" {
+resource "kubernetes_config_map" "canopy_schedule_service" {
   metadata {
-    name      = "canopy-auth0-service"
+    name      = "canopy-schedule-service"
     namespace = local.namespace
   }
 
   data = {
     "global.properties"      = data.template_file.global_properties.rendered
-    "application.properties" = file("files/canopy-auth0-service.properties")
+    "application.properties" = file("files/canopy-schedule-service.properties")
   }
 }
 
-resource "kubernetes_secret" "canopy_auth0_service" {
+resource "kubernetes_secret" "canopy_schedule_service" {
   metadata {
-    name      = "canopy-auth0-service"
+    name      = "canopy-schedule-service"
     namespace = local.namespace
   }
 
@@ -26,28 +26,28 @@ resource "kubernetes_secret" "canopy_auth0_service" {
   type = "Opaque"
 }
 
-resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
+resource "kubernetes_deployment" "canopy_schedule_service_deployment" {
   metadata {
-    name = "canopy-auth0-service"
+    name = "canopy-schedule-service"
     namespace = local.namespace
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     labels = merge(local.common_labels, {
-      "sapienceanalytics.com/name" = "canopy-auth0-service"
+      "sapienceanalytics.com/name" = "canopy-schedule-service"
     })
     
     annotations = {}
   }
 
   spec {
-    replicas = var.canopy_auth0_service_deployment_replicas
+    replicas = var.canopy_schedule_service_deployment_replicas
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     selector {
       match_labels = {
-        "sapienceanalytics.com/name" = "canopy-auth0-service"
+        "sapienceanalytics.com/name" = "canopy-schedule-service"
       }
     }
 
@@ -56,24 +56,24 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
         // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
         //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
         labels = merge(local.common_labels, {
-          "sapienceanalytics.com/name" = "canopy-auth0-service"
+          "sapienceanalytics.com/name" = "canopy-schedule-service"
         })
         
         annotations = {}
       }
 
       spec {
-        container {     
-               
+        container {
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-auth0-service:1.3.3"
-          name  = "canopy-auth0-service"
+          image = "${var.canopy_container_registry_hostname}/canopy-schedule-service:1.3.0"
+          name  = "canopy-schedule-service"
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
             value_from {
               secret_key_ref {
-                name = "canopy-auth0-service"
+                name = "canopy-schedule-service"
                 key  = "canopy.database.username"
               }
             }
@@ -82,7 +82,7 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
             name = "CANOPY_DATABASE_PASSWORD"
             value_from {
               secret_key_ref {
-                name = "canopy-auth0-service"
+                name = "canopy-schedule-service"
                 key  = "canopy.database.password"
               }
             }
@@ -106,40 +106,37 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
               }
             }
           }
-
-          env {
-            name = "REDIS_PASSWORD"
-            value_from {
-              secret_key_ref {
-                name = "redis"
-                key  = "redis-password"
-              }
-            }
-          }
-
+          
           env {
             name  = "SPRING_PROFILES_ACTIVE"
             value = "centralized-logging"
           }
 
           env {
-            name  = "canopy.sso.redirect-to-canopyV3"
-            value = "https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
+            name  = "canopy.portal.url.versions"
+            value = "[(null):'https://canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com','3':'https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com']"
           }
 
-          env {
-            name  = "canopy.sso.service-base-url"
-            value = "https://api.${var.environment}.sapienceanalytics.com/auth0"
-          }
-          env {
-            name  = "canopy.sso.redirect-to-canopy"
-            value = "https://canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
-          }
+          # env {
+          #   name  = "messaging.enabled"
+          #   value = "false"
+          # }
+          # env {
+          #   name  = "messaging.password"
+          #   value = "dummy"
+          # }
+          # env {
+          #   name  = "messaging.server"
+          #   value = "dummy"
+          # }
+          # env {
+          #   name  = "messaging.username"
+          #   value = "dummy"
+          # }
 
-          // the "serverTimezone" setting isn't in the global.properties, but this service needs it set
           env {
-            name  = "spring.datasource.url"
-            value = "jdbc:mysql://sapience-mysql-$${realm}-$${environment}.mysql.database.azure.com:$${database.port:3306}/$${database.name}?verifyServerCertificate=false&useSSL=true&serverTimezone=UTC"
+            name  = "jms.type"
+            value = "servicebus"
           }
 
           readiness_probe {
@@ -154,28 +151,22 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
             failure_threshold = 3
           }
 
-          liveness_probe {
-            http_get {
-              path = "/ping"
-              port = 8080
-            }
-
-            initial_delay_seconds = 180
-            period_seconds = 10
-	          timeout_seconds = 2
-            failure_threshold = 6
-          }
-
-          # resources {
-          #   requests {
-          #     memory = "512M"
-          #     cpu    = "150m"
+          # liveness_probe {
+          #   http_get {
+          #     path = "/ping"
+          #     port = 8080
           #   }
+
+          #   initial_delay_seconds = 180
+          #   period_seconds = 10
+	        #   timeout_seconds = 2
+          #   failure_threshold = 6
           # }
+
           resources {
             requests {
-              memory = var.canopy_auth0_service_deployment_request_memory
-              cpu    = var.canopy_auth0_service_deployment_request_cpu
+              memory = var.canopy_schedule_service_deployment_request_memory
+              cpu    = var.canopy_schedule_service_deployment_request_cpu
             }
           }
 
@@ -185,36 +176,36 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
             read_only = true
           }
           
-          # # needed by the user-service for Hazelcast
-          # # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
-          # volume_mount {
-          #   name = "default-token"
-          #   read_only = true
-          #   mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
-          # }
+          # needed by the user-service for Hazelcast
+          # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
+          volume_mount {
+            name = "default-token"
+            read_only = true
+            mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
+          }
         }
 
-        # # needed by the user-service for Hazelcast
-        # # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
-        # volume {
-		    #   name = "default-token"
-		    #   secret {
-        #     secret_name = data.local_file.default_token_secret_name.content
-		    #     default_mode = "0420"
-		    #   }
-        # }
+        # needed by the user-service for Hazelcast
+        # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
+        volume {
+		      name = "default-token"
+		      secret {
+            secret_name = data.local_file.default_token_secret_name.content
+		        default_mode = "0420"
+		      }
+        }
 
         volume {
           name = "application-config"
           config_map {
-            name = "canopy-auth0-service"
+            name = "canopy-schedule-service"
           }
         }
 
         volume {
           name = "application-secrets"
           secret {
-            secret_name = "canopy-auth0-service"
+            secret_name = "canopy-schedule-service"
           }
         }
         
@@ -227,17 +218,17 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
   }
 }
 
-resource "kubernetes_service" "canopy_auth0_service_service" {
+resource "kubernetes_service" "canopy_schedule_service_service" {
   metadata {
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     labels = merge(local.common_labels, {
-      "sapienceanalytics.com/name" = "canopy-auth0-service"
+      "sapienceanalytics.com/name" = "canopy-schedule-service"
     })
     
     annotations = {}
     
-    name = "canopy-auth0-service"
+    name = "canopy-schedule-service"
     namespace = local.namespace
   }
 
@@ -245,7 +236,7 @@ resource "kubernetes_service" "canopy_auth0_service_service" {
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     selector = {
-      "sapienceanalytics.com/name" = "canopy-auth0-service"
+      "sapienceanalytics.com/name" = "canopy-schedule-service"
     }
 
     port {

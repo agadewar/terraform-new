@@ -42,6 +42,9 @@ variable "canopy_marketplace_service_deployment_request_cpu" {}
 variable "canopy_notification_service_deployment_replicas" {}
 variable "canopy_notification_service_deployment_request_memory" {}
 variable "canopy_notification_service_deployment_request_cpu" {}
+variable "canopy_schedule_service_deployment_replicas" {}
+variable "canopy_schedule_service_deployment_request_memory" {}
+variable "canopy_schedule_service_deployment_request_cpu" {}
 variable "canopy_setting_service_deployment_replicas" {}
 variable "canopy_setting_service_deployment_request_memory" {}
 variable "canopy_setting_service_deployment_request_cpu" {}

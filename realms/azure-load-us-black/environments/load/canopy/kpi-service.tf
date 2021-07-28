@@ -59,8 +59,7 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
   }
 
   spec {
-    # replicas = var.kpi_service_deployment_replicas
-    replicas = 8
+    replicas = var.kpi_service_deployment_replicas
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
@@ -83,11 +82,9 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
 
       spec {
         container {
-          image_pull_policy = "Always"
-
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
           # image = "${var.canopy_container_registry_hostname}/kpi-service:2.43.0-SNAPSHOT"
-          image = "${var.canopy_container_registry_hostname}/kpi-service:2.52.0"
+          image = "${var.canopy_container_registry_hostname}/kpi-service:2.53.0"
           name  = "kpi-service"
 
           # env {

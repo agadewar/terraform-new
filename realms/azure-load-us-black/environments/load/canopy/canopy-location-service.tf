@@ -68,7 +68,6 @@ resource "kubernetes_deployment" "canopy_location_service_deployment" {
 
       spec {
         container {
-          image_pull_policy = "Always"
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
           image = "${var.canopy_container_registry_hostname}/canopy-location-service:1.49.0"
@@ -168,6 +167,10 @@ resource "kubernetes_deployment" "canopy_location_service_deployment" {
           env {
             name  = "canopy.queue.action.scheduler"
             value = "canopy-location-action-scheduler"
+          }
+          env {
+            name  = "canopy.queue.populateAttributesEvents"
+            value = "canopy-location-populate-attributes-events"
           }
 
           // disable custom eventhandlers

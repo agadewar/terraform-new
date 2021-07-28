@@ -66,9 +66,21 @@ resource "kubernetes_deployment" "canopy_portal_deployment" {
 
       spec {
         container {
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-portal:3.9.1-JWT.1621365527"
+          image = "${var.canopy_container_registry_hostname}/canopy-portal:3.16.0-beta.20210721200507807"
           name  = "canopy-portal"
+
+          // fall back to prior URL lookup through environment variables, not through call to setting-service;
+          // any non-empty string value here will cause portal to not use the endpoints from the setting-service
+          env {
+            name = "ENVIRONMENT_IGNORE_SERVICE_ENDPOINTS"
+            value = "true"
+          }
+          env {
+            name = "ENVIRONMENT_DISABLE_DOWN_FOR_MAINTENANCE"
+            value = "true"
+          }
 
           env {
             name = "ENVIRONMENT_AUTH0_SERVICE_BASE_URL"
@@ -94,7 +106,7 @@ resource "kubernetes_deployment" "canopy_portal_deployment" {
             name = "ENVIRONMENT_MARKETPLACE_SERVICE_BASE_URL"
             value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/marketplace"
           }
-          env { 
+          env {
             name = "ENVIRONMENT_NOTIFICATION_SERVICE_BASE_URL"
             value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/notification"
           }
