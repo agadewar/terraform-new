@@ -145,3 +145,26 @@ resource "azurerm_storage_container" "talend_storage_account" {
   storage_account_name  = azurerm_storage_account.talend_storage_account.name
   container_access_type = "blob"
 }
+
+resource "azurerm_storage_account" "talend_storage_account_qa" {
+  name                      = "talend${replace(var.realm, "-", "")}qa"
+  resource_group_name       = var.resource_group_name
+  location                  = var.resource_group_location
+  account_tier              = "Standard"
+  account_kind              = "StorageV2"
+  account_replication_type  = "ZRS"
+  enable_https_traffic_only = "true"
+
+  tags = merge(local.common_tags)
+
+  lifecycle {
+    prevent_destroy = "true"
+  }
+}
+
+resource "azurerm_storage_container" "talend_storage_container_qa" {
+  name                  = "talend-${replace(var.realm, "-", "")}-qa"
+  resource_group_name   = var.resource_group_name
+  storage_account_name  = azurerm_storage_account.talend_storage_account_qa.name
+  container_access_type = "blob"
+}
