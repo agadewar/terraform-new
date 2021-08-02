@@ -10,7 +10,7 @@ resource "kubernetes_config_map" "identity_provider" {
       "Authorization__IdentityProvider" = "Auth0"
 
       #AUTH0
-      "Authorization__Auth0__Authority"  = "https://sapience-lab-us-demo.auth0.com/"
+      "Authorization__Auth0__Authority"  = "https://login.demo.lab.sapienceanalytics.com/"
       "Authorization__Auth0__Audience"   = "https://api.sapienceanalytics.com"
       "Authorization__Auth0__ClientId"   = "ot1zP3J0CaNqNcX1EMoy3ob3jLvlTLnc"
       "Authorization__Auth0__Connection" = "Username-Password-Authentication"

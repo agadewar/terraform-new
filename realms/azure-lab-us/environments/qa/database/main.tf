@@ -1,22 +1,40 @@
+# terraform {
+#   backend "azurerm" {
+#     key = "database.tfstate"
+#   }
+# }
+
+# provider "azurerm" {
+#   version         = "1.31.0"
+#   subscription_id = var.subscription_id
+# }
+
+# data "terraform_remote_state" "aks_egress" {
+#   backend = "azurerm"
+
+#   config = {
+#     access_key           = var.realm_backend_access_key
+#     storage_account_name = var.realm_backend_storage_account_name
+#     container_name       = var.realm_backend_container_name
+#     key                  = "black/aks-egress.tfstate"
+#   }
+# }
+
 terraform {
-  backend "azurerm" {
-    key = "database.tfstate"
+  required_providers {
+    random = {
+      source  = "hashicorp/random"
+      version = "3.0.1"
+    }
   }
-}
+  required_version = "~> 0.12"
+  backend "remote" {
+    hostname      = "app.terraform.io"
+    organization  = "SapienceAnalytics"
 
-provider "azurerm" {
-  version         = "1.31.0"
-  subscription_id = var.subscription_id
-}
-
-data "terraform_remote_state" "aks_egress" {
-  backend = "azurerm"
-
-  config = {
-    access_key           = var.realm_backend_access_key
-    storage_account_name = var.realm_backend_storage_account_name
-    container_name       = var.realm_backend_container_name
-    key                  = "black/aks-egress.tfstate"
+    workspaces {
+      name = "terraform-azurerm-databases-qa"
+    }
   }
 }
 
@@ -417,22 +435,6 @@ resource "azurerm_mysql_database" "user" {
   collation           = "latin1_swedish_ci"
 }
 
-#resource "azurerm_cosmosdb_account" "integrations_mongodb" {
-#  name                = "sapience-integrations-mongodb-${var.realm}-${var.environment}"
-#  resource_group_name = var.resource_group_name
-#  location            = var.resource_group_location
-#  offer_type          = "Standard"
-#  kind                = "MongoDB"
-
-#  consistency_policy {
-#    consistency_level = "Strong"
-#  }
-
-#  geo_location {
-#    location          = local.cosmos_failover_location
-#    failover_priority = 0
-#  }
-#}
 
 resource "azurerm_redis_cache" "redis_cache" {
   name                = "sapience-redis-cache-${var.realm}-${var.environment}"
@@ -447,11 +449,3 @@ resource "azurerm_redis_cache" "redis_cache" {
   redis_configuration {
   }
 }
-
-#resource "azurerm_redis_firewall_rule" "firewall_redis_cache" {
-#  name                = "someIPrange"
-#  redis_cache_name    = azurerm_redis_cache.redis_cache.name
-#  resource_group_name = var.resource_group_name
-#  start_ip            = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
-#  end_ip              = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
-#}
