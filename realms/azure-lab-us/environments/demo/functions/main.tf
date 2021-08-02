@@ -372,7 +372,7 @@ resource "azurerm_function_app" "function_app_sapience_admin_integrations_api" {
       "AzureServiceBus:DeletedUsersEntityPath"   =  "sapience-admin-users-deleted"
       "IdentityProvider:Issuer"                  =  "https://sapience-lab-us-demo.auth0.com/"
       "IdentityProvider:Audience"                =  "https://api.sapienceanalytics.com"
-      "Auth0:Authority"                          =  "https://sapience-lab-us-demo.auth0.com/"
+      "Auth0:Authority"                          =  "https://login.demo.lab.sapienceanalytics.com/"
       "Auth0:Audience"                           =  "https://api.sapienceanalytics.com"
       "Auth0:ClientId"                           =  "ot1zP3J0CaNqNcX1EMoy3ob3jLvlTLnc"
       "Auth0:Connection"                         =  "Username-Password-Authentication"
