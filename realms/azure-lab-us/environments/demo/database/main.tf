@@ -1,12 +1,13 @@
 terraform {
-  backend "azurerm" {
+ backend "azurerm" {
     key = "database.tfstate"
   }
 }
 
 provider "azurerm" {
-  version         = "1.31.0"
+  version         = "2.27.0"
   subscription_id = var.subscription_id
+  features {}
 }
 
 data "terraform_remote_state" "aks_egress" {
@@ -164,6 +165,17 @@ resource "azurerm_cosmosdb_account" "lab_us_demo_alerts_mongodb" {
     consistency_level = "Strong"
   }
 
+  capabilities {
+     name = "EnableAggregationPipeline"
+  }
+  capabilities {
+     name = "EnableMongo"
+  }
+  capabilities {
+     name = "MongoDBv3.4"
+  }
+
+
   geo_location {
     location          = local.cosmos_failover_location
     failover_priority = 0
@@ -227,6 +239,11 @@ resource "azurerm_cosmosdb_account" "sapience-integration-mongodb-lab-us-demo" {
   capabilities  {
     name = "MongoDBv3.4"
   }
+  
+  capabilities {
+    name = "EnableMongo"
+  }
+
   consistency_policy {
     consistency_level = "Strong"
   }
@@ -246,6 +263,10 @@ resource "azurerm_cosmosdb_account" "canopy_settings_mongodb" {
 
   consistency_policy {
     consistency_level = "Strong"
+  }
+
+   capabilities {
+      name = "EnableMongo"
   }
 
   geo_location {
@@ -331,13 +352,8 @@ resource "azurerm_mysql_server" "sapience" {
   name                = "sapience-mysql-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
+  sku_name            = var.mysql_server_sku_name
 
-  sku {
-    name     = var.mysql_server_sku_name
-    capacity = var.mysql_server_sku_capacity
-    tier     = var.mysql_server_sku_tier
-    family   = var.mysql_server_sku_family
-  }
 
   storage_profile {
     storage_mb            = var.mysql_server_storage_profile_storage_mb
@@ -348,7 +364,8 @@ resource "azurerm_mysql_server" "sapience" {
   administrator_login          = var.mysql_server_administrator_login
   administrator_login_password = var.mysql_server_administrator_password
   version                      = var.mysql_server_version
-  ssl_enforcement              = "Enabled"
+  #ssl_enforcement             = "Enabled"
+  ssl_enforcement_enabled      = true
 }
 
 resource "azurerm_mysql_configuration" "sapience_log_bin_trust_function_creators" {
