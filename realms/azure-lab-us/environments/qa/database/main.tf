@@ -1,24 +1,25 @@
-terraform {
-  backend "azurerm" {
-    key = "database.tfstate"
-  }
-}
+ terraform {
+   backend "azurerm" {
+     key = "database.tfstate"
+   }
+ }
 
-provider "azurerm" {
-  version         = "1.31.0"
-  subscription_id = var.subscription_id
-}
+ provider "azurerm" {
+   version         = "2.27.0"
+   subscription_id = var.subscription_id
+   features {}
+ }
 
-data "terraform_remote_state" "aks_egress" {
-  backend = "azurerm"
+ data "terraform_remote_state" "aks_egress" {
+   backend = "azurerm"
 
-  config = {
-    access_key           = var.realm_backend_access_key
-    storage_account_name = var.realm_backend_storage_account_name
-    container_name       = var.realm_backend_container_name
-    key                  = "black/aks-egress.tfstate"
-  }
-}
+   config = {
+     access_key           = var.realm_backend_access_key
+     storage_account_name = var.realm_backend_storage_account_name
+     container_name       = var.realm_backend_container_name
+     key                  = "black/aks-egress.tfstate"
+   }
+ }
 
 locals {
   sql_server_version                    = "12.0"
@@ -179,10 +180,20 @@ resource "azurerm_cosmosdb_account" "sapience-integration-mongodb-lab-us-qa" {
   location            = var.resource_group_location
   offer_type          = "Standard"
   kind                = "MongoDB"
+  is_virtual_network_filter_enabled = true
+  ip_range_filter                   = "47.190.73.52,219.91.160.58,210.16.93.186,20.81.225.32,40.71.98.165,104.42.195.92,40.76.54.131,52.176.6.30,52.169.50.45,52.187.184.26"
 
   capabilities  {
     name = "EnableAggregationPipeline"
   }
+
+  virtual_network_rule {
+    id = "/subscriptions/b78a61e7-f2ed-4cb0-8f48-6548408935e9/resourceGroups/lab-red-us/providers/Microsoft.Network/virtualNetworks/lab-red-us/subnets/aks-pool01"
+  }
+  capabilities {
+    name = "EnableMongo"
+  }  
+
   capabilities  {
     name = "MongoDBv3.4"
   }
@@ -211,6 +222,10 @@ resource "azurerm_cosmosdb_account" "lab_us_qa_alerts_mongodb" {
          name = "EnableAggregationPipeline"
   }
   
+  capabilities {
+    name = "EnableMongo"
+  }
+
   capabilities {
       name = "MongoDBv3.4"
   }
@@ -276,6 +291,14 @@ resource "azurerm_cosmosdb_account" "canopy_settings_mongodb" {
     consistency_level = "Strong"
   }
 
+  capabilities {
+        name = "AllowSelfServeUpgradeToMongo36"
+  }
+  
+  capabilities {
+        name = "DisableRateLimitingResponses"
+  }
+
   geo_location {
     location          = local.cosmos_failover_location
     failover_priority = 0
@@ -318,24 +341,20 @@ resource "azurerm_mysql_server" "sapience" {
   name                = "sapience-mysql-${var.realm}-${var.environment}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
-
-  sku {
-    name     = var.mysql_server_sku_name
-    capacity = var.mysql_server_sku_capacity
-    tier     = var.mysql_server_sku_tier
-    family   = var.mysql_server_sku_family
-  }
+  ssl_enforcement_enabled     = true
+  sku_name   = var.mysql_server_sku_name
 
   storage_profile {
     storage_mb            = var.mysql_server_storage_profile_storage_mb
     backup_retention_days = 14
     geo_redundant_backup  = "Disabled"
+    auto_grow             = "Disabled"
   }
 
   administrator_login          = var.mysql_server_administrator_login
   administrator_login_password = var.mysql_server_administrator_password
   version                      = var.mysql_server_version
-  ssl_enforcement              = "Enabled"
+  #ssl_enforcement              = "Enabled"
 }
 
 resource "azurerm_mysql_configuration" "sapience_log_bin_trust_function_creators" {
@@ -417,23 +436,6 @@ resource "azurerm_mysql_database" "user" {
   collation           = "latin1_swedish_ci"
 }
 
-#resource "azurerm_cosmosdb_account" "integrations_mongodb" {
-#  name                = "sapience-integrations-mongodb-${var.realm}-${var.environment}"
-#  resource_group_name = var.resource_group_name
-#  location            = var.resource_group_location
-#  offer_type          = "Standard"
-#  kind                = "MongoDB"
-
-#  consistency_policy {
-#    consistency_level = "Strong"
-#  }
-
-#  geo_location {
-#    location          = local.cosmos_failover_location
-#    failover_priority = 0
-#  }
-#}
-
 resource "azurerm_redis_cache" "redis_cache" {
   name                = "sapience-redis-cache-${var.realm}-${var.environment}"
   location            = var.resource_group_location
@@ -447,11 +449,3 @@ resource "azurerm_redis_cache" "redis_cache" {
   redis_configuration {
   }
 }
-
-#resource "azurerm_redis_firewall_rule" "firewall_redis_cache" {
-#  name                = "someIPrange"
-#  redis_cache_name    = azurerm_redis_cache.redis_cache.name
-#  resource_group_name = var.resource_group_name
-#  start_ip            = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
-#  end_ip              = data.terraform_remote_state.aks_egress.outputs.aks_egress_ip_address
-#}
