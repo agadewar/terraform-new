@@ -75,7 +75,8 @@ resource "kubernetes_deployment" "canopy_hierarchy_service_deployment" {
         container {
           
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.19.0"
+          # image = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.19.0"
+          image = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.20.0-SNAPSHOT"
           name  = "canopy-hierarchy-service"
 
           env {
