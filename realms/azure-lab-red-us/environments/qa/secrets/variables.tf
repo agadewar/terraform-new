@@ -36,3 +36,4 @@ variable "BulkUploadDbConfig__ConnString" {}
 variable "Mongodb_integration_password" {}
 variable "cyclr_client_id" {}
 variable "cyclr_client_secret" {}
+variable "sql_server_staging_etl_user_password" {}
