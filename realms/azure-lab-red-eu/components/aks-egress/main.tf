@@ -41,8 +41,13 @@ data "terraform_remote_state" "kubernetes" {
 
 resource "azurerm_public_ip" "aks_egress" {
   name                = "aks-egress-${var.realm}-red"
+<<<<<<< Updated upstream
   location            = "${data.terraform_remote_state.kubernetes.outputs.kubernetes_location}"
   resource_group_name = var.resource_group_name
+=======
+  location            = "northeurope"
+  resource_group_name = "lab-eu-red"
+>>>>>>> Stashed changes
   
   public_ip_address_allocation = "static"
   sku = "Standard"
