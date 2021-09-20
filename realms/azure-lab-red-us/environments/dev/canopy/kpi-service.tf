@@ -59,7 +59,7 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
   }
 
   spec {
-    replicas = 1
+    replicas = var.kpi_service_deployment_replicas
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
@@ -83,8 +83,31 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/kpi-service:2.14.12.docker"
+          # image = "${var.canopy_container_registry_hostname}/kpi-service:2.43.0-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/kpi-service:2.53.0"
           name  = "kpi-service"
+
+          # env {
+          #   name  = "spring.jpa.show-sql"
+          #   value = "true"
+          # }
+          # env {
+          #   name  = "spring.jpa.properties.hibernate.format_sql"
+          #   value = "true"
+          # }
+          # env {
+          #   name  = "logging.level.org.hibernate.SQL"
+          #   value = "DEBUG"
+          # }
+          # env {
+          #   name  = "logging.level.org.hibernate.type.descriptor.sql.BasicBinder"
+          #   value = "TRACE"
+          # }
+
+          env {
+            name = "JAVA_OPTS"
+            value = "-Xmx3072m -XX:+UseG1GC"
+          }
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
@@ -135,8 +158,79 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
           }
 
           env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
             name  = "com.banyanhills.canopy.kpi.event.inbound.KpiInboundEventPipeLineHandler.disabled"
             value = "true"
+          }
+          env {
+            name  = "canopy.portal.url.versions"
+            value = "[(null):'https://canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com','3':'https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com']"
+          }
+
+          env {
+            name  = "spring.datasource.tomcat.initial-size"
+            value = "10"
+          }
+          env {
+            name  = "spring.datasource.tomcat.max-active"
+            value = "200"
+          }
+          env {
+            name  = "spring.datasource.tomcat.min-idle"
+            value = "10"
+          }
+          env {
+            name  = "spring.datasource.tomcat.max-idle"
+            value = "30"
+          }
+          env {
+            name  = "spring.datasource.tomcat.min-evictable-idle-time-millis"
+            value = "5000"
+          }
+          env {
+            name  = "spring.datasource.initial-size"
+            value = "$${spring.datasource.tomcat.initial-size}"
+          }
+          env {
+            name  = "spring.datasource.max-active"
+            value = "$${spring.datasource.tomcat.max-active}"
+          }
+          env {
+            name  = "spring.datasource.min-idle"
+            value = "$${spring.datasource.tomcat.min-idle}"
+          }
+          env {
+            name  = "spring.datasource.max-idle"
+            value = "$${spring.datasource.tomcat.max-idle}"
+          }
+          env {
+            name  = "spring.datasource.min-evictable-idle-time-millis"
+            value = "$${spring.datasource.tomcat.min-evictable-idle-time-millis}"
+          }
+
+          env {
+            name  = "job.executor.threads"
+            value = "10"
+          }
+          env {
+            name  = "job.executor.maxThreads"
+            value = "100"
+          }
+          env {
+            name  = "jms.concurrency"
+            value = "20-20"
+          }
+          env {
+            name  = "server.undertow.io-threads"
+            value = "20"
+          }
+          env {
+            name  = "server.undertow.worker-threads"
+            value = "2000"
           }
 
           env {
@@ -203,7 +297,7 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
             initial_delay_seconds = 15
             period_seconds = 5
             timeout_seconds = 2
-            failure_threshold = 3
+            failure_threshold = 6
           }
 
           liveness_probe {
@@ -214,14 +308,14 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
 
             initial_delay_seconds = 180
             period_seconds = 10
-	          timeout_seconds = 2
+	          timeout_seconds = 5
             failure_threshold = 6
           }
 
           resources {
             requests {
-              memory = "2048M"
-              cpu    = "1000m"
+              memory = var.kpi_service_deployment_request_memory
+              cpu    = var.kpi_service_deployment_request_cpu
             }
           }
 

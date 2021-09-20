@@ -45,7 +45,7 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
   }
 
   spec {
-    replicas = 1
+    replicas = var.canopy_device_service_deployment_replicas
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
@@ -68,9 +68,15 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
 
       spec {
         container {
+          
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.28.3.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.59.0"
           name  = "canopy-device-service"
+
+          # env {
+          #   name  = "logging.level.com.banyanhills.canopy.device"
+          #   value = "DEBUG"
+          # }
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
@@ -138,6 +144,15 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             }
           }
           env {
+            name = "REDIS_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "redis"
+                key  = "redis-password"
+              }
+            }
+          }
+          env {
             name = "GOOGLE_API_KEY"
             value_from {
               secret_key_ref {
@@ -148,18 +163,106 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
           }
 
           env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
             name  = "com.banyanhills.canopy.device.eventhandler.AllDeviceEventHandler.disabled"
             value = "true"
+          }
+          # env {
+          #   name  = "canopy.security.userDetailsCacheEnabled"
+          #   value = "true"
+          # }
+          env {
+            name  = "canopy.device.persist-devices-to-hierarchy"
+            value = "false"
+          }
+
+          env {
+            name  = "canopy.portal.url.versions"
+            value = "[(null):'https://canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com','3':'https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com']"
+          }
+
+          env {
+            name  = "messaging.enabled"
+            value = "false"
+          }
+          env {
+            name  = "messaging.password"
+            value = "dummy"
+          }
+          env {
+            name  = "messaging.server"
+            value = "dummy"
+          }
+          env {
+            name  = "messaging.username"
+            value = "dummy"
+          }
+          env {
+            name  = "schemaregistry.password"
+            value = "dummy"
+          }
+          env {
+            name  = "schemaregistry.url"
+            value = "dummy"
+          }
+          env {
+            name  = "schemaregistry.username"
+            value = "dummy"
           }
 
           env {
             name  = "server.undertow.worker-threads"
             value = "2000"
           }
-
+          
+          env {
+            name  = "spring.datasource.tomcat.initial-size"
+            value = "20"
+          }
+          env {
+            name  = "spring.datasource.tomcat.max-active"
+            value = "300"
+          }
+          env {
+            name  = "spring.datasource.tomcat.min-idle"
+            value = "20"
+          }
+          env {
+            name  = "spring.datasource.tomcat.max-idle"
+            value = "50"
+          }
+          env {
+            name  = "spring.datasource.tomcat.min-evictable-idle-time-millis"
+            value = "5000"
+          }
+          env {
+            name  = "spring.datasource.initial-size"
+            value = "$${spring.datasource.tomcat.initial-size}"
+          }
+          env {
+            name  = "spring.datasource.max-active"
+            value = "$${spring.datasource.tomcat.max-active}"
+          }
+          env {
+            name  = "spring.datasource.min-idle"
+            value = "$${spring.datasource.tomcat.min-idle}"
+          }
+          env {
+            name  = "spring.datasource.max-idle"
+            value = "$${spring.datasource.tomcat.max-idle}"
+          }
+          env {
+            name  = "spring.datasource.min-evictable-idle-time-millis"
+            value = "$${spring.datasource.tomcat.min-evictable-idle-time-millis}"
+          }
+          
           env {
             name  = "jms.queues"
-            value = "canopy-device-agent-info,canopy-device-device-event,canopy-device-device-component,canopy-device-file-version,canopy-device-generic-data-info,canopy-device-heartbeat,canopy-device-leaf-versions,canopy-device-software-update,canopy-device-system-info,canopy-device-system-utilization"
+            value = "canopy-device-agent-info,canopy-device-device-event,canopy-device-device-component,canopy-device-file-version,canopy-device-generic-data-info,canopy-device-heartbeat,canopy-device-leaf-versions,canopy-device-schedule,canopy-device-software-update,canopy-device-system-info,canopy-device-system-utilization"
           }
           env {
             name  = "jms.type"
@@ -172,7 +275,7 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_hostname
           }
           env { 
-            name  = "servicebus.key"   // 
+            name  = "servicebus.key" 
             value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
           }
           env { 
@@ -206,8 +309,24 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             value = "canopy-device-heartbeat"
           }
           env {
+            name  = "canopy.queue.inventoryEvent"
+            value = "canopy-device-inventory-event"
+          }
+          env {
+            name  = "canopy.queue.leafActions"
+            value = "canopy-device-leaf-actions"
+          }
+          env {
             name  = "canopy.queue.leafVersions"
             value = "canopy-device-leaf-versions"
+          }
+          env {
+            name  = "canopy.queue.populateAttributesEvents"
+            value = "canopy-device-populate-attributes-events"
+          }
+          env {
+            name  = "canopy.queue.schedule"
+            value = "canopy-device-schedule"
           }
           env {
             name  = "canopy.queue.softwareUpdate"
@@ -236,7 +355,15 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             value = "false"
           }
           env {
+            name  = "homedepot.enabled"
+            value = "false"
+          }
+          env {
             name  = "ipa.enabled"
+            value = "false"
+          }
+          env {
+            name  = "kiosk.enabled"
             value = "false"
           }
           env {
@@ -256,6 +383,10 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             value = "false"
           }
           env {
+            name  = "revel.enabled"
+            value = "false"
+          }
+          env {
             name  = "wu.enabled"
             value = "false"
           }
@@ -272,22 +403,22 @@ resource "kubernetes_deployment" "canopy_device_service_deployment" {
             failure_threshold = 3
           }
 
-          liveness_probe {
-            http_get {
-              path = "/ping"
-              port = 8080
-            }
+          # liveness_probe {
+          #   http_get {
+          #     path = "/ping"
+          #     port = 8080
+          #   }
 
-            initial_delay_seconds = 180
-            period_seconds = 10
-	          timeout_seconds = 2
-            failure_threshold = 6
-          }
+          #   initial_delay_seconds = 180
+          #   period_seconds = 10
+	        #   timeout_seconds = 2
+          #   failure_threshold = 6
+          # }
 
           resources {
             requests {
-              memory = "1536M"
-              cpu    = "150m"
+              memory = var.canopy_device_service_deployment_request_memory
+              cpu    = var.canopy_device_service_deployment_request_cpu
             }
           }
 

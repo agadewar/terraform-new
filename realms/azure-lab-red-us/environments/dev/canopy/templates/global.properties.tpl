@@ -9,12 +9,14 @@ canopy.device.service.url=http://canopy-device-service/
 canopy.fs.service.url=dummy
 canopy.hierarchy.service.url=http://canopy-hierarchy-service/
 canopy.inventory.service.url=dummy
+canopy.kpi.service.url=http://kpi-service/
 canopy.leafbroker.service.url=http://eventpipeline-leaf-broker/
 canopy.location.service.url=http://canopy-location-service/
 canopy.marketplace.service.url=http://canopy-marketplace-service/
 canopy.mdm.service.url=dummy
 canopy.notification.service.url=http://canopy-notification-service/
 canopy.rm.service.url=dummy
+canopy.schedule.service.url=http://canopy-schedule-service/
 canopy.security.service.url=http://canopy-user-service/
 canopy.setting.service.url=http://canopy-setting-service/
 canopy.settings.service.url=http://canopy-settings-service/
@@ -27,7 +29,7 @@ email.enabled = false
 email.fromAddress=steve.ardis@banyanhills.com
 
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.datasource.url=jdbc:mysql://sapience-mysql-$${realm}-$${environment}.mysql.database.azure.com:$${database.port:3306}/$${database.name}?verifyServerCertificate=false&useSSL=true
+spring.datasource.url=jdbc:mysql://sapience-mysql-$${realm}-$${environment}.mysql.database.azure.com:$${database.port:3306}/$${database.name}?verifyServerCertificate=false&useSSL=true&serverTimezone=UTC
 spring.datasource.username=$${CANOPY_DATABASE_USERNAME}@sapience-mysql-$${realm}-$${environment}.mysql.database.azure.com
 spring.datasource.password=$${CANOPY_DATABASE_PASSWORD}
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect

@@ -284,6 +284,7 @@ name:  admin_settings_api_mapping
 prefix: /admin/settings/
 service: admin-settings-api
 rewrite: /admin/settings/
+timeout_ms: 10000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS

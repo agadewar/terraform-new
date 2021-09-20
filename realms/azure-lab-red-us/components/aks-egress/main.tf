@@ -1,6 +1,24 @@
+# terraform {
+#   backend "azurerm" {
+#     key = "red/aks-egress.tfstate"
+#   }
+# }
+
 terraform {
-  backend "azurerm" {
-    key = "red/aks-egress.tfstate"
+  required_providers {
+    random = {
+      source  = "hashicorp/random"
+      version = "3.0.1"
+    }
+  }
+  required_version = "~> 0.12"
+  backend "remote" {
+    hostname      = "app.terraform.io"
+    organization  = "SapienceAnalytics"
+
+    workspaces {
+      name = "terraform-azurerm-kubernetes-aks-egress-lab-red-us"
+    }
   }
 }
 

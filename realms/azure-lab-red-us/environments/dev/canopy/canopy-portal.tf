@@ -66,49 +66,65 @@ resource "kubernetes_deployment" "canopy_portal_deployment" {
 
       spec {
         container {
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-portal:3.0.0rc13-beta.20200916023653885"
+          image = "${var.canopy_container_registry_hostname}/canopy-portal:3.16.0-beta.20210721200507807"
           name  = "canopy-portal"
+
+          // fall back to prior URL lookup through environment variables, not through call to setting-service;
+          // any non-empty string value here will cause portal to not use the endpoints from the setting-service
+          env {
+            name = "ENVIRONMENT_IGNORE_SERVICE_ENDPOINTS"
+            value = "true"
+          }
+          env {
+            name = "ENVIRONMENT_DISABLE_DOWN_FOR_MAINTENANCE"
+            value = "true"
+          }
 
           env {
             name = "ENVIRONMENT_AUTH0_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/auth0"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/auth0"
           }
           env { 
             name = "ENVIRONMENT_DEVICE_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/device"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/device"
           }
           env { 
             name = "ENVIRONMENT_HIERARCHY_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/hierarchy"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/hierarchy"
           }
           env { 
             name = "ENVIRONMENT_KPI_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/kpi"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/kpi"
           }
           env { 
             name = "ENVIRONMENT_LOCATION_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/location"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/location"
           }
           env {
             name = "ENVIRONMENT_MARKETPLACE_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/marketplace"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/marketplace"
+          }
+          env {
+            name = "ENVIRONMENT_NOTIFICATION_SERVICE_BASE_URL"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/notification"
           }
           env { 
-            name = "ENVIRONMENT_NOTIFICATION_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/notification"
+            name = "ENVIRONMENT_NOTIFICATION_WS_SERVICE_BASE_URL"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/notification"
           }
           env { 
             name = "ENVIRONMENT_SETTING_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/setting"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/setting"
           }
           env { 
             name = "ENVIRONMENT_SETTINGS_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/settings"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/settings"
           }
           env { 
             name = "ENVIRONMENT_USER_SERVICE_BASE_URL"
-            value = "https://api.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com/user"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/user"
           }
           env { 
             name  = "ENVIRONMENT_APPEND_PATH_PREFIX_ON_MODALS"
@@ -291,20 +307,6 @@ resource "kubernetes_ingress" "canopy_portal" {
 
   spec {
     rule {
-      host = "canopyv3.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
-      http {
-        path {
-          backend {
-            service_name = "canopy-portal"
-            service_port = 80
-          }
-
-          path = "/"
-        }
-      }
-    }
-
-    rule {
       host = "canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
       http {
         path {
@@ -334,7 +336,6 @@ resource "kubernetes_ingress" "canopy_portal" {
 
     tls {
       hosts = [
-        "canopyv3.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com",
         "canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
         "canopyv3.${var.environment}.sapienceanalytics.com"
       ]

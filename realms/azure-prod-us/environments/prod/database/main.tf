@@ -438,8 +438,8 @@ resource "azurerm_mysql_server" "sapience" {
   location            = var.resource_group_location
 
   sku {
-    name     = var.mysql_server_sku_name
-    capacity = var.mysql_server_sku_capacity
+    name     = "GP_Gen5_8"
+    capacity = "8"
     tier     = var.mysql_server_sku_tier
     family   = var.mysql_server_sku_family
   }
