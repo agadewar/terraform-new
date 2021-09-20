@@ -34,7 +34,7 @@ resource "azurerm_servicebus_namespace" "namespace" {
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
   sku                 = "Premium"
-  capacity            = "4"
+  capacity            = "1"
 
   tags = merge(local.common_tags, {})
 }
