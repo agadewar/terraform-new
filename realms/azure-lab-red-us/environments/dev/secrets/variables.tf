@@ -38,3 +38,4 @@ variable "cyclr_client_id" {}
 variable "cyclr_client_secret" {}
 variable "sql_server_staging_etl_user_password"{}
 variable "base_conf_secret" {}
+variable "ConnectionStrings__EDW" {}
