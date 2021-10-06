@@ -8,6 +8,6 @@ resource "kubernetes_secret" "bulk-upload" {
       UploadBlob__StorageAccountAccessKey = var.UploadBlob__StorageAccountAccessKey
       BulkUploadDbConfig__ConnString = var.BulkUploadDbConfig__ConnString
       ConnectionStrings__Admin = var.connectionstring_admin
-      ConnectionStrings__EDW = var.ConnectionStrings__EDW
+      ConnectionStrings__EDW = var.connectionstring_edw
   }
 }
