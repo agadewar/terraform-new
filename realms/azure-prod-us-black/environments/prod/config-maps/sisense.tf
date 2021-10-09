@@ -35,7 +35,7 @@ resource "kubernetes_config_map" "sisense" {
       "ENVIRONMENT_SISENSE_URL"           = "https://sapiencebi.sapienceanalytics.com"
       "ENVIRONMENT_SISENSE_JS_PLATFORM"   =  "linux"
 
-
+      "Sisense__UseNewService"           =  false
 
       #SISENSE WINDOWS INTERNAL ENDPOINTS
       #"Sisense__BaseHost"             = "http://sisense.prod-black.us.azure.internal.sapienceanalytics.com:8081/"
@@ -48,5 +48,6 @@ resource "kubernetes_config_map" "sisense" {
       "Sisense__SecurityEndpoint"      = "https://sapiencebi.sapienceanalytics.com/api/settings/security"
       "Sisense__UserSecurityEndpoint"  = "https://sapiencebi.sapienceanalytics.com/api/v1/users"
       "Sisense__BaseUrl"               = "https://sapiencebi.sapienceanalytics.com/"
+      
   }
 }
