@@ -66,7 +66,8 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.3.19.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.3.19.docker-20210930b"
+          image_pull_policy = "Always"
           name  = "eventpipeline-leaf-broker"
 
           env { 
@@ -125,6 +126,12 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
           }
 
           env {
+            name  = "canopy.leafbroker.kafka-partition-key-generator.expression"
+            #value = "#{\\'$\\'}{event.path}:#{\\'$\\'}{event.deviceId}#{\\'$\\'}{ (event.data?.domain && event.data?.userId) ? (\\':\\' + event.data.domain + \\':\\' + event.data.userId) : \\'\\'}"
+            value = "#{'$'}{event.path}:#{'$'}{event.deviceId}#{'$'}{ (event.data?.activity?.domain && event.data?.activity?.userId) ? (':' + event.data.activity.domain + ':' + event.data.activity.userId) : ''}"
+          }
+
+          env {
             name  = "canopy.security.cookie.enabled"
             value = "true"
           }
@@ -132,10 +139,10 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
             name  = "canopy.security.userDetailsCacheEnabled"
             value = "false"
           }
-          # env {
-          #   name  = "logging.level.io.canopy.leaf.broker"
-          #   value = "DEBUG"
-          # }
+          env {
+            name  = "logging.level.io.canopy.leaf.broker"
+            value = "DEBUG"
+          }
 
           readiness_probe {
             http_get {
