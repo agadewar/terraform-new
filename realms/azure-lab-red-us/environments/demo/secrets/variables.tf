@@ -26,6 +26,7 @@ variable "auth0_alertrules_clientid" {}
 variable "machine_learning_service_account_password" {}
 variable "redis_dashboard_Password"{}
 variable "Sisense__SharedSecret"{}
+variable "base_conf_secret" {}
 variable "Sisense__Auth0ClientSecret"{}
 variable "Auth0ManagementApi__ClientSecret" {}
 variable "ApimConfiguration__DelegationKey" {}
