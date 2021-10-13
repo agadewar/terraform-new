@@ -69,7 +69,7 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
         container {
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.10.0"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.11.0-SNAPSHOT"
           name  = "eventpipeline-leaf-broker"
 
           env { 
@@ -148,6 +148,11 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
           }
 
           env {
+            name  = "canopy.leafbroker.kafka-partition-key-generator.expression"
+            value = "#{'$'}{event.path}:#{'$'}{event.deviceId}#{'$'}{ (event.data?.activity?.domain && event.data?.activity?.userId) ? (':' + event.data.activity.domain + ':' + event.data.activity.userId) : ''}"
+          }
+
+          env {
             name  = "SPRING_PROFILES_ACTIVE"
             value = "centralized-logging"
           }
@@ -173,10 +178,10 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
           #  name  = "canopy.security.userDetailsCacheEnabled"
           #  value = "true"
           #}
-          # env {
-          #   name  = "logging.level.io.canopy.leaf.broker"
-          #   value = "DEBUG"
-          # }
+          env {
+            name  = "logging.level.io.canopy.leaf.broker"
+            value = "DEBUG"
+          }
           env {
             name  = "server.undertow.worker-threads"
             value = "4000"
