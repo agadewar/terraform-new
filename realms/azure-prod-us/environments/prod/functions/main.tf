@@ -331,6 +331,10 @@ resource "azurerm_function_app" "function_app_sapience_admin_integrations_api" {
       APPLICATIONINSIGHTS_CONNECTION_STRING      =  "InstrumentationKey=16515cc7-b0ef-487c-9cff-d85ce3b24c44;IngestionEndpoint=https://eastus-1.in.applicationinsights.azure.com/"
       WEBSITE_ENABLE_SYNC_UPDATE_SITE            =  true
       WEBSITE_RUN_FROM_PACKAGE                   =  1
+      AzureServiceBus__TeamCreatedConnection     =  "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=e3X/d+veSSV1+9jQl2+UipmuKnelcLm+YeZy2QuHmz0=;"
+      AzureServiceBus__TeamUpdatedConnection     =  "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=8tN2Sd6QY74ftp7XnftyEnJVXr0MOlOrejFpV12ZUdo=;"
+      "AzureServiceBus:UpdatedUsersEndpoint"     = "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Full;SharedAccessKey=RTMP/wTWoL4TftZV8m9cHcwwT3yhGlt2auFw/vEoAVc=;"
+      "AzureServiceBus:UpdatedUsersEntityPath"   = "sapience-admin-users-updated"      
       "AzureServiceBus:Endpoint"                 =  "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=5qUDVqkfHhmGS+KYIAnuvYEMU3N+CrcxiUhfI8t9kT0=;"
       "AzureServiceBus:EntityPath"               =  "sapience-admin-users-created"
       "AzureServiceBus:DeletedUsersEndPoint"     =  "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=Jip9weAu9AbCQ2f0KsNeaSBlNWaSn+hCwyfKq7U+gFk=;"
@@ -348,10 +352,10 @@ resource "azurerm_function_app" "function_app_sapience_admin_integrations_api" {
       "ConnectionStrings:Staging"                =  "Data Source=sapience-prod-us-prod.database.windows.net;Database=Staging;User=appsvc_api_user;Password=AZoZtwZych+n}991umI;"
       "UploadBlob:Container"                     =  "sapience-upload"
       "UploadBlob:StorageAccountAccessKey"       =  "DefaultEndpointsProtocol=https;AccountName=sapprodusbuprod;AccountKey=nOERUaQGyYHpSVJHfaGxNM+CY2Y9uq4nVG0QnJpnSsncoPJ/saEnKlv2ydFoLUjTyy6+L3wNiajFHo7Ntph63Q==;EndpointSuffix=core.windows.net"
-      "BulkUploadDbConfig:ConnString"            =  "mongodb://sapience-bulk-upload-mongodb-prod-us-prod:Nv7gyM3WPLwOsIIkyFLIH2ctlZ1iaLv49qp3MPIy1xjl63w2is7CrOOOAJV1pWdhFCJSMFAEU3Q19eQfEAgMHA==@sapience-bulk-upload-mongodb-prod-us-prod.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
+      "BulkUploadDbConfig:ConnString"            =  "mongodb://sapience-bulk-upload-mongodb-prod-us-prod:QM5mfMmbs44TVNZY06NMPlZuDrD8i6TQm2AFOtvdQ18yFOgiYnmn4FPiBETPX187Vw1XJotGH0HRaVzFfWInGA==@sapience-bulk-upload-mongodb-prod-us-prod.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
       "BulkUploadDbConfig:DatabaseName"          =  "BulkUploadWorkflow"
       "BulkUploadDbConfig:Events"                =  "BulkUploadEvents"
-      "Integration:ConnString"                   =  "mongodb://sapience-integration-mongodb-prod-us-prod:bAR9EDQzFQkTxUFbyy6dwYEVxFCAJuJATjnHwfj3knlitGy8L60Vc2aQfBuZGoRAzFm7ZlfPCA2BrkcRSQABDQ==@sapience-integration-mongodb-prod-us-prod.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@sapience-integration-mongodb-prod-us-prod@"
+      "Integration:ConnString"                   =  "mongodb://sapience-integration-mongodb-prod-us-prod:ATNLWqdijUtQ2O5kAsaswaegKi9xEEg8gngWEkq7v8GCxPoWJLQe8iPm0wl7IjqzbarPb7CjFQhk7w5cUv8JIw==@sapience-integration-mongodb-prod-us-prod.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@sapience-integration-mongodb-prod-us-prod@"
       "Integration:DatabaseName"                 =  "Test"
       "Integration:Collections:IntegrationEvents" =  "Integration_Events"
   }
