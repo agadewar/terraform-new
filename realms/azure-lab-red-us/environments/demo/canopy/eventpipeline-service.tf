@@ -68,7 +68,7 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
   }
 
   spec {
-    replicas = 1
+    replicas = var.eventpipeline_service_deployment_replicas
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
@@ -91,9 +91,15 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
 
       spec {
         container {
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.3.6.sapience-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.5.2"
           name  = "eventpipeline-service"
+
+          env { 
+            name = "EVENTPIPELINE_SERVICE_XMX"
+            value = "2048m"
+          }
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
@@ -150,6 +156,30 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
             }
           }
 
+          env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
+            name  = "JMS_TYPE"
+            value = "servicebus"
+          }
+
+          // servicebus settings
+          env { 
+            name  = "SERVICEBUS_HOST"
+            value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_hostname
+          }
+          env { 
+            name  = "SERVICEBUS_KEY" 
+            value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
+          }
+          env { 
+            name  = "SERVICEBUS_POLICY"
+            value = "RootManageSharedAccessKey"
+          }
+
           readiness_probe {
             http_get {
               path = "/ping"
@@ -176,8 +206,8 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
 
           resources {
             requests {
-              memory = "2048M"
-              cpu    = "1000m"
+              memory = var.eventpipeline_service_deployment_request_memory
+              cpu    = var.eventpipeline_service_deployment_request_cpu
             }
           }
 

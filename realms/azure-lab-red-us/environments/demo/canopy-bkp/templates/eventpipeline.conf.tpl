@@ -7,7 +7,7 @@ eventpipeline.channel.transactionCapacity=1000
 eventpipeline.channel.capacity = 100000
 
 eventpipeline.sources.eventpipeline.type = com.banyanhills.eventpipeline.flume.source.KafkaSource
-#eventpipeline.sources.eventpipeline.channels = logger eventarchive deviceregistration
+eventpipeline.sources.eventpipeline.channels = logger eventarchive deviceregistration
 eventpipeline.sources.eventpipeline.batchSize = 1000
 eventpipeline.sources.eventpipeline.kafka.bootstrap.servers = ${kafka_bootstrap_servers}
 eventpipeline.sources.eventpipeline.kafka.consumer.sasl.jaas.config = org.apache.kafka.common.security.plain.PlainLoginModule required username="$${KAFKA_USERNAME}" password="$${KAFKA_PASSWORD}";
@@ -60,3 +60,8 @@ eventpipeline.sinks.logger.channel = logger
 #eventpipeline.sinks.eventarchive.hdfs.rollCount = 0
 #eventpipeline.sinks.eventarchive.serializer = avro_event
 #eventpipeline.sinks.eventarchive.serializer.compressionCodec = snappy
+#eventpipeline.sinks.eventarchive.hdfs.rollInterval = 0
+#eventpipeline.sinks.eventarchive.hdfs.closeTries = 20
+#eventpipeline.sinks.eventarchive.hdfs.retryInterval = 15
+#eventpipeline.sinks.eventarchive.hdfs.batchSize = 100
+#eventpipeline.sinks.eventarchive.hdfs.idleTimeout = 60

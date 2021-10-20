@@ -1,58 +1,44 @@
-resource "kubernetes_config_map" "kpi_service" {
+resource "kubernetes_config_map" "canopy_device_service" {
   metadata {
-    name      = "kpi-service"
+    name      = "canopy-device-service"
     namespace = local.namespace
   }
 
   data = {
     "global.properties"      = data.template_file.global_properties.rendered
-    "application.properties" = file("files/kpi-service.properties")
+    "application.properties" = file("files/canopy-device-service.properties")
   }
 }
 
-resource "kubernetes_secret" "kpi_service" {
+resource "kubernetes_secret" "canopy_device_service" {
   metadata {
-    name      = "kpi-service"
+    name      = "canopy-device-service"
     namespace = local.namespace
   }
 
   data = {
-    # "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
+    "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
     "canopy.database.username" = var.mysql_canopy_username
     "canopy.database.password" = var.mysql_canopy_password
-    # "kafka.username"           = var.kafka_username
-    # "kafka.password"           = var.kafka_password
-    # "azure.datalake.key"       = data.terraform_remote_state.data_lake.outputs.azure_data_lake_storage_gen2_key_1
     "canopy.service-account.username" = var.canopy_service_account_username
     "canopy.service-account.password" = var.canopy_service_account_password
+    "kafka.username"           = var.kafka_username
+    "kafka.password"           = var.kafka_password
+    "google.api.key"           = var.google_api_key
   }
 
   type = "Opaque"
 }
 
-# resource "kubernetes_service" "datalake" {
-#   metadata {
-#     name = "datalake"
-#     namespace = local.namespace
-#   }
-
-#   spec {
-#     external_name = "sapdl${replace(lower(var.realm), "-", "")}${var.environment}.dfs.core.windows.net"
-#     # external_name = "datalake.dfs.core.windows.net"
-
-#     type = "ExternalName"
-#   }
-# }
-
-resource "kubernetes_deployment" "kpi_service_deployment" {
+resource "kubernetes_deployment" "canopy_device_service_deployment" {
   metadata {
-    name = "kpi-service"
+    name = "canopy-device-service"
     namespace = local.namespace
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     labels = merge(local.common_labels, {
-      "sapienceanalytics.com/name" = "kpi-service"
+      "sapienceanalytics.com/name" = "canopy-device-service"
     })
     
     annotations = {}
@@ -65,7 +51,7 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     selector {
       match_labels = {
-        "sapienceanalytics.com/name" = "kpi-service"
+        "sapienceanalytics.com/name" = "canopy-device-service"
       }
     }
 
@@ -74,7 +60,7 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
         // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
         //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
         labels = merge(local.common_labels, {
-          "sapienceanalytics.com/name" = "kpi-service"
+          "sapienceanalytics.com/name" = "canopy-device-service"
         })
         
         annotations = {}
@@ -83,14 +69,14 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
       spec {
         container {
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/kpi-service:2.14.12.docker"
-          name  = "kpi-service"
+          image = "${var.canopy_container_registry_hostname}/canopy-device-service:1.19.5.docker-SNAPSHOT"
+          name  = "canopy-device-service"
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
             value_from {
               secret_key_ref {
-                name = "kpi-service"
+                name = "canopy-device-service"
                 key  = "canopy.database.username"
               }
             }
@@ -99,8 +85,17 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
             name = "CANOPY_DATABASE_PASSWORD"
             value_from {
               secret_key_ref {
-                name = "kpi-service"
+                name = "canopy-device-service"
                 key  = "canopy.database.password"
+              }
+            }
+          }
+          env {
+            name = "CANOPY_AMQP_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "canopy-device-service"
+                key  = "canopy.amqp.password"
               }
             }
           }
@@ -109,7 +104,7 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
             name = "CANOPY_SERVICE_ACCOUNT_USERNAME"
             value_from {
               secret_key_ref {
-                name = "kpi-service"
+                name = "canopy-user-service"
                 key  = "canopy.service-account.username"
               }
             }
@@ -118,52 +113,53 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
             name = "CANOPY_SERVICE_ACCOUNT_PASSWORD"
             value_from {
               secret_key_ref {
-                name = "kpi-service"
+                name = "canopy-user-service"
                 key  = "canopy.service-account.password"
               }
             }
           }
 
           env {
-            name = "REDIS_PASSWORD"
+            name = "KAFKA_USERNAME"
             value_from {
               secret_key_ref {
-                name = "redis"
-                key  = "redis-password"
+                name = "canopy-device-service"
+                key  = "kafka.username"
+              }
+            }
+          }
+          env {
+            name = "KAFKA_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "canopy-device-service"
+                key  = "kafka.password"
+              }
+            }
+          }
+          env {
+            name = "GOOGLE_API_KEY"
+            value_from {
+              secret_key_ref {
+                name = "canopy-device-service"
+                key  = "google.api.key"
               }
             }
           }
 
           env {
-            name  = "com.banyanhills.canopy.kpi.event.inbound.KpiInboundEventPipeLineHandler.disabled"
+            name  = "com.banyanhills.canopy.device.eventhandler.AllDeviceEventHandler.disabled"
             value = "true"
           }
 
           env {
-            name  = "bootstrap.enabled"
-            value = "true"
-          }
-
-          env {
-            name  = "influx.url"
-            value = "http://influxdb:8086"
-          }
-          env {
-            name  = "influx.username"
-            value = "admin"
-          }
-          env {
-            name  = "influx.password"
-            value = var.influxdb_password
-          }
-          env {
-            name  = "influx.retentionPolicy"
-            value = "autogen"
+            name  = "server.undertow.worker-threads"
+            value = "2000"
           }
 
           env {
             name  = "jms.queues"
-            value = "canopy-kpi,canopy-publish"
+            value = "canopy-device-agent-info,canopy-device-device-event,canopy-device-device-component,canopy-device-file-version,canopy-device-generic-data-info,canopy-device-heartbeat,canopy-device-leaf-versions,canopy-device-software-update,canopy-device-system-info,canopy-device-system-utilization"
           }
           env {
             name  = "jms.type"
@@ -186,12 +182,74 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
 
           // queues
           env {
-            name  = "canopy.queue.kpi"
-            value = "canopy-kpi"
+            name  = "canopy.queue.agentInfo"
+            value = "canopy-device-agent-info"
           }
           env {
-            name  = "canopy.queue.publish"
-            value = "canopy-publish"
+            name  = "canopy.queue.deviceEvent"
+            value = "canopy-device-device-event"
+          }
+          env {
+            name  = "canopy.queue.deviceComponent"
+            value = "canopy-device-device-component"
+          }
+          env {
+            name  = "canopy.queue.fileVersion"
+            value = "canopy-device-file-version"
+          }
+          env {
+            name  = "canopy.queue.generic.dataInfo"
+            value = "canopy-device-generic-data-info"
+          }
+          env {
+            name  = "canopy.queue.heartbeat"
+            value = "canopy-device-heartbeat"
+          }
+          env {
+            name  = "canopy.queue.leafVersions"
+            value = "canopy-device-leaf-versions"
+          }
+          env {
+            name  = "canopy.queue.softwareUpdate"
+            value = "canopy-device-software-update"
+          }
+          env {
+            name  = "canopy.queue.systemInfo"
+            value = "canopy-device-system-info"
+          }
+          env {
+            name  = "canopy.queue.systemUtilization"
+            value = "canopy-device-system-utilization"
+          }
+
+          // disable custom eventhandlers
+          env {
+            name  = "chargeit.enabled"
+            value = "false"
+          }
+          env {
+            name  = "ipa.enabled"
+            value = "false"
+          }
+          env {
+            name  = "mm.enabled"
+            value = "false"
+          }
+          env {
+            name  = "optconnect.enabled"
+            value = "false"
+          }
+          env {
+            name  = "posiflex.enabled"
+            value = "false"
+          }
+          env {
+            name  = "pti.enabled"
+            value = "false"
+          }
+          env {
+            name  = "wu.enabled"
+            value = "false"
           }
 
           readiness_probe {
@@ -220,8 +278,8 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
 
           resources {
             requests {
-              memory = "2048M"
-              cpu    = "1000m"
+              memory = "1536M"
+              cpu    = "150m"
             }
           }
 
@@ -231,44 +289,36 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
             read_only = true
           }
           
-          # # needed by the user-service for Hazelcast
-          # # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
-          # volume_mount {
-          #   name = "default-token"
-          #   read_only = true
-          #   mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
-          # }
+          # needed by the user-service for Hazelcast
+          # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
+          volume_mount {
+            name = "default-token"
+            read_only = true
+            mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
+          }
         }
 
-        # # Create an alias record because we have to hardcode the property name in eventpipeline-service's core-site.xml.  String
-        # # interpolation is only allowed in the value.  So, we need somethign constant... which is the "datalake.dfs.core.windows.net"
-        # # entry below.
-        # host_aliases {
-        #   ip = "sapiencedatalake${var.environment}.dfs.core.windows.net"
-        #   hostnames = [ "datalake.dfs.core.windows.net" ]
-        # }
-
-        # # needed by the user-service for Hazelcast
-        # # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
-        # volume {
-		    #   name = "default-token"
-		    #   secret {
-        #     secret_name = data.local_file.default_token_secret_name.content
-		    #     default_mode = "0420"
-		    #   }
-        # }
+        # needed by the user-service for Hazelcast
+        # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
+        volume {
+		      name = "default-token"
+		      secret {
+            secret_name = data.local_file.default_token_secret_name.content
+		        default_mode = "0420"
+		      }
+        }
 
         volume {
           name = "application-config"
           config_map {
-            name = "kpi-service"
+            name = "canopy-device-service"
           }
         }
 
         volume {
           name = "application-secrets"
           secret {
-            secret_name = "kpi-service"
+            secret_name = "canopy-device-service"
           }
         }
         
@@ -281,17 +331,17 @@ resource "kubernetes_deployment" "kpi_service_deployment" {
   }
 }
 
-resource "kubernetes_service" "kpi_service_service" {
+resource "kubernetes_service" "canopy_device_service_service" {
   metadata {
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     labels = merge(local.common_labels, {
-      "sapienceanalytics.com/name" = "kpi-service"
+      "sapienceanalytics.com/name" = "canopy-device-service"
     })
     
     annotations = {}
     
-    name = "kpi-service"
+    name = "canopy-device-service"
     namespace = local.namespace
   }
 
@@ -299,7 +349,7 @@ resource "kubernetes_service" "kpi_service_service" {
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     selector = {
-      "sapienceanalytics.com/name" = "kpi-service"
+      "sapienceanalytics.com/name" = "canopy-device-service"
     }
 
     port {

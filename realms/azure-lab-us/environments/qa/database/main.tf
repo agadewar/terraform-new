@@ -372,6 +372,14 @@ resource "azurerm_mysql_database" "auth0" {
   collation           = "utf8_unicode_ci"
 }
 
+resource "azurerm_mysql_database" "schedule" {
+  name                = "schedule"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_server.sapience.name
+  charset             = "latin1"
+  collation           = "latin1_swedish_ci"
+}
+
 resource "azurerm_mysql_database" "device" {
   name                = "device"
   resource_group_name = var.resource_group_name

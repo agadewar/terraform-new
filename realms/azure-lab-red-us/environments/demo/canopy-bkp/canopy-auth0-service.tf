@@ -64,13 +64,11 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
 
       spec {
         container {
-          image_pull_policy = "Always"
-          
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-auth0-service:1.3.0-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-auth0-service:1.1.7.docker-SNAPSHOT"
           name  = "canopy-auth0-service"
 
-          env {
+          env { 
             name = "CANOPY_DATABASE_USERNAME"
             value_from {
               secret_key_ref {
@@ -116,16 +114,6 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
                 key  = "redis-password"
               }
             }
-          }
-
-          env {
-            name  = "SPRING_PROFILES_ACTIVE"
-            value = "centralized-logging"
-          }
-
-          env {
-            name  = "canopy.sso.redirect-to-canopyV3"
-            value = "https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
           }
 
           env {

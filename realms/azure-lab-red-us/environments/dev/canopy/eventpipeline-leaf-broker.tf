@@ -69,7 +69,7 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
         container {
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.10.0"
+          image = "${var.canopy_container_registry_hostname}/eventpipeline-leaf-broker:1.11.0"
           name  = "eventpipeline-leaf-broker"
 
           env { 
@@ -147,6 +147,12 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
             }
           }
 
+      env {
+            name  = "canopy.leafbroker.kafka-partition-key-generator.expression"
+            #value = "#{\\'$\\'}{event.path}:#{\\'$\\'}{event.deviceId}#{\\'$\\'}{ (event.data?.domain && event.data?.userId) ? (\\':\\' + event.data.domain + \\':\\' + event.data.userId) : \\'\\'}"
+            value = "#{'$'}{event.path}:#{'$'}{event.deviceId}#{'$'}{ (event.data?.activity?.domain && event.data?.activity?.userId) ? (':' + event.data.activity.domain + ':' + event.data.activity.userId) : ''}"
+          }
+
           env {
             name  = "SPRING_PROFILES_ACTIVE"
             value = "centralized-logging"
@@ -158,7 +164,7 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
           }
           env {
             name  = "camel.io.canopy.leaf.broker.service.eventservice.producer.event-ingestion-target-legacy"
-            value = "kafka://canopy-eventpipeline?brokers=$${kafka.bootstrap.servers}&securityProtocol=SASL_SSL&saslMechanism=PLAIN&saslJaasConfig=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$${KAFKA_USERNAME}\" password=\"$${KAFKA_PASSWORD}\";&sslEndpointAlgorithm=https"
+            value = "kafka://canopy-eventpipeline?brokers=$${kafka.bootstrap.servers}&securityProtocol=SASL_SSL&saslMechanism=PLAIN&saslJaasConfig=RAW(org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$${KAFKA_USERNAME}\" password=\"$${KAFKA_PASSWORD}\";)&sslEndpointAlgorithm=https"
           }
 
           env {

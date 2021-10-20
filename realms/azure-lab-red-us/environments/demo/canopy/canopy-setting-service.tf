@@ -1,3 +1,25 @@
+# data "terraform_remote_state" "storage_account" {
+#   backend = "azurerm"
+
+#   config = {
+#     access_key           = var.realm_backend_access_key
+#     storage_account_name = var.realm_backend_storage_account_name
+#     container_name       = var.realm_backend_container_name
+#     key                  = "storage-account.tfstate"
+#   }
+# }
+
+#resource "azurerm_storage_container" "canopy_setting_service" {
+#  name                  = "canopy-setting-service-${var.environment}"
+#  resource_group_name   = var.resource_group_name
+#  storage_account_name  = data.terraform_remote_state.storage_account.outputs.storage_account_name
+#  container_access_type = "blob"
+
+#  lifecycle {
+#    prevent_destroy = "true"
+#  }
+#}
+
 resource "kubernetes_config_map" "canopy_setting_service" {
   metadata {
     name      = "canopy-setting-service"
@@ -19,6 +41,8 @@ resource "kubernetes_secret" "canopy_setting_service" {
   data = {
     "canopy.database.username" = var.mysql_canopy_username
     "canopy.database.password" = var.mysql_canopy_password
+    "canopy.service-account.username" = var.canopy_service_account_username
+    "canopy.service-account.password" = var.canopy_service_account_password
   }
 
   type = "Opaque"
@@ -39,7 +63,7 @@ resource "kubernetes_deployment" "canopy_setting_service_deployment" {
   }
 
   spec {
-    replicas = 1
+    replicas = var.canopy_setting_service_deployment_replicas
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
@@ -62,8 +86,9 @@ resource "kubernetes_deployment" "canopy_setting_service_deployment" {
 
       spec {
         container {
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-setting-service:1.3.0"
+          image = "${var.canopy_container_registry_hostname}/canopy-setting-service:1.11.0"
           name  = "canopy-setting-service"
 
           env { 
@@ -83,6 +108,61 @@ resource "kubernetes_deployment" "canopy_setting_service_deployment" {
                 key  = "canopy.database.password"
               }
             }
+          }
+
+          env {
+            name = "CANOPY_SERVICE_ACCOUNT_USERNAME"
+            value_from {
+              secret_key_ref {
+                name = "canopy-user-service"
+                key  = "canopy.service-account.username"
+              }
+            }
+          }
+          env {
+            name = "CANOPY_SERVICE_ACCOUNT_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "canopy-user-service"
+                key  = "canopy.service-account.password"
+              }
+            }
+          }
+
+          env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
+            name  = "azure.account.name"
+            value = "sapience${replace(var.realm, "-", "")}"
+          }
+          env {
+            name  = "azure.account.key"
+            #value = data.terraform_remote_state.storage_account.outputs.storage_account_access_key
+            value = var.storage_account_access_key
+          }
+          env {
+            name  = "azure.canopy.branding.container"
+            #value = azurerm_storage_container.canopy_setting_service.name
+            value = "canopy-settings-service-${var.environment}"
+          }
+
+          env {
+            name  = "canopy.fileservice.client"
+            value = "azure"
+          }
+
+          env {
+            name  = "canopy.portal.url.versions"
+            value = "[(null):'https://canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com','3':'https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com']"
+          }
+
+          // we aren't going to process these messages
+          env {
+            name  = "messaging.event-ingestion-queue"
+            value = "canopy-deadend"
           }
 
           readiness_probe {
@@ -111,8 +191,8 @@ resource "kubernetes_deployment" "canopy_setting_service_deployment" {
 
           resources {
             requests {
-              memory = "256M"
-              cpu    = "150m"
+              memory = var.canopy_setting_service_deployment_request_memory
+              cpu    = var.canopy_setting_service_deployment_request_cpu
             }
           }
 

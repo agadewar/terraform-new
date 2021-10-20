@@ -1,6 +1,6 @@
-resource "kubernetes_config_map" "canopy_v2" {
+resource "kubernetes_config_map" "canopy_portal" {
   metadata {
-    name      = "canopy-v2"
+    name      = "canopy-portal"
     namespace = local.namespace
   }
 
@@ -28,28 +28,28 @@ resource "kubernetes_config_map" "canopy_v2" {
 #   type = "Opaque"
 # }
 
-resource "kubernetes_deployment" "canopy_v2_deployment" {
+resource "kubernetes_deployment" "canopy_portal_deployment" {
   metadata {
-    name = "canopy-v2"
+    name = "canopy-portal"
     namespace = local.namespace
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     labels = merge(local.common_labels, {
-      "sapienceanalytics.com/name" = "canopy-v2"
+      "sapienceanalytics.com/name" = "canopy-portal"
     })
     
     annotations = {}
   }
 
   spec {
-    replicas = var.canopy_v2_deployment_replicas
+    replicas = 1
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     selector {
       match_labels = {
-        "sapienceanalytics.com/name" = "canopy-v2"
+        "sapienceanalytics.com/name" = "canopy-portal"
       }
     }
 
@@ -58,7 +58,7 @@ resource "kubernetes_deployment" "canopy_v2_deployment" {
         // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
         //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
         labels = merge(local.common_labels, {
-          "sapienceanalytics.com/name" = "canopy-v2"
+          "sapienceanalytics.com/name" = "canopy-portal"
         })
         
         annotations = {}
@@ -68,8 +68,19 @@ resource "kubernetes_deployment" "canopy_v2_deployment" {
         container {
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-v2:3.49.5"
-          name  = "canopy-v2"
+          image = "${var.canopy_container_registry_hostname}/canopy-portal:3.16.0-beta.20210721200507807"
+          name  = "canopy-portal"
+
+          // fall back to prior URL lookup through environment variables, not through call to setting-service;
+          // any non-empty string value here will cause portal to not use the endpoints from the setting-service
+          env {
+            name = "ENVIRONMENT_IGNORE_SERVICE_ENDPOINTS"
+            value = "true"
+          }
+          env {
+            name = "ENVIRONMENT_DISABLE_DOWN_FOR_MAINTENANCE"
+            value = "true"
+          }
 
           env {
             name = "ENVIRONMENT_AUTH0_SERVICE_BASE_URL"
@@ -95,8 +106,12 @@ resource "kubernetes_deployment" "canopy_v2_deployment" {
             name = "ENVIRONMENT_MARKETPLACE_SERVICE_BASE_URL"
             value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/marketplace"
           }
-          env { 
+          env {
             name = "ENVIRONMENT_NOTIFICATION_SERVICE_BASE_URL"
+            value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/notification"
+          }
+          env { 
+            name = "ENVIRONMENT_NOTIFICATION_WS_SERVICE_BASE_URL"
             value = "https://api.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com/notification"
           }
           env { 
@@ -188,8 +203,8 @@ resource "kubernetes_deployment" "canopy_v2_deployment" {
 
           resources {
             requests {
-              memory = var.canopy_v2_deployment_request_memory
-              cpu    = var.canopy_v2_deployment_request_cpu
+              memory = "64M"
+              cpu    = "150m"
             }
           }
 
@@ -241,17 +256,17 @@ resource "kubernetes_deployment" "canopy_v2_deployment" {
   }
 }
 
-resource "kubernetes_service" "canopy_v2_service" {
+resource "kubernetes_service" "canopy_portal_service" {
   metadata {
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     labels = merge(local.common_labels, {
-      "sapienceanalytics.com/name" = "canopy-v2"
+      "sapienceanalytics.com/name" = "canopy-portal"
     })
     
     annotations = {}
     
-    name = "canopy-v2"
+    name = "canopy-portal"
     namespace = local.namespace
   }
 
@@ -259,7 +274,7 @@ resource "kubernetes_service" "canopy_v2_service" {
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     selector = {
-      "sapienceanalytics.com/name" = "canopy-v2"
+      "sapienceanalytics.com/name" = "canopy-portal"
     }
 
     port {
@@ -270,9 +285,9 @@ resource "kubernetes_service" "canopy_v2_service" {
   }
 }
 
-resource "kubernetes_ingress" "canopy_v2" {
+resource "kubernetes_ingress" "canopy_portal" {
   metadata {
-    name      = "canopy-v2"
+    name      = "canopy-portal"
     namespace = local.namespace
 
     annotations = {
@@ -292,11 +307,11 @@ resource "kubernetes_ingress" "canopy_v2" {
 
   spec {
     rule {
-      host = "canopy.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
+      host = "canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
       http {
         path {
           backend {
-            service_name = "canopy-v2"
+            service_name = "canopy-portal"
             service_port = 80
           }
 
@@ -306,25 +321,11 @@ resource "kubernetes_ingress" "canopy_v2" {
     }
 
     rule {
-      host = "canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
+      host = "canopyv3.${var.environment}.sapienceanalytics.com"
       http {
         path {
           backend {
-            service_name = "canopy-v2"
-            service_port = 80
-          }
-
-          path = "/"
-        }
-      }
-    }
-
-    rule {
-      host = "canopy.${var.environment}.sapienceanalytics.com"
-      http {
-        path {
-          backend {
-            service_name = "canopy-v2"
+            service_name = "canopy-portal"
             service_port = 80
           }
 
@@ -335,11 +336,10 @@ resource "kubernetes_ingress" "canopy_v2" {
 
     tls {
       hosts = [
-        "canopy.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com",
-        "canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
-        "canopy.${var.environment}.sapienceanalytics.com"
+        "canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
+        "canopyv3.${var.environment}.sapienceanalytics.com"
       ]
-      secret_name = "canopy-v2-certs"
+      secret_name = "canopy-portal-certs"
     }
   }
 }

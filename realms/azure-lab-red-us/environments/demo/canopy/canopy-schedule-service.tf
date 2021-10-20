@@ -1,80 +1,53 @@
-data "template_file" "eventpipeline_conf" {
-  template = file("templates/eventpipeline.conf.tpl")
-
-  vars = {
-    datalake_name           = "sapdl${replace(lower(var.realm), "-", "")}${var.environment}"
-    # datalake_name           = "datalake"
-    kafka_bootstrap_servers = var.kafka_bootstrap_servers
-  }
-}
-
-resource "kubernetes_config_map" "eventpipeline_service" {
+resource "kubernetes_config_map" "canopy_schedule_service" {
   metadata {
-    name      = "eventpipeline-service"
+    name      = "canopy-schedule-service"
     namespace = local.namespace
   }
 
   data = {
     "global.properties"      = data.template_file.global_properties.rendered
-    "application.properties" = file("files/eventpipeline-service.properties")
-    "eventpipeline.conf"     = data.template_file.eventpipeline_conf.rendered
+    "application.properties" = file("files/canopy-schedule-service.properties")
   }
 }
 
-resource "kubernetes_secret" "eventpipeline_service" {
+resource "kubernetes_secret" "canopy_schedule_service" {
   metadata {
-    name      = "eventpipeline-service"
+    name      = "canopy-schedule-service"
     namespace = local.namespace
   }
 
   data = {
-    "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
     "canopy.database.username" = var.mysql_canopy_username
     "canopy.database.password" = var.mysql_canopy_password
-    "kafka.username"           = var.kafka_username
-    "kafka.password"           = var.kafka_password
-    "azure.datalake.key"       = data.terraform_remote_state.data_lake.outputs.azure_data_lake_storage_gen2_key_1
+    "canopy.service-account.username" = var.canopy_service_account_username
+    "canopy.service-account.password" = var.canopy_service_account_password
   }
 
   type = "Opaque"
 }
 
-# resource "kubernetes_service" "datalake" {
-#   metadata {
-#     name = "datalake"
-#     namespace = local.namespace
-#   }
-
-#   spec {
-#     external_name = "sapdl${replace(lower(var.realm), "-", "")}${var.environment}.dfs.core.windows.net"
-#     # external_name = "datalake.dfs.core.windows.net"
-
-#     type = "ExternalName"
-#   }
-# }
-
-resource "kubernetes_deployment" "eventpipeline_service_deployment" {
+resource "kubernetes_deployment" "canopy_schedule_service_deployment" {
   metadata {
-    name = "eventpipeline-service"
+    name = "canopy-schedule-service"
     namespace = local.namespace
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     labels = merge(local.common_labels, {
-      "sapienceanalytics.com/name" = "eventpipeline-service"
+      "sapienceanalytics.com/name" = "canopy-schedule-service"
     })
     
     annotations = {}
   }
 
   spec {
-    replicas = 1
+    replicas = var.canopy_schedule_service_deployment_replicas
 
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     selector {
       match_labels = {
-        "sapienceanalytics.com/name" = "eventpipeline-service"
+        "sapienceanalytics.com/name" = "canopy-schedule-service"
       }
     }
 
@@ -83,7 +56,7 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
         // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
         //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
         labels = merge(local.common_labels, {
-          "sapienceanalytics.com/name" = "eventpipeline-service"
+          "sapienceanalytics.com/name" = "canopy-schedule-service"
         })
         
         annotations = {}
@@ -91,15 +64,16 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
 
       spec {
         container {
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/eventpipeline-service:1.3.7.sapience-SNAPSHOT"
-          name  = "eventpipeline-service"
+          image = "${var.canopy_container_registry_hostname}/canopy-schedule-service:1.3.0"
+          name  = "canopy-schedule-service"
 
           env { 
             name = "CANOPY_DATABASE_USERNAME"
             value_from {
               secret_key_ref {
-                name = "eventpipeline-service"
+                name = "canopy-schedule-service"
                 key  = "canopy.database.username"
               }
             }
@@ -108,46 +82,61 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
             name = "CANOPY_DATABASE_PASSWORD"
             value_from {
               secret_key_ref {
-                name = "eventpipeline-service"
+                name = "canopy-schedule-service"
                 key  = "canopy.database.password"
               }
             }
           }
+
           env {
-            name = "CANOPY_AMQP_PASSWORD"
+            name = "CANOPY_SERVICE_ACCOUNT_USERNAME"
             value_from {
               secret_key_ref {
-                name = "eventpipeline-service"
-                key  = "canopy.amqp.password"
+                name = "canopy-user-service"
+                key  = "canopy.service-account.username"
               }
             }
           }
           env {
-            name = "KAFKA_USERNAME"
+            name = "CANOPY_SERVICE_ACCOUNT_PASSWORD"
             value_from {
               secret_key_ref {
-                name = "eventpipeline-service"
-                key  = "kafka.username"
+                name = "canopy-user-service"
+                key  = "canopy.service-account.password"
               }
             }
           }
+          
           env {
-            name = "KAFKA_PASSWORD"
-            value_from {
-              secret_key_ref {
-                name = "eventpipeline-service"
-                key  = "kafka.password"
-              }
-            }
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
           }
+
           env {
-            name = "AZURE_DATALAKE_KEY"
-            value_from {
-              secret_key_ref {
-                name = "eventpipeline-service"
-                key  = "azure.datalake.key"
-              }
-            }
+            name  = "canopy.portal.url.versions"
+            value = "[(null):'https://canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com','3':'https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com']"
+          }
+
+          # env {
+          #   name  = "messaging.enabled"
+          #   value = "false"
+          # }
+          # env {
+          #   name  = "messaging.password"
+          #   value = "dummy"
+          # }
+          # env {
+          #   name  = "messaging.server"
+          #   value = "dummy"
+          # }
+          # env {
+          #   name  = "messaging.username"
+          #   value = "dummy"
+          # }
+
+          env {
+            name  = "jms.type"
+            value = "servicebus"
           }
 
           readiness_probe {
@@ -162,28 +151,23 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
             failure_threshold = 3
           }
 
-          liveness_probe {
-            http_get {
-              path = "/ping"
-              port = 8080
-            }
+          # liveness_probe {
+          #   http_get {
+          #     path = "/ping"
+          #     port = 8080
+          #   }
 
-            initial_delay_seconds = 180
-            period_seconds = 10
-	          timeout_seconds = 2
-            failure_threshold = 6
-          }
+          #   initial_delay_seconds = 180
+          #   period_seconds = 10
+	        #   timeout_seconds = 2
+          #   failure_threshold = 6
+          # }
 
           resources {
             requests {
-              memory = "2048M"
-              cpu    = "1000m"
+              memory = var.canopy_schedule_service_deployment_request_memory
+              cpu    = var.canopy_schedule_service_deployment_request_cpu
             }
-          }
-
-        env { 
-            name = "EVENTPIPELINE_SERVICE_XMX"
-            value = "2048m"
           }
 
           volume_mount { 
@@ -201,14 +185,6 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
           }
         }
 
-        # # Create an alias record because we have to hardcode the property name in eventpipeline-service's core-site.xml.  String
-        # # interpolation is only allowed in the value.  So, we need somethign constant... which is the "datalake.dfs.core.windows.net"
-        # # entry below.
-        # host_aliases {
-        #   ip = "sapiencedatalake${var.environment}.dfs.core.windows.net"
-        #   hostnames = [ "datalake.dfs.core.windows.net" ]
-        # }
-
         # needed by the user-service for Hazelcast
         # this is being done due to "automountServiceAccountToken" not being supported (https://github.com/terraform-providers/terraform-provider-kubernetes/issues/38)
         volume {
@@ -222,14 +198,14 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
         volume {
           name = "application-config"
           config_map {
-            name = "eventpipeline-service"
+            name = "canopy-schedule-service"
           }
         }
 
         volume {
           name = "application-secrets"
           secret {
-            secret_name = "eventpipeline-service"
+            secret_name = "canopy-schedule-service"
           }
         }
         
@@ -242,17 +218,17 @@ resource "kubernetes_deployment" "eventpipeline_service_deployment" {
   }
 }
 
-resource "kubernetes_service" "eventpipeline_service_service" {
+resource "kubernetes_service" "canopy_schedule_service_service" {
   metadata {
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     labels = merge(local.common_labels, {
-      "sapienceanalytics.com/name" = "eventpipeline-service"
+      "sapienceanalytics.com/name" = "canopy-schedule-service"
     })
     
     annotations = {}
     
-    name = "eventpipeline-service"
+    name = "canopy-schedule-service"
     namespace = local.namespace
   }
 
@@ -260,7 +236,7 @@ resource "kubernetes_service" "eventpipeline_service_service" {
     // TODO (PBI-12532) - once "terraform-provider-kubernetes" commit "4fa027153cf647b2679040b6c4653ef24e34f816" is merged, change the prefix on the
     //                    below labels to "app.kubernetes.io" - see: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
     selector = {
-      "sapienceanalytics.com/name" = "eventpipeline-service"
+      "sapienceanalytics.com/name" = "canopy-schedule-service"
     }
 
     port {
