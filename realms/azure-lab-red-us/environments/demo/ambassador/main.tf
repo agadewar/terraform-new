@@ -283,6 +283,7 @@ name:  admin_settings_api_mapping
 prefix: /admin/settings/
 service: admin-settings-api
 rewrite: /admin/settings/
+timeout_ms: 10000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -306,7 +307,7 @@ name:  sapience_external_integration
 prefix: /external/integration/
 service: sapience-third-party-integration-api
 rewrite: /external/integration/
-timeout_ms: 10000
+timeout_ms: 30000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS

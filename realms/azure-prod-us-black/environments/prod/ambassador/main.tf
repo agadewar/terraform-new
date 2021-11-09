@@ -274,6 +274,7 @@ name:  admin_users_api_mapping
 prefix: /admin/users/
 service: admin-users-api
 rewrite: /admin/users/
+timeout_ms: 10000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -285,6 +286,7 @@ name:  admin_settings_api_mapping
 prefix: /admin/settings/
 service: admin-settings-api
 rewrite: /admin/settings/
+timeout_ms: 10000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -319,7 +321,7 @@ name:  sapience_external_integration
 prefix: /external/integration/
 service: sapience-third-party-integration-api
 rewrite: /external/integration/
-timeout_ms: 10000
+timeout_ms: 30000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -421,6 +423,7 @@ name:  admin_dashboard_api_mapping
 prefix: /admin/dashboard/
 service: admin-dashboard-api
 rewrite: /admin/dashboard/
+timeout_ms: 10000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
