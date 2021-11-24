@@ -23,6 +23,6 @@ resource "kubernetes_config_map" "misc" {
       "ENVIRONMENT_SISENSETYPE"                =  "js"
       "ENVIRONMENT_ENABLE_ADMIN_REPORTS"       =  true
       "ENVIRONMENT_ENABLE_ADMIN_DASHBOARD"     =  true
-      "ENVIRONMENT_ENABLE_INTEGRATION_MONITOR_CYCLE_TILE" =  false
+      "ENVIRONMENT_ENABLE_INTEGRATION_MONITOR_CYCLE_TILE" =  true
   }
 }
