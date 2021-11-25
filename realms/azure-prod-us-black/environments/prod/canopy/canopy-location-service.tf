@@ -68,8 +68,9 @@ resource "kubernetes_deployment" "canopy_location_service_deployment" {
 
       spec {
         container {
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-location-service:1.12.0.docker"
+          image = "${var.canopy_container_registry_hostname}/canopy-location-service:1.49.0"
           name  = "canopy-location-service"
 
           env { 
@@ -121,6 +122,16 @@ resource "kubernetes_deployment" "canopy_location_service_deployment" {
           }
 
           env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
+            name  = "messaging.enabled"
+            value = "false"
+          }
+
+          env {
             name  = "jms.queues"
             value = "canopy-location-action-scheduler"
           }
@@ -135,7 +146,7 @@ resource "kubernetes_deployment" "canopy_location_service_deployment" {
             value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_hostname
           }
           env { 
-            name  = "servicebus.key"   // 
+            name  = "servicebus.key"
             value = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
           }
           env { 
@@ -143,10 +154,23 @@ resource "kubernetes_deployment" "canopy_location_service_deployment" {
             value = "RootManageSharedAccessKey"
           }
 
+          env {
+            name  = "canopy.location.image-storage-provider"
+            value = "azure"
+          }
+          env {
+            name  = "canopy.portal.url.versions"
+            value = "[(null):'https://canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com','3':'https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com']"
+          }
+
           // queues
           env {
             name  = "canopy.queue.action.scheduler"
             value = "canopy-location-action-scheduler"
+          }
+          env {
+            name  = "canopy.queue.populateAttributesEvents"
+            value = "canopy-location-populate-attributes-events"
           }
 
           // disable custom eventhandlers

@@ -2,9 +2,16 @@ variable "global_realm_backend_access_key" {}
 variable "global_realm_backend_storage_account_name" {}
 variable "global_realm_backend_container_name" {}
 
+variable "realm_backend_access_key" {}
+variable "realm_backend_storage_account_name" {}
+variable "realm_backend_container_name" {}
+variable "storage_account_access_key" {}
+
 variable "env_backend_access_key" {}
 variable "env_backend_storage_account_name" {}
 variable "env_backend_container_name" {}
+
+variable "resource_group_name" {} 
 
 variable "cloud" {}
 variable "realm" {}
@@ -18,9 +25,9 @@ variable "kafka_password" {}
 
 variable "canopy_container_registry_hostname" {}
 
-variable "canopy_auth0_service_deployment_replicas"{}
-variable "canopy_auth0_service_deployment_request_memory"{}
-variable "canopy_auth0_service_deployment_request_cpu"{}
+variable "canopy_auth0_service_deployment_replicas" {}
+variable "canopy_auth0_service_deployment_request_memory" {}
+variable "canopy_auth0_service_deployment_request_cpu" {}
 variable "canopy_device_service_deployment_replicas" {}
 variable "canopy_device_service_deployment_request_memory" {}
 variable "canopy_device_service_deployment_request_cpu" {}
@@ -30,12 +37,15 @@ variable "canopy_hierarchy_service_deployment_request_cpu" {}
 variable "canopy_location_service_deployment_replicas" {}
 variable "canopy_location_service_deployment_request_memory" {}
 variable "canopy_location_service_deployment_request_cpu" {}
-variable "canopy_marketplace_service_deployment_replicas"{}
-variable "canopy_marketplace_service_deployment_request_memory"{}
-variable "canopy_marketplace_service_deployment_request_cpu"{}
+variable "canopy_marketplace_service_deployment_replicas" {}
+variable "canopy_marketplace_service_deployment_request_memory" {}
+variable "canopy_marketplace_service_deployment_request_cpu" {}
 variable "canopy_notification_service_deployment_replicas" {}
 variable "canopy_notification_service_deployment_request_memory" {}
 variable "canopy_notification_service_deployment_request_cpu" {}
+variable "canopy_schedule_service_deployment_replicas" {}
+variable "canopy_schedule_service_deployment_request_memory" {}
+variable "canopy_schedule_service_deployment_request_cpu" {}
 variable "canopy_setting_service_deployment_replicas" {}
 variable "canopy_setting_service_deployment_request_memory" {}
 variable "canopy_setting_service_deployment_request_cpu" {}
@@ -58,7 +68,6 @@ variable "kpi_service_deployment_replicas" {}
 variable "kpi_service_deployment_request_memory" {}
 variable "kpi_service_deployment_request_cpu" {}
 
-
 # variable "sapience_container_registry_hostname" {}
 # variable "sapience_container_registry_username" {}
 # variable "sapience_container_registry_password" {}
@@ -75,6 +84,8 @@ variable "mysql_canopy_password" {}
 
 variable "canopy_service_account_username" {}
 variable "canopy_service_account_password" {}
+
+variable "canopy_security_jwt_secret" {}
 
 variable "google_api_key" {
   default = ""

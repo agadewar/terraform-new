@@ -66,8 +66,9 @@ resource "kubernetes_deployment" "canopy_v2_deployment" {
 
       spec {
         container {
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-v2:0.2.6"
+          image = "${var.canopy_container_registry_hostname}/canopy-v2:3.49.5"
           name  = "canopy-v2"
 
           env {
@@ -291,6 +292,20 @@ resource "kubernetes_ingress" "canopy_v2" {
 
   spec {
     rule {
+      host = "canopy.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com"
+      http {
+        path {
+          backend {
+            service_name = "canopy-v2"
+            service_port = 80
+          }
+
+          path = "/"
+        }
+      }
+    }
+
+    rule {
       host = "canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
       http {
         path {
@@ -320,6 +335,7 @@ resource "kubernetes_ingress" "canopy_v2" {
 
     tls {
       hosts = [
+        "canopy.${var.environment}.${var.dns_realm}-black.${var.region}.${var.cloud}.sapienceanalytics.com",
         "canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com",
         "canopy.${var.environment}.sapienceanalytics.com"
       ]

@@ -68,7 +68,7 @@ resource "kubernetes_deployment" "canopy_v2_deployment" {
         container {
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-v2:3.49.5"
+          image = "${var.canopy_container_registry_hostname}/canopy-v2:3.49.5.1"
           name  = "canopy-v2"
 
           env {

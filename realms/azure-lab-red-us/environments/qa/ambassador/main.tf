@@ -178,6 +178,8 @@ apiVersion: ambassador/v1
 kind:  Mapping
 name:  canopy_auth0_service_mapping
 prefix: /auth0/
+add_response_headers:
+  SameSite: None
 service: canopy-auth0-service
 ---
 apiVersion: ambassador/v1
@@ -258,7 +260,7 @@ name:  sapience_external_integration
 prefix: /external/integration/
 service: sapience-third-party-integration-api
 rewrite: /external/integration/
-timeout_ms: 20000
+timeout_ms: 30000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS

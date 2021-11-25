@@ -27,7 +27,10 @@ resource "kubernetes_secret" "canopy_hierarchy_service" {
     namespace = local.namespace
   }
 
-  data = {}
+  data = {
+    "canopy.service-account.username" = var.canopy_service_account_username
+    "canopy.service-account.password" = var.canopy_service_account_password
+  }
 
   type = "Opaque"
 }
@@ -70,9 +73,30 @@ resource "kubernetes_deployment" "canopy_hierarchy_service_deployment" {
 
       spec {
         container {
+          
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.7.1.docker-SNAPSHOT"
+          # image = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.19.0"
+          image = "${var.canopy_container_registry_hostname}/canopy-hierarchy-service:1.20.0-SNAPSHOT"
           name  = "canopy-hierarchy-service"
+
+          env {
+            name = "CANOPY_SERVICE_ACCOUNT_USERNAME"
+            value_from {
+              secret_key_ref {
+                name = "canopy-hierarchy-service"
+                key  = "canopy.service-account.username"
+              }
+            }
+          }
+          env {
+            name = "CANOPY_SERVICE_ACCOUNT_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "canopy-hierarchy-service"
+                key  = "canopy.service-account.password"
+              }
+            }
+          }
 
           env {
             name = "REDIS_PASSWORD"
@@ -83,6 +107,16 @@ resource "kubernetes_deployment" "canopy_hierarchy_service_deployment" {
               }
             }
           }
+
+          env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          # env {
+          #   name  = "canopy.security.userDetailsCacheEnabled"
+          #   value = "true"
+          # }
 
           env {
             name  = "logging.level.com.banyanhills.canopy.hierarchy"

@@ -319,7 +319,7 @@ kind:  Mapping
 name:  sapience_app_api_mapping
 prefix: /
 service: sapience-app-api
-timeout_ms: 30000
+timeout_ms: 40000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -338,9 +338,8 @@ cors:
 apiVersion: ambassador/v1
 kind:  Mapping
 name:  sapience_meeting_mapping
-prefix: /external/integration/
+prefix: /node/
 service: sapience-meeting
-rewrite: /external/integration/
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS

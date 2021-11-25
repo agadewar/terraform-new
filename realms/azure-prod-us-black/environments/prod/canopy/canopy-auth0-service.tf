@@ -63,9 +63,10 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
       }
 
       spec {
-        container {
+        container {     
+               
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-auth0-service:1.1.7.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-auth0-service:1.3.3"
           name  = "canopy-auth0-service"
 
           env { 
@@ -117,6 +118,16 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
           }
 
           env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
+            name  = "canopy.sso.redirect-to-canopyV3"
+            value = "https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com"
+          }
+
+          env {
             name  = "canopy.sso.service-base-url"
             value = "https://api.${var.environment}.sapienceanalytics.com/auth0"
           }
@@ -155,10 +166,16 @@ resource "kubernetes_deployment" "canopy_auth0_service_deployment" {
             failure_threshold = 6
           }
 
+          # resources {
+          #   requests {
+          #     memory = "512M"
+          #     cpu    = "150m"
+          #   }
+          # }
           resources {
             requests {
-              memory = "512M"
-              cpu    = "150m"
+              memory = var.canopy_auth0_service_deployment_request_memory
+              cpu    = var.canopy_auth0_service_deployment_request_cpu
             }
           }
 

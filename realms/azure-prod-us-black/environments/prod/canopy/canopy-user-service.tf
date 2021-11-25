@@ -18,13 +18,14 @@ resource "kubernetes_secret" "canopy_user_service" {
   }
 
   data = {
-    "canopy.amqp.password"     = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
-    "canopy.database.username" = var.mysql_canopy_username
-    "canopy.database.password" = var.mysql_canopy_password
+    "canopy.amqp.password"            = data.terraform_remote_state.service_bus.outputs.servicebus_namespace_default_primary_key
+    "canopy.database.username"        = var.mysql_canopy_username
+    "canopy.database.password"        = var.mysql_canopy_password
     "canopy.service-account.username" = var.canopy_service_account_username
     "canopy.service-account.password" = var.canopy_service_account_password
-    "kafka.username"           = var.kafka_username
-    "kafka.password"           = var.kafka_password
+    "kafka.username"                  = var.kafka_username
+    "kafka.password"                  = var.kafka_password
+    "canopy.security.jwt.secret"      = var.canopy_security_jwt_secret
   }
 
   type = "Opaque"
@@ -68,8 +69,9 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
 
       spec {
         container {
+
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-user-service:2.5.3.docker-SNAPSHOT"
+          image = "${var.canopy_container_registry_hostname}/canopy-user-service:2.15.0"
           name  = "canopy-user-service"
 
           env { 
@@ -155,7 +157,22 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
           # env {
           #   name  = "cache.token.ttl-seconds"
           #   value = "300"
-          # }          
+          # }
+
+          env {
+            name  = "SPRING_PROFILES_ACTIVE"
+            value = "centralized-logging"
+          }
+
+          env {
+            name  = "canopy.portal.url.versions"
+            value = "[(null):'https://canopy.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com','3':'https://canopyv3.${var.environment}.${var.dns_realm}.${var.region}.${var.cloud}.sapienceanalytics.com']"
+          }
+
+          # env {
+          #   name  = "canopy.security.userDetailsCacheEnabled"
+          #   value = "true"
+          # }     
 
           env {
             name  = "canopy.security.service-permission-source"
@@ -173,13 +190,89 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
           # }
 
           # env {
-          #   name  = "logging.level.com.banyanhills.canopy.user.cache.Cache"
+          #   name  = "logging.level.com.banyanhills.canopy.user"
           #   value = "DEBUG"
           # }
 
           env {
             name  = "server.undertow.worker-threads"
             value = "2000"
+          }
+
+          env {
+            name  = "spring.datasource.tomcat.initial-size"
+            value = "50"
+          }
+          env {
+            name  = "spring.datasource.tomcat.max-active"
+            value = "300"
+          }
+          env {
+            name  = "spring.datasource.tomcat.min-idle"
+            value = "50"
+          }
+          env {
+            name  = "spring.datasource.tomcat.max-idle"
+            value = "60"
+          }
+          env {
+            name  = "spring.datasource.tomcat.min-evictable-idle-time-millis"
+            value = "5000"
+          }
+          env {
+            name  = "spring.datasource.initial-size"
+            value = "$${spring.datasource.tomcat.initial-size}"
+          }
+          env {
+            name  = "spring.datasource.max-active"
+            value = "$${spring.datasource.tomcat.max-active}"
+          }
+          env {
+            name  = "spring.datasource.min-idle"
+            value = "$${spring.datasource.tomcat.min-idle}"
+          }
+          env {
+            name  = "spring.datasource.max-idle"
+            value = "$${spring.datasource.tomcat.max-idle}"
+          }
+          env {
+            name  = "spring.datasource.min-evictable-idle-time-millis"
+            value = "$${spring.datasource.tomcat.min-evictable-idle-time-millis}"
+          }
+
+          env {
+            name  = "redis.cleanup-keys-amount"
+            value = "2000"
+          }
+          env {
+            name  = "redis.min-cleanup-delay"
+            value = "2"
+          }
+          env {
+            name  = "redis.max-cleanup-delay"
+            value = "15"
+          }
+
+          env {
+            name  = "canopy.security.jwt.environment"
+            value = "sapience-${var.environment}"
+          }
+          env {
+            name  = "canopy.security.jwt.expiration-seconds"
+            value = "43200"   # 12 hours
+          }
+          env {
+            name  = "canopy.security.jwt.issuer"
+            value = "https://sapienceanalytics.com"
+          }
+          env {
+            name  = "canopy.security.jwt.secret"
+            value_from {
+                secret_key_ref {
+                  name = "canopy-user-service"
+                  key  = "canopy.security.jwt.secret"
+                }
+              }
           }
 
           readiness_probe {
