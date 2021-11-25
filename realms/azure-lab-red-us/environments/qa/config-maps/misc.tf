@@ -19,10 +19,17 @@ resource "kubernetes_config_map" "misc" {
       "ENVIRONMENT_VUE_HELP_URL"               =  "https://help.qa.lab.us.azure.sapienceanalytics.com" 
       "ENVIRONMENT_CANOPY_URL"                 =  "https://canopy.qa.lab-black.us.azure.sapienceanalytics.com/#/sso?path=%2FSapience"
       "ENVIRONMENT_CANOPY_V3_URL"              =  "https://canopyv3.qa.lab-black.us.azure.sapienceanalytics.com/#/sso?path=%2FSapience"
+<<<<<<< HEAD
       "ENVIRONMENT_NAME"                                  =  "qa"
       "ENVIRONMENT_SISENSETYPE"                           =  "js"
       "ENVIRONMENT_ENABLE_ADMIN_REPORTS"                  =  true
       "ENVIRONMENT_ENABLE_ADMIN_DASHBOARD"                =  true
+=======
+      "ENVIRONMENT_NAME"                       =  "qa"
+      "ENVIRONMENT_SISENSETYPE"                =  "js"
+      "ENVIRONMENT_ENABLE_ADMIN_REPORTS"       =  true
+      "ENVIRONMENT_ENABLE_ADMIN_DASHBOARD"     =  true
+>>>>>>> 25076eca4249c499abd265c2cffcb570f6addd53
       "ENVIRONMENT_ENABLE_INTEGRATION_MONITOR_CYCLE_TILE" =  true
   }
 }

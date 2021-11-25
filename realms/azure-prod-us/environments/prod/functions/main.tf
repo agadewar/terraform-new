@@ -117,17 +117,19 @@ resource "azurerm_function_app" "function_app_admin_users" {
       Auth0__ManagementApiAudience            =   "https://sapience-prod-us-prod.auth0.com/api/v2/"
       Auth0__ManagementApiBaseUrl             =   "https://sapience-prod-us-prod.auth0.com"
       Auth0__ManagementApiSecret              =   "hy9J1imVKuK1OkBmVrNhNLIIQIp1FEpJL3Rd-dJsJMGozeQc9ruvRHagHHNvSkzQ"
-      Sisense__BaseUrl                        =   "https://sisense.prod.prod.us.azure.sapienceanalytics.com/"
-      Sisense__UsersUri                       =   "api/users?email="
+      Sisense__BaseUrl                        =   "https://sapiencebi.sapienceanalytics.com/"
+      Sisense__UsersUri                       =   "api/v1/users/bulk"
       Sisense__DefaultGroupUri                =   "api/v1/groups?name="
       Sisense__DataSecurityUri                =   "api/elasticubes/datasecurity"
       Sisense__ElasticubesUri                 =   "api/v1/elasticubes/getElasticubes"
       Sisense__DailyDataSource                =   "Sapience-Daily-CompanyId-Env"
       Sisense__HourlyDataSource               =   "Sapience-Hourly-CompanyId-Env"
       Sisense__Env                            =   "Prod"
-      Sisense__Secret                         =   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNWRjZGQ1YzBkYmMyZTEwNWQ0YjIzNDJiIiwiYXBpU2VjcmV0IjoiMmQ0NDFlODUtY2NlYy05YzBlLTQ3MTktN2IxY2M1YTk5YmY2IiwiaWF0IjoxNTczNzcxMDU2fQ.55UdBA5jXCv1jbryo5T5hZLJq0GZfAlMoKUYlSRiVS8"
+      "Sisense__Server"                       =   "localhost"
+      Sisense__SharedSecret                   =   "8b4a9c52-e2d5-2768-9788-cfc35d41ba6b"
+      Sisense__Secret                         =   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNWRjZGQ1YzBkYmMyZTEwNWQ0YjIzNDJiIiwiYXBpU2VjcmV0IjoiMmQ0NDFlODUtY2NlYy05YzBlLTQ3MTktN2IxY2M1YTk5YmY2IiwiaWF0IjoxNjExOTQzNzc5fQ.qBrRZsipEywKZoLZfcfLDF4Ybei-iSKzH8GUXndI_yw"
       Canopy__Auth0Url                        =   "https://api.prod.sapienceanalytics.com/auth0/v1/integrations/auth0"
-      Canopy__Credentials                     =   "Sapience:sapience_AdminServices:H#Qx6qbmafdafd112415##!w8#vKKs3"
+      Canopy__Credentials                     =   "Sapience:sapience_adminservices:H#Qx6qbmafdafd112415##!w8#vKKs3"
       Canopy__UserServiceUrl                  =   "https://api.prod.sapienceanalytics.com/user/v1/users/"
       DeleteConnection                        =   "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Full;SharedAccessKey=I0SPY/91uh/fwGAn8FI++mvKs+GNorXsFhhluhvRccg="
       EditConnection                          =   "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Full;SharedAccessKey=RTMP/wTWoL4TftZV8m9cHcwwT3yhGlt2auFw/vEoAVc="
@@ -140,6 +142,11 @@ resource "azurerm_function_app" "function_app_admin_users" {
       Sisense__GetUserUri                     =   "api/v1/users?email="
       WEBSITE_ENABLE_SYNC_UPDATE_SITE         =   true 
       WEBSITE_RUN_FROM_PACKAGE                =   "1" 
+      "TeamCreatedConnection"                 = "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Subscribe;SharedAccessKey=D4uLc+Y5iaD+gW3w2hl20TNvzXW5X0dyE9LHH+z925I=;"
+      "TeamDeletedConnection"                 = "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Subscribe;SharedAccessKey=bJ6HHjI6IkF6yXNEaV9LUe7LR9Ee5lE9wb18tankVUE=;"
+      "TeamUpdatedConnection"                 = "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Subscribe;SharedAccessKey=Kn/xeW8N3R6ZViFdhtwRbSevEm435rWcOknRqmwSuO0=;"
+      "UserActivatedConnection"               = "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Subscribe;SharedAccessKey=JXn4gf7Z0HQPvaR8cTQySeYRIX3ruFRu69dcLqZn+jc=;"
+      "UserDeactivatedConnection"             = "Endpoint=sb://sapience-prod-us-prod.servicebus.windows.net/;SharedAccessKeyName=Subscribe;SharedAccessKey=7iibjTy5i59ych4JrTZqkspkbTm/CeHplqvQlCifH+g=;"
 
   }
 }
@@ -358,5 +365,46 @@ resource "azurerm_function_app" "function_app_sapience_admin_integrations_api" {
       "Integration:ConnString"                   =  "mongodb://sapience-integration-mongodb-prod-us-prod:ATNLWqdijUtQ2O5kAsaswaegKi9xEEg8gngWEkq7v8GCxPoWJLQe8iPm0wl7IjqzbarPb7CjFQhk7w5cUv8JIw==@sapience-integration-mongodb-prod-us-prod.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@sapience-integration-mongodb-prod-us-prod@"
       "Integration:DatabaseName"                 =  "Test"
       "Integration:Collections:IntegrationEvents" =  "Integration_Events"
+  }
+}
+
+resource "azurerm_storage_account" "sapience_functions_integration_teams" {
+  name                     = "sapintteams${replace(lower(var.realm), "-", "")}${var.environment}"
+  resource_group_name      = var.resource_group_name
+  location                 = "eastus2"
+  account_tier             = "Standard"
+  account_kind             = "Storage"
+  account_replication_type = "GRS"
+
+  tags = merge(local.common_tags, {})
+}
+
+resource "azurerm_app_service_plan" "service_plan_integration_teams" {
+  name                = "azure-function-service-plan-sap-intg-teams-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+
+  sku {
+    tier = "Standard"
+    size = "S1"
+  }
+}
+
+resource "azurerm_function_app" "function_app_sapience_integration_teams" {
+  name                        = "azure-functions-app-sapience-integration-teams-${var.realm}-${var.environment}"
+  resource_group_name         = var.resource_group_name
+  location                    = var.resource_group_location
+  app_service_plan_id         = azurerm_app_service_plan.service_plan_integration_teams.id 
+  storage_connection_string   = azurerm_storage_account.sapience_functions_integration_teams.primary_connection_string
+  version                     = "3.1"
+
+      app_settings                             = {
+      APPINSIGHTS_INSTRUMENTATIONKEY           =  "16515cc7-b0ef-487c-9cff-d85ce3b24c44"
+      APPLICATIONINSIGHTS_CONNECTION_STRING    =  "InstrumentationKey=16515cc7-b0ef-487c-9cff-d85ce3b24c44;IngestionEndpoint=https://eastus-1.in.applicationinsights.azure.com/"
+      WEBSITE_ENABLE_SYNC_UPDATE_SITE          =  true
+      WEBSITE_RUN_FROM_PACKAGE                 =  1
+      "MongoDb__ConnectionString"              = "mongodb://sapience-integration-mongodb-prod-us-prod:ATNLWqdijUtQ2O5kAsaswaegKi9xEEg8gngWEkq7v8GCxPoWJLQe8iPm0wl7IjqzbarPb7CjFQhk7w5cUv8JIw==@sapience-integration-mongodb-prod-us-prod.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@sapience-integration-mongodb-prod-us-prod@"
+      "MongoDb__DatabaseName"                  = "Integrations"
+      "MongoDb__Collection"                    = "MS_Teams_Calls"
   }
 }
