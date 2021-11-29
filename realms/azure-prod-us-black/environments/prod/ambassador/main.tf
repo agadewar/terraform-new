@@ -318,6 +318,39 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  sapience_app_kpi_api_mapping
+prefix: /app/kpi/
+service: sapience-app-kpi-api
+rewrite: /app/kpi/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_app_overview_api_mapping
+prefix: /app/overview/
+service: sapience-app-overview-api
+rewrite: /app/overview/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_app_trends_api_mapping
+prefix: /app/trends/
+service: sapience-app-trends-api
+rewrite: /app/trends/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  sapience_external_integration
 prefix: /external/integration/
 service: sapience-third-party-integration-api
