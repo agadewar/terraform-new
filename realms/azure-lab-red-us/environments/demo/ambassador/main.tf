@@ -359,6 +359,18 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  sapience_app_stats_api_mapping
+prefix: /app/stats/
+service: sapience-app-stats-api
+rewrite: /app/stats/
+timeout_ms: 10000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  sapience_app_api_mapping
 prefix: /
 service: sapience-app-api

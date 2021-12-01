@@ -351,6 +351,17 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  sapience_app_stats_api_mapping
+prefix: /app/stats/
+service: sapience-app-stats-api
+rewrite: /app/stats/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  sapience_external_integration
 prefix: /external/integration/
 service: sapience-third-party-integration-api
