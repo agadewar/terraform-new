@@ -322,6 +322,7 @@ name:  sapience_app_kpi_api_mapping
 prefix: /app/kpi/
 service: sapience-app-kpi-api
 rewrite: /app/kpi/
+timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -333,6 +334,7 @@ name:  sapience_app_overview_api_mapping
 prefix: /app/overview/
 service: sapience-app-overview-api
 rewrite: /app/overview/
+timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -344,6 +346,7 @@ name:  sapience_app_trends_api_mapping
 prefix: /app/trends/
 service: sapience-app-trends-api
 rewrite: /app/trends/
+timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -355,6 +358,7 @@ name:  sapience_app_stats_api_mapping
 prefix: /app/stats/
 service: sapience-app-stats-api
 rewrite: /app/stats/
+timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS

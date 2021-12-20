@@ -445,7 +445,7 @@ resource "azurerm_mysql_server" "sapience" {
   }
 
   storage_profile {
-    storage_mb            = var.mysql_server_storage_profile_storage_mb
+    storage_mb            = "2571264"
     backup_retention_days = 14
     geo_redundant_backup  = "Disabled"
   }
