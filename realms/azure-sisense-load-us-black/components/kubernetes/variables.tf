@@ -33,6 +33,12 @@ variable "kubernetes_pool03_os_disk_size_gb" {}
 variable "kubernetes_pool03_min_count" {}
 variable "kubernetes_pool03_max_count" {}
 
+variable "kubernetes_pool04_vm_size" {}
+variable "kubernetes_pool04_os_type" {}
+variable "kubernetes_pool04_os_disk_size_gb" {}
+variable "kubernetes_pool04_min_count" {}
+variable "kubernetes_pool04_max_count" {}
+
 variable "realm_common_tags" {
   type = map(string)
 }
