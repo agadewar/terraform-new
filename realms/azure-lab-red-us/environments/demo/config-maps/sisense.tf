@@ -47,7 +47,7 @@ resource "kubernetes_config_map" "sisense" {
 
       #"Sisense__BaseUrl" = "https://sisense.demo.lab.us.azure.sapienceanalytics.com/"
       "Sisense__BaseUrl" = "https://sapiencebi-demo-lab-us-azure.sapienceanalytics.com/"
-      "Sisense__UseNewService" = true
+      "Sisense__UseNewService" = false
 
 
   }

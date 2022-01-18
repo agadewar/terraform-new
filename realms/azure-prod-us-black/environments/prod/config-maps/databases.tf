@@ -12,5 +12,6 @@ resource "kubernetes_config_map" "databases" {
       "MongoDBConnectorSettings__ServerName"           = "sapience-integration-mongodb-prod-us-prod.mongo.cosmos.azure.com"
       "MongoDBConnectorSettings__ConnectionProperties" = "ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@sapience-integration-mongodb-prod-us-prod@"
       "MongoDBConnectorSettings__UserName"             = "sapience-integration-mongodb-prod-us-prod"
+      "MongoDBConnectorSettings__DbName"               = "Integrations"
   }
 }
