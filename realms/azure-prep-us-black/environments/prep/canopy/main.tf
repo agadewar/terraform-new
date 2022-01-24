@@ -69,16 +69,16 @@ data "terraform_remote_state" "container_registry" {
   }
 }
 
-# data "terraform_remote_state" "service_bus" {
-#   backend = "azurerm"
+data "terraform_remote_state" "service_bus" {
+  backend = "azurerm"
 
-#   config = {
-#     access_key           = var.env_backend_access_key
-#     storage_account_name = var.env_backend_storage_account_name
-#     container_name       = var.env_backend_container_name
-#     key                  = "../service-bus.tfstate"
-#   }
-# }
+  config = {
+    access_key           = var.env_backend_access_key
+    storage_account_name = var.env_backend_storage_account_name
+    container_name       = var.env_backend_container_name
+    key                  = "../service-bus.tfstate"
+  }
+}
 
 data "terraform_remote_state" "database" {
   backend = "azurerm"

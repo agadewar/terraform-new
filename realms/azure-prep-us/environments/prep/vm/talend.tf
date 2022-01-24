@@ -82,7 +82,7 @@ resource "azurerm_virtual_machine" "talend" {
   # NOTE: This may not be optimal in all cases.
   delete_data_disks_on_termination = true
 
-  storage_image_reference {
+storage_image_reference {
     publisher = "Canonical"
     offer     = "0002-com-ubuntu-minimal-xenial-daily"
     sku       = "minimal-16_04-daily-lts-gen2"

@@ -18,22 +18,6 @@ variable "realm_common_tags" {
   type = map(string)
 }
 
-# PASSWORDS FOR OLD VMs IN THE WRONG SUBNET
-// variable "sisense_appquery_01_admin_username" {}
-// variable "sisense_appquery_01_admin_password" {}
-// variable "sisense_appquery_02_admin_username" {}
-// variable "sisense_appquery_02_admin_password" {}
-// variable "sisense_build_admin_username" {}
-// variable "sisense_build_admin_password" {}
-
-# PASSWORDS FOR NEW VMs IN THE CORRECT SUBNET
-variable "sisense_appquery_001_admin_username" {}
-variable "sisense_appquery_001_admin_password" {}
-variable "sisense_appquery_002_admin_username" {}
-variable "sisense_appquery_002_admin_password" {}
-variable "sisense_build_001_admin_username" {}
-variable "sisense_build_001_admin_password" {}
-
 variable "talend_admin_username" {}
 variable "talend_admin_password" {}
 
