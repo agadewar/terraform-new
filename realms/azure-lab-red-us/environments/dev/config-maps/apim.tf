@@ -12,7 +12,7 @@ resource "kubernetes_config_map" "apim" {
       "ApimConfiguration__ServiceName"    = "sapience-lab-us-dev"
       "ApimConfiguration__SubscriptionId" = var.subscription_id
       "ApimConfiguration__ClientId"       = "nHCfXevT0sYIlyPdKKv4ZMcH8jFPsZPn"
-      "ApimConfiguration__Authority"      = "https://dev-piin5umt.auth0.com"
+      "ApimConfiguration__Authority"      = "https://login.dev.lab.sapienceanalytics.com"
       
   }
 }

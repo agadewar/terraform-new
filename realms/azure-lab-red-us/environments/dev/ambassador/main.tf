@@ -486,6 +486,18 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
+name:  sapience_kpi_api
+prefix: /kpis/
+service: sapience-kpi-api
+rewrite: /kpis/
+timeout_ms: 100000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
+---
+apiVersion: ambassador/v1
+kind:  Mapping
 name:  admin_dashboard_api_mapping
 prefix: /admin/dashboard/
 service: admin-dashboard-api

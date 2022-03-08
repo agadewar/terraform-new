@@ -5,6 +5,6 @@ resource "kubernetes_config_map" "integrations" {
   }
 
   data = { 
-      "AzureFuncSettings__BaseHost" = "https://azure-func-app-sapience-admin-integrations-api-lab-us-qa.azurewebsites.net"
+      "AzureFuncSettings__BaseHost" = "https://azure-admin-bulk-upload-lab-us-qa.azurewebsites.net"
    }
 }

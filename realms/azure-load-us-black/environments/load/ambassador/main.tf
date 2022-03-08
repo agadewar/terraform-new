@@ -62,8 +62,9 @@ resource "kubernetes_ingress" "api" {
       "kubernetes.io/ingress.class"        = "nginx"
       "kubernetes.io/tls-acme"             = "true"
       "nginx.ingress.kubernetes.io/proxy-connect-timeout" = "120"
-      "nginx.ingress.kubernetes.io/proxy-read-timeout" = "120"
-      "nginx.ingress.kubernetes.io/proxy-send-timeout" = "120"
+      "nginx.ingress.kubernetes.io/proxy-read-timeout"    = "120"
+      "nginx.ingress.kubernetes.io/proxy-send-timeout"    = "120"
+      "nginx.ingress.kubernetes.io/proxy-body-size"       = "50m"
     }
   }
 
@@ -421,7 +422,7 @@ kind:  Mapping
 name:  sapience_app_dashboard_mapping
 prefix: /dashboard/
 service: sapience-app-dashboard
-timeout_ms: 100000
+timeout_ms: 30000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -455,6 +456,18 @@ name:  admin_reports_api_mapping
 prefix: /admin/reports/
 service: admin-reports-api
 rewrite: /admin/reports/
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_kpi_api
+prefix: /kpis/
+service: sapience-kpi-api
+rewrite: /kpis/
+timeout_ms: 30000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS

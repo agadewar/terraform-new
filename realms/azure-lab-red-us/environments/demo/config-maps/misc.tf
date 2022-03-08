@@ -11,6 +11,7 @@ resource "kubernetes_config_map" "misc" {
       "LocalSwagger"                           =   "false"
       "API_URL"                                =   "http://sapience-app-alerts/alertrules/company/eval"
       "MicroserviceUrls__AdminSettingBaseUrl"  =   "https://api.demo.sapienceanalytics.com/admin/settings/"
+      "EnableNewGenerationEngine"              = true
 
       #UI
       "ENVIRONMENT_VUE_URL"                    =   "https://app.demo.sapienceanalytics.com"

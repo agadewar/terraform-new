@@ -76,7 +76,7 @@ data "terraform_remote_state" "service_bus" {
     access_key           = var.env_backend_access_key
     storage_account_name = var.env_backend_storage_account_name
     container_name       = var.env_backend_container_name
-    key                  = "../service-bus.tfstate"
+    key                  = "service-bus.tfstate"
   }
 }
 
@@ -87,7 +87,7 @@ data "terraform_remote_state" "database" {
     access_key           = var.env_backend_access_key
     storage_account_name = var.env_backend_storage_account_name
     container_name       = var.env_backend_container_name
-    key                  = "../database.tfstate"
+    key                  = "database.tfstate"
   }
 }
 
@@ -98,7 +98,7 @@ data "terraform_remote_state" "data_lake" {
     access_key           = var.env_backend_access_key
     storage_account_name = var.env_backend_storage_account_name
     container_name       = var.env_backend_container_name
-    key                  = "../data-lake.tfstate"
+    key                  = "data-lake.tfstate"
   }
 }
 

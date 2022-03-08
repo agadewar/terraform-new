@@ -20,5 +20,6 @@ resource "kubernetes_config_map" "misc" {
       "ENVIRONMENT_ENABLE_ADMIN_DASHBOARD"     =  true
 
       "MicroserviceUrls__AdminSettingBaseUrl"  =   "https://api.load.sapienceanalytics.com/admin/settings/"
+      "EnableNewGenerationEngine"              = true
   }
 }

@@ -395,7 +395,7 @@ resource "azurerm_mysql_database" "kpi1" {
   resource_group_name = var.resource_group_name
   server_name         = azurerm_mysql_server.sapience.name
   charset             = "utf8"
-  collation           = "utf8_unicode_ci"
+  collation           = "latin1_swedish_ci"
 }
 
 resource "azurerm_mysql_database" "leafbroker" {

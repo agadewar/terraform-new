@@ -51,9 +51,10 @@ locals {
   config_path = ".local/kubeconfig"
 
   cluster_name                 = "${var.realm}"
-  node_pool_profile_1_name    = "pool01"
-  node_pool_profile_2_name    = "pool02"
-  node_pool_profile_3_name    = "pool03"
+  node_pool_profile_1_name    = "system"
+  node_pool_profile_2_name    = "build"
+  node_pool_profile_3_name    = "query"
+  node_pool_profile_4_name    = "application"
   dns_prefix                   = "${var.realm}"
   linux_profile_admin_username = "sapience"
 
@@ -79,7 +80,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   dns_prefix          = local.dns_prefix
 
   kubernetes_version = var.kubernetes_version
-  
+
   network_profile {
             load_balancer_sku  = "Standard"
             network_plugin     = "kubenet"
@@ -110,7 +111,6 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   }
 
   addon_profile {
-    kube_dashboard { enabled = true }
 
     oms_agent {
       enabled = false
@@ -135,9 +135,36 @@ resource "azurerm_kubernetes_cluster_node_pool" "pool02" {
   enable_auto_scaling   = true
   min_count             = var.kubernetes_pool02_min_count
   max_count             = var.kubernetes_pool02_max_count
-  max_pods              = 250
+  max_pods             = 250
   vnet_subnet_id        = data.terraform_remote_state.network.outputs.aks-pool_subnet_id #ALL NODES MUST BELONG TO THE SAME SUBNET
 }
+
+resource "azurerm_kubernetes_cluster_node_pool" "pool03" {
+  name                  = local.node_pool_profile_3_name
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.kubernetes.id
+  vm_size               = var.kubernetes_pool03_vm_size
+  os_type               = var.kubernetes_pool03_os_type
+  os_disk_size_gb       = var.kubernetes_pool03_os_disk_size_gb
+  enable_auto_scaling   = true
+  min_count             = var.kubernetes_pool03_min_count
+  max_count             = var.kubernetes_pool03_max_count
+  max_pods             = 250
+  vnet_subnet_id        = data.terraform_remote_state.network.outputs.aks-pool_subnet_id #ALL NODES MUST BELONG TO THE SAME SUBNET
+}
+
+resource "azurerm_kubernetes_cluster_node_pool" "pool04" {
+  name                  = local.node_pool_profile_4_name
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.kubernetes.id
+  vm_size               = var.kubernetes_pool04_vm_size
+  os_type               = var.kubernetes_pool04_os_type
+  os_disk_size_gb       = var.kubernetes_pool04_os_disk_size_gb
+  enable_auto_scaling   = true
+  min_count             = var.kubernetes_pool04_min_count
+  max_count             = var.kubernetes_pool04_max_count
+  max_pods             = 250
+  vnet_subnet_id        = data.terraform_remote_state.network.outputs.aks-pool_subnet_id #ALL NODES MUST BELONG TO THE SAME SUBNET
+}
+
 
 resource "null_resource" "kubeconfig" {
   depends_on = [azurerm_kubernetes_cluster.kubernetes]
