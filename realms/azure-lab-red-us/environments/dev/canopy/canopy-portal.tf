@@ -68,7 +68,7 @@ resource "kubernetes_deployment" "canopy_portal_deployment" {
         container {
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-portal:3.16.0-beta.20210721200507807"
+          image = "${var.canopy_container_registry_hostname}/canopy-portal:3.20.1-beta.20211208175941323"
           name  = "canopy-portal"
 
           // fall back to prior URL lookup through environment variables, not through call to setting-service;
