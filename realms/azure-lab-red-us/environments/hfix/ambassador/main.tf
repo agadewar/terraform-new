@@ -178,6 +178,8 @@ apiVersion: ambassador/v1
 kind:  Mapping
 name:  canopy_auth0_service_mapping
 prefix: /auth0/
+add_response_headers:
+  SameSite: None
 service: canopy-auth0-service
 ---
 apiVersion: ambassador/v1
@@ -227,7 +229,6 @@ kind:  Mapping
 name:  canopy_user_service_mapping
 prefix: /user/
 service: canopy-user-service
-timeout_ms: 60000
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -241,17 +242,29 @@ circuit_breakers:
   max_pending_requests: 8000
   max_requests: 8000
 ---
-#apiVersion: ambassador/v1
-#kind:  Mapping
-#name:  eventpipeline_leaf_broker_eh_mapping
-#prefix: /leafbroker_eh/
-#service: eventpipeline-leaf-broker-eh
-#timeout_ms: 120000
-#connect_timeout_ms: 120000
-#circuit_breakers:
-#- max_connections: 8000
-#  max_pending_requests: 8000
-#  max_requests: 8000
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  eventpipeline_leaf_broker_eh_mapping
+prefix: /leafbroker_eh/
+service: eventpipeline-leaf-broker-eh
+timeout_ms: 120000
+connect_timeout_ms: 120000
+circuit_breakers:
+- max_connections: 8000
+  max_pending_requests: 8000
+  max_requests: 8000
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_external_integration
+prefix: /external/integration/
+service: sapience-third-party-integration-api
+rewrite: /external/integration/
+timeout_ms: 30000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -272,7 +285,7 @@ name:  admin_users_api_mapping
 prefix: /admin/users/
 service: admin-users-api
 rewrite: /admin/users/
-timeout_ms: 60000
+timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -307,6 +320,55 @@ name:  admin_org_api_mapping
 prefix: /admin/org/
 service: admin-org-api
 rewrite: /admin/org/
+timeout_ms: 10000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_app_kpi_api_mapping
+prefix: /app/kpi/
+service: sapience-app-kpi-api
+rewrite: /app/kpi/
+timeout_ms: 30000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_app_overview_api_mapping
+prefix: /app/overview/
+service: sapience-app-overview-api
+rewrite: /app/overview/
+timeout_ms: 30000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_app_trends_api_mapping
+prefix: /app/trends/
+service: sapience-app-trends-api
+rewrite: /app/trends/
+timeout_ms: 30000
+cors:
+  origins: "*"
+  methods: GET, POST, PUT, DELETE, OPTIONS
+  headers: Content-Type, Authorization, v-request-id, SisenseToken  
+---
+apiVersion: ambassador/v1
+kind:  Mapping
+name:  sapience_app_stats_api_mapping
+prefix: /app/stats/
+service: sapience-app-stats-api
+rewrite: /app/stats/
+timeout_ms: 30000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -321,7 +383,7 @@ timeout_ms: 30000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id, SisenseToken, Origin
+  headers: Content-Type, Authorization, v-request-id, SisenseToken
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
@@ -335,23 +397,11 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
-name:  sapience_external_integration
-prefix: /external/integration/
-service: sapience-third-party-integration-api
-rewrite: /external/integration/
-timeout_ms: 30000
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id, SisenseToken
----
-apiVersion: ambassador/v1
-kind:  Mapping
 name:  admin_uploads_api_mapping
 prefix: /admin/uploads/
 service: admin-uploads-api
 rewrite: /admin/uploads/
-timeout_ms: 30000
+timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -373,7 +423,7 @@ kind:  Mapping
 name:  sapience_app_dashboard_mapping
 prefix: /dashboard/
 service: sapience-app-dashboard
-timeout_ms: 200000
+timeout_ms: 20000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -414,95 +464,10 @@ cors:
 ---
 apiVersion: ambassador/v1
 kind:  Mapping
-name:  sapience_app_kpi_api_mapping
-prefix: /app/kpi/
-service: sapience-app-kpi-api
-rewrite: /app/kpi/
-timeout_ms: 10000
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id, SisenseToken
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  sapience_app_stats_api_mapping
-prefix: /app/stats/
-service: sapience-app-stats-api
-rewrite: /app/stats/
-timeout_ms: 10000
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id, SisenseToken
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  sapience_app_overview_api_mapping
-prefix: /app/overview/
-service: sapience-app-overview-api
-rewrite: /app/overview/
-timeout_ms: 10000
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id, SisenseToken
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  sapience_app_trends_api_mapping
-prefix: /app/trends/
-service: sapience-app-trends-api
-rewrite: /app/trends/
-timeout_ms: 10000
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id, SisenseToken
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  admin_app_activity_uploads_api
-prefix: /admin/upload/appurls/
-service: admin-app-activity-uploads-api
-rewrite: /admin/upload/appurls/
-timeout_ms: 100000
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id, SisenseToken
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  sapience_app_employee_api
-prefix: /app/employee/
-service: sapience-app-employee-api
-rewrite: /app/employee/
-timeout_ms: 100000
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id, SisenseToken
----
-apiVersion: ambassador/v1
-kind:  Mapping
-name:  sapience_kpi_api
-prefix: /kpis/
-service: sapience-kpi-api
-rewrite: /kpis/
-timeout_ms: 100000
-cors:
-  origins: "*"
-  methods: GET, POST, PUT, DELETE, OPTIONS
-  headers: Content-Type, Authorization, v-request-id, SisenseToken
----
-apiVersion: ambassador/v1
-kind:  Mapping
 name:  admin_dashboard_api_mapping
 prefix: /admin/dashboard/
 service: admin-dashboard-api
 rewrite: /admin/dashboard/
-timeout_ms: 100000
 cors:
   origins: "*"
   methods: GET, POST, PUT, DELETE, OPTIONS
@@ -518,8 +483,6 @@ EOF
     }
   }
 }
-
-# resource "kubernetes_deployment" "statsd_sink" {
 #   metadata {
 #     # creation_timestamp = null
 #     name = "statsd-sink"
@@ -601,6 +564,7 @@ EOF
 #     timestamp = "${timestamp()}"   # DELETE ME
 #   }
 #   provisioner "local-exec" {
-#     command = "kubectl apply --kubeconfig=${local.config_path} -n dev -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
+#     command = "kubectl apply --kubeconfig=${local.config_path} -n qa -f -<<EOF\n${file("files/statsd-sink.yaml")}\nEOF"
 #   }
 # }
+

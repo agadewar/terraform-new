@@ -442,3 +442,53 @@ resource "azurerm_function_app" "function_app_sapience_admin_integrations_api" {
       "Integration:Collections:IntegrationEvents" =  "Integration_Events"
   }
 }
+
+resource "azurerm_app_service_plan" "service_plan_admin_core" {
+  name                = "azure-fun-service-plan-sap-admin-core-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+
+  sku {
+    tier = "Standard"
+    size = "S1"
+  }
+}
+
+resource "azurerm_function_app" "function_app_sapience_admin_core" {
+  name                = "azure-functions-app-sapience-admin-core-${var.realm}-${var.environment}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+  app_service_plan_id = azurerm_app_service_plan.service_plan_admin_core.id
+  #app_settings               = var.function_app_admin_users  
+  storage_connection_string = azurerm_storage_account.sapience_functions_admin_core.primary_connection_string
+  version                   = "5.0"
+
+  app_settings = {
+    FUNCTIONS_WORKER_RUNTIME                 = "dotnet"
+    WEBSITE_ENABLE_SYNC_UPDATE_SITE          = true
+    WEBSITE_RUN_FROM_PACKAGE                 = 1
+    Connection                               = "Endpoint=sb://sapience-${var.realm}-${var.environment}.servicebus.windows.net/;SharedAccessKeyName=Subscribe;SharedAccessKey=/PWQZJwtG9LOKdJG0xK1hHucIgB24GDqlj5nuWIuyNw="
+    FUNCTIONS_WORKER_RUNTIME                 = "dotnet"
+    WEBSITE_ENABLE_SYNC_UPDATE_SITE          = true
+    WEBSITE_RUN_FROM_PACKAGE                 = 1
+    AzureServiceBus__UserCreatedEndpoint     = "Endpoint=sb://sapience-lab-us-qa.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=x9D7XYbxSiMMVssulaXMBn4Q12u7SEHX1pqAkAToGJQ=;"
+    AzureServiceBus__UserDeletedEndpoint     = "Endpoint=sb://sapience-lab-us-qa.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=JzwF1gV5j3J19tXwUFR94d9UFu3Nw+8R5nJu6w1XywI=;"
+    AzureServiceBus__UserUpdatedEndpoint     = "Endpoint=sb://sapience-lab-us-qa.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=+Eroe177bx7QH4Rxa27w/4JcQz+V/MQoioODtdYYR3Q=;"
+    AzureServiceBus__UserActivatedEndpoint   = "Endpoint=sb://sapience-lab-us-qa.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=gVRdguOg57vdiENhEJtGtCmplyofHajJE4Le+wIxzMc=;"
+    AzureServiceBus__UserDeactivatedEndpoint = "Endpoint=sb://sapience-lab-us-qa.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=8dLg1rD+Wef/yCBEv0iMMCnXdoL+Rbd1+rPfrbiW/A8=;"
+    AzureServiceBus__TeamCreatedEndpoint     = "Endpoint=sb://sapience-lab-us-qa.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=9dul+PfKkRmhv4lCUArkN99RfmSYEON28DAL+tQ6Kcs=;"
+    AzureServiceBus__TeamDeletedEndpoint     = "Endpoint=sb://sapience-lab-us-qa.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=EIlG8bZWeJ/ypzFmMJ+wPElD/iiLx5bJN6hfBqAmzYU=;"
+    AzureServiceBus__TeamUpdatedEndpoint     = "Endpoint=sb://sapience-lab-us-qa.servicebus.windows.net/;SharedAccessKeyName=Publish;SharedAccessKey=OLmzMRHwkQuX0UkeiwTD3GkvOYp4VxlR3Oc47GQFw4g=;"
+    ConnectionStrings__Admin                 = "Data Source=sapience-lab-us-qa.database.windows.net;Database=Admin;User=appsvc_api_user;Password=T9TbZHe8BnoZapR4JRkU;"
+  }
+}
+
+resource "azurerm_storage_account" "sapience_functions_admin_core" {
+  name                     = "sapadmincorefn${replace(lower(var.realm), "-", "")}${var.environment}"
+  resource_group_name      = var.resource_group_name
+  location                 = "eastus2"
+  account_tier             = "Standard"
+  account_replication_type = "GRS"
+
+  tags = merge(local.common_tags, {})
+}
