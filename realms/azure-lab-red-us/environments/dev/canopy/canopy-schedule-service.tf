@@ -66,7 +66,7 @@ resource "kubernetes_deployment" "canopy_schedule_service_deployment" {
         container {
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-schedule-service:1.3.0"
+          image = "${var.canopy_container_registry_hostname}/canopy-schedule-service:1.4.0-20220328160955774"
           name  = "canopy-schedule-service"
 
           env { 

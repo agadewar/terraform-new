@@ -66,7 +66,7 @@ resource "kubernetes_deployment" "canopy_notification_service_deployment" {
         container {
           
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-notification-service:1.11.5"
+          image = "${var.canopy_container_registry_hostname}/canopy-notification-service:1.12.0"
           name  = "canopy-notification-service"
 
           env { 
