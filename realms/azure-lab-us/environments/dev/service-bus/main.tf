@@ -169,6 +169,16 @@ resource "azurerm_servicebus_queue" "canopy-device-system-info" {
 
   }
 
+  resource "azurerm_servicebus_queue" "dummy" {
+  name                = "dummy"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_servicebus_namespace.namespace.name
+  max_size_in_megabytes = 1024
+
+  enable_partitioning = false
+
+  }
+
  resource "azurerm_servicebus_queue" "canopy-location-action-scheduler" {
   name                = "canopy-location-action-scheduler"
   resource_group_name = var.resource_group_name

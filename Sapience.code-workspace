@@ -8,6 +8,15 @@
         },
         {
             "path": "../open-cluster-access"
+        },
+        {
+            "path": "../sapience-demo-data-monitor"
+        },
+        {
+            "path": "../terraform-azurerm-admin-apim"
+        },
+        {
+            "path": "../leaf_dist"
         }
     ]
 }

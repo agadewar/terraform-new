@@ -24,7 +24,7 @@ resource "kubernetes_config_map" "misc" {
       "ENVIRONMENT_SISENSETYPE"              =  "js"
       "ENVIRONMENT_ENABLE_ADMIN_REPORTS"     =  true
       "ENVIRONMENT_ENABLE_ADMIN_DASHBOARD"   =  true
-      "ENVIRONMENT_SWITCH_SISENSE_TO_DB"     =  false
+      "ENVIRONMENT_SWITCH_SISENSE_TO_DB"     =  true
       "ENVIRONMENT_SISENSE_DATASOURCE_NAME"  =  "Dev"
 
       

@@ -85,7 +85,7 @@ variable "mysql_canopy_password" {}
 variable "canopy_service_account_username" {}
 variable "canopy_service_account_password" {}
 
-variable "canopy_security_jwt_secret" {}
+variable "canopy_security_jwt_key" {}
 
 variable "google_api_key" {
   default = ""

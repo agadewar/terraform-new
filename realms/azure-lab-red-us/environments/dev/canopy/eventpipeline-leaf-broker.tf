@@ -163,7 +163,8 @@ resource "kubernetes_deployment" "eventpipeline_leafbroker_deployment" {
             value = "log:io.canopy.leaf.broker.service.EventServiceKakfa?showHeaders=true&level=ERROR"
           }
           env {
-            name  = "camel.io.canopy.leaf.broker.service.eventservice.producer.event-ingestion-target-legacy"
+            #name  = "camel.io.canopy.leaf.broker.service.eventservice.producer.event-ingestion-target-legacy"
+            name   = "camel.io.canopy.leaf.broker.producer.event-target-uri"
             value = "kafka://canopy-eventpipeline?brokers=$${kafka.bootstrap.servers}&securityProtocol=SASL_SSL&saslMechanism=PLAIN&saslJaasConfig=RAW(org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$${KAFKA_USERNAME}\" password=\"$${KAFKA_PASSWORD}\";)&sslEndpointAlgorithm=https"
           }
 

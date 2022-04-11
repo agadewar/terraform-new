@@ -25,7 +25,7 @@ resource "kubernetes_secret" "canopy_user_service" {
     "canopy.service-account.password" = var.canopy_service_account_password
     "kafka.username"                  = var.kafka_username
     "kafka.password"                  = var.kafka_password
-    "canopy.security.jwt.secret"      = var.canopy_security_jwt_secret
+    "canopy.security.jwt.key"      = var.canopy_security_jwt_key
   }
 
   type = "Opaque"
@@ -71,7 +71,7 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
         container {
 
           # See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-          image = "${var.canopy_container_registry_hostname}/canopy-user-service:2.21.0-20220328161327057"
+          image = "${var.canopy_container_registry_hostname}/canopy-user-service:2.21.0-20220404135603513"
           name  = "canopy-user-service"
 
           env { 
@@ -266,11 +266,11 @@ resource "kubernetes_deployment" "canopy_user_service_deployment" {
             value = "https://sapienceanalytics.com"
           }
           env {
-            name  = "canopy.security.jwt.secret"
+            name  = "canopy.security.jwt.key"
             value_from {
                 secret_key_ref {
                   name = "canopy-user-service"
-                  key  = "canopy.security.jwt.secret"
+                  key  = "canopy.security.jwt.key"
                 }
               }
           }
